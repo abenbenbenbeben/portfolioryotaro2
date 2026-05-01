@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Ryotaro Portfolio</title><link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@300;500;700&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{
+  --sidebar-width: 360px;
+  --ui-shift: calc(var(--sidebar-width) / 2);
+}html{ scrollbar-gutter: stable; }
+body{ overflow-y: scroll; }
+
+:root{
+  --sidebar-width: 360px;
+  --ui-shift: calc(var(--sidebar-width) / 2);
+}
+
+*{ box-sizing: border-box; }  /* ←これを追加 */
+
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  overscroll-behavior: none;
+  background: #000;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: none;
+}
+
+canvas { display: block; }
+
+/* マウストレイル */
+#trail {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+
+/* ===== Left UI (Profile Style) ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100%;
+  padding: 30px 26px 24px;
+  border-right: 1px solid rgba(255,255,255,0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background:
+    radial-gradient(1200px 800px at -200px -200px, rgba(255,255,255,0.08), transparent 55%),
+    linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+  z-index: 30;
+  color: #fff;
+  font-family: "Shippori Mincho", serif;
+}
+.sidebar .logo{
+  padding: 6px 4px 4px;
+}
+.sidebar .logo img{
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 18px rgba(255,255,255,0.25));
+}
+.text-panel{
+  background: rgba(0,0,0,0.58);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
+  padding: 16px 14px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.55);
+}
+.info h1{
+  margin: 0 0 10px 0;
+  font-size: 17px;
+  letter-spacing: .22em;
+}
+.info p{
+  margin: 0;
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  font-size: 11px;
+  line-height: 2.0;
+  color: rgba(255,255,255,0.7);
+}
+
+/* メニュー */
+.menu{
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  padding-left: 16px;
+}
+.menu a{
+  color: #fff;
+  text-decoration: none;
+  opacity: .86;
+  position: relative;
+  padding-left: 6px;
+}
+.menu a:before{
+  content:"";
+  position:absolute;
+  left:-6px;
+  top:50%;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background: rgba(255,255,255,0.55);
+  transform: translateY(-50%);
+  opacity:0;
+  transition: opacity .2s ease;
+}
+.menu a:hover{
+  opacity: 1;
+}
+.menu a:hover:before{
+  opacity:1;
+}
+
+
+/* ===== Layout Toggle ===== */
+.layout-toggle {
+  position: fixed;
+  top: 36px;
+  right: 36px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  z-index: 35;
+}
+.mode-label {
+  color:#fff;
+  font-size:10px;
+  letter-spacing:.3em;
+  opacity:.6;
+  padding: 8px 6px 8px 10px;
+}
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: .25em;
+  padding: 8px 14px;
+  opacity: .5;
+  cursor: pointer;
+  font-family: inherit;
+}
+.toggle-btn.active {
+  opacity: 1;
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+}
+
+/* ===== Loader ===== */
+.loader {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 50;
+  overflow: hidden;
+  transition: opacity .35s ease;
+}
+.loader.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+.loader-ui {
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===== Loader Floating Images (5枚) ===== */
+.loader-floats {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.loader-float {
+  position: absolute;
+  width: 760px;
+  height: auto;
+  opacity: .9;
+  filter: drop-shadow(0 0 22px rgba(255,255,255,.3));
+  will-change: transform;
+}
+.loader-float.f1 { left: -12%; top: -8%; }
+.loader-float.f2 { right: -18%; top: 6%; }
+.loader-float.f3 { left: 6%; bottom: -14%; }
+.loader-float.f4 { right: 4%; bottom: -12%; }
+.loader-float.f5 { left: 36%; top: 30%; }
+
+.loader-ring {
+  position:relative;
+  width:160px;
+  height:160px;
+}
+.percent {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:16px;
+  letter-spacing:.2em;
+}
+.loading-text {
+  margin-top:16px;
+  font-size:11px;
+  letter-spacing:.4em;
+  color:#fff;
+  opacity:.6;
+}
+
+/* 回る縁 */
+#ring {
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  animation: ringSpin 1.2s linear infinite;
+}
+@keyframes ringSpin {
+  from { transform: rotate(-90deg); }
+  to   { transform: rotate(270deg); }
+}
+
+/* ===== Custom Cursor ===== */
+.cursor {
+  position:fixed;
+  top:0; left:0;
+  pointer-events:none;
+  z-index:100;
+}
+.cursor-dot {
+  width:6px;
+  height:6px;
+  background:#fff;
+  border-radius:50%;
+  position:absolute;
+  transform:translate(-50%,-50%);
+  transition:transform .2s ease, background .2s ease;
+}
+.cursor-ring {
+  width:48px;
+  height:48px;
+  border:1px solid rgba(255,255,255,.6);
+  border-radius:50%;
+  position:absolute;
+  transform:translate(-50%,-50%);
+  transition:transform .2s ease, opacity .2s ease, border-color .2s ease;
+}
+.cursor-text {
+  position:absolute;
+  top:60px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#fff;
+  font-size:10px;
+  letter-spacing:.2em;
+  opacity:0;
+  transition:opacity .2s;
+}
+.cursor.active .cursor-ring {
+  transform:translate(-50%,-50%) scale(1.7);
+}
+.cursor.active .cursor-text {
+  opacity:.8;
+}
+
+/* ===== Cursor Hover Gray ===== */
+.cursor.gray .cursor-dot { background: #9b9b9b; }
+.cursor.gray .cursor-ring { border-color: rgba(180,180,180,.8); }
+
+/* ===== Cursor Hover Scale (dot only) ===== */
+.cursor.hover .cursor-dot {
+  transform: translate(-50%,-50%) scale(2.2);
+}
+
+/* ===== Cursor Press on Image (dot bigger) ===== */
+.cursor.press .cursor-dot {
+  transform: translate(-50%,-50%) scale(3.2);
+}
+
+/* ===== UI ===== */
+.title {
+  position:fixed;
+  top:48px;
+  left:calc(50% + var(--ui-shift));
+  transform:translateX(-50%);
+  color:#fff;
+  font-size:22px;
+  letter-spacing:.25em;
+  z-index:10;
+}
+.counter {
+  position:fixed;
+  bottom:18px;
+  left:calc(50% + var(--ui-shift));
+  transform:translateX(-50%);
+  color:#fff;
+  opacity:.8;
+  z-index:10;
+}
+
+/* ===== Arrows ===== */
+.arrow {
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:72px;
+  color:#fff;
+  opacity:.35;
+  cursor:pointer;
+  z-index:20;
+  user-select:none;
+}
+.arrow.left { left: calc(var(--sidebar-width) + 100px); }
+.arrow.right { right:50px; }
+.arrow:hover{opacity:.9}
+
+/* ===== Responsive ===== */
+@media (max-width: 1100px){
+  :root{ --sidebar-width: 300px; }
+  .sidebar{ padding:24px 20px; }
+  .menu{ font-size:20px; gap:26px; letter-spacing:.22em; }
+  .info h1{ font-size:16px; }
+  .info p{ font-size:10px; }
+  .hero h1{ font-size:26px; }
+}
+
+@media (max-width: 820px){
+  :root{ --sidebar-width: 240px; }
+  .sidebar{ padding:20px 16px; }
+  .sidebar .logo img{ max-width:220px; }
+  .text-panel{ padding:12px; }
+  .menu{ font-size:18px; gap:22px; letter-spacing:.2em; padding-left:10px; }
+  .hero h1{ font-size:22px; }
+}
+
+@media (max-width: 640px){
+  :root{ --sidebar-width: 190px; }
+  .sidebar{ padding:16px 12px; }
+  .sidebar .logo img{ max-width:180px; }
+  .info h1{ font-size:14px; letter-spacing:.18em; }
+  .info p{ font-size:9px; line-height:1.8; }
+  .menu{ font-size:15px; gap:16px; letter-spacing:.16em; }
+  .menu a:before{ display:none; }
+  .meta{ font-size:9px; letter-spacing:.1em; }
+}
+
+@media (max-width: 480px){
+  :root{ --sidebar-width: 160px; }
+  .sidebar{ padding:12px 10px; }
+  .sidebar .logo img{ max-width:150px; }
+  .menu{ font-size:13px; gap:12px; letter-spacing:.14em; }
+  .text-panel{ padding:10px; }
+}
+
+</style>
+</head>
+
+<!-- ここからUI -->
+<body>
+  <aside class="sidebar">
+    <div class="logo"><img src="logo.png" alt="logo"></div>
+    <div class="text-panel info">
+      <h1>良太郎 / Ryotaro</h1>
+      <p>アート / デザイン / ビジュアル表現<br>静けさの中にある揺らぎと光を表現しています。</p>
+    </div>
+    <nav class="menu">
+      <a href="profile.html">PROFILE</a>
+      <a href="file:///Users/ryotaro/Desktop/portfolio:%E3%81%AE%E3%82%B3%E3%83%92%E3%82%9A%E3%83%BC/honban.html">DESIGN</a>
+      <a href="javascript:void(0)">ILLUSTRATION</a>
+      <a href="javascript:void(0)">CONTACT</a>
+    </nav>
+  
+</aside>
+
+<div class="layout-toggle">
+  <span class="mode-label">MODE</span>
+  <button class="toggle-btn active" data-mode="ring">RING</button>
+  <button class="toggle-btn" data-mode="sphere">SPHERE</button>
+</div>
+<!-- ここまでのUI -->
+
+
+<!-- Loader -->
+<div class="loader" id="loader">
+  <div class="loader-floats" id="loaderFloats">
+    <img class="loader-float f1" src="loader-image.png" alt="">
+    <img class="loader-float f2" src="loader-image2.png" alt="">
+    <img class="loader-float f3" src="loader-image3.png" alt="">
+    <img class="loader-float f4" src="loader-image4.png" alt="">
+    <img class="loader-float f5" src="loader-image5.png" alt="">
+  </div>
+  <div class="loader-ui">
+    <div class="loader-ring">
+      <svg width="160" height="160">
+        <circle cx="80" cy="80" r="68"
+          stroke="rgba(255,255,255,.2)"
+          stroke-width="2" fill="none"/>
+        <circle id="ring"
+          cx="80" cy="80" r="68"
+          stroke="#fff"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"
+        />
+      </svg>
+      <div class="percent" id="percent">0%</div>
+    </div>
+    <div class="loading-text">LOADING</div>
+  </div>
+</div>
+
+<canvas id="trail"></canvas>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor">
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+  <div class="cursor-text">DRAG</div>
+</div>
+
+<!-- Arrows -->
+<div class="arrow left" id="arrowLeft">‹</div>
+<div class="arrow right" id="arrowRight">›</div>
+
+<div class="title" id="title"></div>
+<div class="counter" id="counter"></div>
+
+<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+<script>
+/* ここからJSは元のまま（動作維持） */
+const cursor = document.getElementById("cursor");
+const ringText = cursor.querySelector(".cursor-text");
+let cx=0, cy=0, tx=0, ty=0;
+
+addEventListener("mousemove",e=>{
+  tx=e.clientX; ty=e.clientY;
+});
+function cursorLoop(){
+  cx += (tx-cx)*0.2;
+  cy += (ty-cy)*0.2;
+  cursor.style.transform=`translate(${cx}px,${cy}px)`;
+  requestAnimationFrame(cursorLoop);
+}
+cursorLoop();
+addEventListener("mousedown",()=>{
+  cursor.classList.add("active");
+  ringText.textContent="DRAG";
+});
+addEventListener("mouseup",()=>{
+  cursor.classList.remove("active");
+  cursor.classList.remove("press");
+  ringText.textContent="VIEW";
+});
+
+const floatEls = Array.from(document.querySelectorAll(".loader-float"));
+const floatData = floatEls.map((el)=>({
+  el,
+  seed: Math.random()*1000,
+  ampX: 140 + Math.random()*80,
+  ampY: 120 + Math.random()*80,
+  ampR: 6 + Math.random()*6,
+  ampS: 0.08 + Math.random()*0.06,
+  spd: 0.6 + Math.random()*0.6,
+  spd2: 0.7 + Math.random()*0.5
+}));
+
+function animateLoaderFloats(t){
+  const time = t * 0.001;
+  for(const d of floatData){
+    const nx = Math.sin(time*d.spd + d.seed);
+    const ny = Math.cos(time*d.spd2 + d.seed*1.7);
+    const nr = Math.sin(time*0.9 + d.seed*0.3);
+    const ns = Math.cos(time*0.7 + d.seed*0.5);
+
+    const x = nx * d.ampX;
+    const y = ny * d.ampY;
+    const r = nr * d.ampR;
+    const s = 1 + ns * d.ampS;
+    d.el.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg) scale(${s})`;
+  }
+  requestAnimationFrame(animateLoaderFloats);
+}
+requestAnimationFrame(animateLoaderFloats);
+
+const trailCanvas = document.getElementById("trail");
+const tctx = trailCanvas.getContext("2d");
+let trailPoints = [];
+function resizeTrail(){
+  trailCanvas.width = innerWidth;
+  trailCanvas.height = innerHeight;
+}
+resizeTrail();
+
+addEventListener("mousemove", e=>{
+  trailPoints.push({x:e.clientX, y:e.clientY, t: performance.now()});
+  if(trailPoints.length > 80) trailPoints.shift();
+});
+addEventListener("mouseleave", ()=>{
+  trailPoints = [];
+});
+
+function drawTrail(){
+  const now = performance.now();
+  while(trailPoints.length && now - trailPoints[0].t > 420) trailPoints.shift();
+  tctx.clearRect(0,0,trailCanvas.width, trailCanvas.height);
+  if(trailPoints.length < 2) return;
+
+  tctx.lineCap = "round";
+  tctx.lineJoin = "round";
+
+  for(let i=1;i<trailPoints.length;i++){
+    const p0 = trailPoints[i-1];
+    const p1 = trailPoints[i];
+    const age = (now - p1.t) / 420;
+    const alpha = Math.max(0, 0.35 * (1 - age));
+    const width = 1.6 * (1 - age) + 0.2;
+
+    tctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+    tctx.lineWidth = width;
+    tctx.beginPath();
+    tctx.moveTo(p0.x, p0.y);
+    tctx.lineTo(p1.x, p1.y);
+    tctx.stroke();
+  }
+}
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,200);
+
+
+const ringCamZ=15;
+const sphereCamZ=22;
+let targetCamZ=ringCamZ;
+
+const CAMERA_SHIFT_PX =450;
+function applyCameraShift(){
+  const shift = (CAMERA_SHIFT_PX / innerWidth) * camera.getFilmWidth();
+  camera.filmOffset = -shift;
+  camera.updateProjectionMatrix();
+}
+applyCameraShift();
+
+// そのあと
+camera.position.z=ringCamZ;
+
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(devicePixelRatio);
+renderer.domElement.style.touchAction = "none";
+document.body.appendChild(renderer.domElement);
+
+const particleCount = 1200;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(particleCount * 3);
+for(let i=0;i<particleCount;i++){
+  pPos[i*3+0] = (Math.random()-0.5)*60;
+  pPos[i*3+1] = (Math.random()-0.5)*60;
+  pPos[i*3+2] = (Math.random()-0.5)*60;
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+const pMat = new THREE.PointsMaterial({
+  color: 0xffffff,
+  size: 0.08,
+  transparent: true,
+  opacity: 0.7,
+  depthWrite: false
+});
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+hovering = false;
+let hoverObj = null;
+
+addEventListener("mousemove", e => {
+  mouse.x = (e.clientX / innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+});
+
+const COUNT = 15;
+const images=[...Array(COUNT)].map((_,i)=>`https://picsum.photos/1400/900?random=${i+1}`);
+const toZenkaku = (n) => n.toString().replace(/[0-9]/g, d =>
+  String.fromCharCode(d.charCodeAt(0) + 0xFEE0)
+);
+const titles = Array.from({length: COUNT}, (_,i)=>`${toZenkaku(i+1)}.com`);
+const links = Array.from({length: COUNT}, (_,i)=>`https://${i+1}.com`);
+
+const STEP=Math.PI*2/COUNT;
+const RING_RADIUS=12.5;
+const SPHERE_RADIUS=12;
+const SPHERE_SCALE=0.85;
+
+const CENTER_OPACITY = 1.0;
+const OTHER_OPACITY = 0.15;
+
+const percent=document.getElementById("percent");
+const ring=document.getElementById("ring");
+const loader=document.getElementById("loader");
+const CIRC=2*Math.PI*68;
+ring.style.strokeDasharray=CIRC;
+ring.style.strokeDashoffset=CIRC;
+let loaded=0;
+let ready=false;
+
+const navEntry = performance.getEntriesByType("navigation")[0];
+const isBackForward = navEntry && navEntry.type === "back_forward";
+const skipFlag = sessionStorage.getItem("skipLoader") === "1";
+if (isBackForward || skipFlag) {
+  loader.classList.add("hide");
+  ready = true;
+  percent.textContent = "100%";
+  ring.style.strokeDashoffset = 0;
+}
+if (!isBackForward) sessionStorage.removeItem("skipLoader");
+
+window.addEventListener("pageshow", (e)=>{
+  if (e.persisted) {
+    loader.classList.add("hide");
+    ready = true;
+  }
+});
+
+setTimeout(()=>{
+  if(!ready){
+    loader.classList.add("hide");
+    ready = true;
+  }
+}, 3500);
+
+function loadedOne(){
+  loaded++;
+  const p=loaded/COUNT;
+  percent.textContent=`${Math.round(p*100)}%`;
+  ring.style.strokeDashoffset=CIRC*(1-p);
+  if(p===1){
+    setTimeout(()=>{
+      if (!ready) {
+        loader.classList.add("hide");
+        ready=true;
+      }
+    },200);
+  }
+}
+
+const group = new THREE.Group();
+scene.add(group);
+
+
+
+const spherePositions=[];
+const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+for(let i=0;i<COUNT;i++){
+  const y = 1 - (i / (COUNT - 1)) * 2;
+  const r = Math.sqrt(1 - y*y);
+  const theta = goldenAngle * i;
+  spherePositions.push(new THREE.Vector3(
+    Math.cos(theta) * r * SPHERE_RADIUS,
+    y * SPHERE_RADIUS,
+    Math.sin(theta) * r * SPHERE_RADIUS
+  ));
+}
+
+const texLoader=new THREE.TextureLoader();
+const meshes=[];
+images.forEach((url,i)=>{
+  const mat=new THREE.MeshBasicMaterial({
+    color:0xffffff, transparent:true, opacity:1,
+    side: THREE.DoubleSide
+  });
+  texLoader.load(
+    url,
+    t=>{mat.map=t;mat.needsUpdate=true;loadedOne();},
+    undefined,
+    loadedOne
+  );
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(9,6),mat);
+  m.userData.index = i;
+  group.add(m);
+  meshes.push(m);
+});
+
+let layoutMode = "ring";
+const layoutButtons = document.querySelectorAll(".toggle-btn");
+
+let currentIndex = 0;
+let sphereCenterIndex = 0;
+let sphereCenteredEnough = false;
+let ringCenterIndex = 0;
+
+function setLayout(mode){
+  layoutMode = mode;
+  layoutButtons.forEach(b=>b.classList.toggle("active", b.dataset.mode===mode));
+
+  if(mode==="ring"){
+    targetCamZ = ringCamZ;
+    ringSnap = currentIndex;
+    ringIndex = currentIndex;
+    ringVel = 0;
+    ringScale = ringBaseScale;
+    group.rotation.set(0,0,0);
+    targetRotX = 0;
+    targetRotY = 0;
+    velX = 0;
+    velY = 0;
+  }else{
+    targetCamZ = sphereCamZ;
+    snapToIndex(currentIndex);
+  }
+}
+layoutButtons.forEach(btn=>{
+  btn.addEventListener("click", ()=>setLayout(btn.dataset.mode));
+});
+
+let ringIndex=0, ringSnap=0, ringVel=0, ringScale=1;
+let ringPointerDown=false, ringDrag=false, ringDragMoved=false;
+let ringLastX=0, ringStartX=0;
+const ringBaseScale=1.6, ringDragScale=.7;
+
+let sphereDragging=false;
+let sphereDragMoved=false;
+let sphereStartX=0,sphereStartY=0;
+let sphereLastX=0,sphereLastY=0;
+let targetRotX=0,targetRotY=0;
+let velX=0,velY=0;
+
+function isUIEvent(e){
+  const t = e.target;
+  return t && t.closest ? t.closest(".menu, .layout-toggle, .arrow") : false;
+}
+
+let lastPinchSwitch = 0;
+const PINCH_SWITCH_COOLDOWN = 250;
+const PINCH_THRESHOLD = 0.03;
+
+function switchToRing(){
+  if(layoutMode === "ring") return;
+  currentIndex = sphereCenterIndex;
+  setLayout("ring");
+}
+function switchToSphere(){
+  if(layoutMode === "sphere") return;
+  currentIndex = ringCenterIndex;
+  setLayout("sphere");
+}
+
+function handlePinchSwitch(deltaY){
+  const now = performance.now();
+  if(now - lastPinchSwitch < PINCH_SWITCH_COOLDOWN) return;
+
+  if(deltaY < -2){
+    lastPinchSwitch = now;
+    switchToRing();
+  }else if(deltaY > 2){
+    lastPinchSwitch = now;
+    switchToSphere();
+  }
+}
+
+let gestureActive = false;
+let gestureStartScale = 1;
+
+addEventListener("gesturestart", (e)=>{
+  gestureActive = true;
+  gestureStartScale = e.scale || 1;
+  e.preventDefault();
+}, {passive:false});
+
+addEventListener("gesturechange", (e)=>{
+  if(!gestureActive) return;
+  e.preventDefault();
+  const scale = e.scale || 1;
+  if(scale > gestureStartScale + PINCH_THRESHOLD){
+    switchToRing();
+  }else if(scale < gestureStartScale - PINCH_THRESHOLD){
+    switchToSphere();
+  }
+}, {passive:false});
+
+addEventListener("gestureend", ()=>{
+  gestureActive = false;
+});
+
+addEventListener("mousedown",e=>{
+  if(isUIEvent(e)) return;
+
+  if(layoutMode==="ring"){
+    ringPointerDown=true;
+    ringDrag=false;
+    ringDragMoved=false;
+    ringStartX=e.clientX;
+    ringLastX=e.clientX;
+    ringVel=0;
+  }else{
+    sphereDragging=true;
+    sphereDragMoved=false;
+    sphereStartX=e.clientX;
+    sphereStartY=e.clientY;
+    sphereLastX=e.clientX;
+    sphereLastY=e.clientY;
+    velX=0; velY=0;
+  }
+});
+addEventListener("mousemove",e=>{
+  if(layoutMode==="ring" && ringPointerDown){
+    if(Math.abs(e.clientX-ringStartX)>4){
+      ringDrag=true;
+      ringDragMoved=true;
+    }
+    if(ringDrag){
+      ringVel-=(e.clientX-ringLastX)*0.002;
+      ringLastX=e.clientX;
+    }
+  }
+  if(layoutMode==="sphere" && sphereDragging){
+    const dx = e.clientX - sphereLastX;
+    const dy = e.clientY - sphereLastY;
+    if(Math.abs(e.clientX-sphereStartX)>4 || Math.abs(e.clientY-sphereStartY)>4) sphereDragMoved=true;
+    velY = dx * 0.003;
+    velX = dy * 0.003;
+    targetRotY += velY;
+    targetRotX += velX;
+    sphereLastX = e.clientX;
+    sphereLastY = e.clientY;
+  }
+});
+addEventListener("mouseup",()=>{
+  if(layoutMode==="ring"){
+    ringPointerDown=false;
+    if(ringDragMoved){
+      ringDrag=false;
+      ringSnap = Math.round(ringIndex);
+    }else if(hoverObj){
+      const idx = hoverObj.userData.index;
+      const isCentered = idx === currentIndex && Math.abs(ringIndex - Math.round(ringIndex)) < 0.12;
+      if(isCentered && links[idx] && ready){
+        sessionStorage.setItem("skipLoader","1");
+        window.location.href = links[idx];
+        return;
+      }
+      ringSnap = idx;
+    }
+  }else{
+    sphereDragging=false;
+    if(!sphereDragMoved && hoverObj){
+      const idx = hoverObj.userData.index;
+      const isCentered = (idx === sphereCenterIndex) && sphereCenteredEnough;
+      if(isCentered && links[idx] && ready){
+        sessionStorage.setItem("skipLoader","1");
+        window.location.href = links[idx];
+        return;
+      }
+      snapToIndex(idx);
+    }
+  }
+});
+
+const WHEEL_SENS = 0.0015;
+
+function onWheel(e){
+  if(isUIEvent(e)) return;
+
+  if(e.ctrlKey){
+    e.preventDefault();
+    handlePinchSwitch(e.deltaY);
+    return;
+  }
+
+  e.preventDefault();
+
+  const dx = e.deltaX * WHEEL_SENS;
+  const dy = e.deltaY * WHEEL_SENS;
+
+  if(layoutMode === "ring"){
+    const delta = (Math.abs(dx) > Math.abs(dy)) ? dx : dy;
+    ringIndex += delta;
+    ringSnap = ringIndex;
+    ringVel = 0;
+  }else{
+    targetRotY += dx * 0.9;
+    targetRotX += dy * 0.9;
+    velX = 0;
+    velY = 0;
+  }
+}
+window.addEventListener("wheel", onWheel, {passive:false});
+
+function layoutRing(){
+  meshes.forEach((m,i)=>{
+    const o=i-ringIndex,a=o*STEP,d=Math.cos(a);
+    m.position.set(Math.sin(a)*RING_RADIUS,0,d*RING_RADIUS-RING_RADIUS);
+    const s=THREE.MathUtils.mapLinear(d,-1,1,.65,1.15)*ringScale;
+    m.scale.set(s,s,1);
+
+    const targetOpacity = (i === currentIndex) ? CENTER_OPACITY : OTHER_OPACITY;
+    m.material.opacity += (targetOpacity - m.material.opacity) * 0.18;
+
+    m.rotation.set(0,0,0);
+  });
+}
+
+function snapToIndex(i){
+  currentIndex = ((i%COUNT)+COUNT)%COUNT;
+  const dir = spherePositions[currentIndex].clone().normalize();
+  const yaw = -Math.atan2(dir.x, dir.z);
+  const pitch = Math.atan2(dir.y, Math.sqrt(dir.x*dir.x + dir.z*dir.z));
+  targetRotY = yaw;
+  targetRotX = pitch;
+  velX = 0; velY = 0;
+}
+
+const arrowLeft = document.getElementById("arrowLeft");
+const arrowRight = document.getElementById("arrowRight");
+
+function goNext(){
+  if(layoutMode==="ring") ringSnap++;
+  else snapToIndex(currentIndex+1);
+}
+function goPrev(){
+  if(layoutMode==="ring") ringSnap--;
+  else snapToIndex(currentIndex-1);
+}
+
+arrowRight.addEventListener("click", goNext);
+arrowLeft.addEventListener("click", goPrev);
+
+addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight") goNext();
+  if(e.key==="ArrowLeft") goPrev();
+});
+
+const titleEl = document.getElementById("title");
+const counterEl = document.getElementById("counter");
+
+const centerRay = new THREE.Raycaster();
+const centerNDC = new THREE.Vector2(0,0);
+
+function updateCenterNDC(){
+  centerNDC.x = (CAMERA_SHIFT_PX / innerWidth) * 2; // NDCは-1〜1
+}
+updateCenterNDC();
+let candidateIndex = 0;
+let candidateFrames = 0;
+const tmpPos = new THREE.Vector3();
+const camDir = new THREE.Vector3();
+
+function getCenterHitIndex(){
+  centerRay.setFromCamera(centerNDC, camera);
+  const hits = centerRay.intersectObjects(meshes);
+  return hits.length ? hits[0].object.userData.index : null;
+}
+
+function updateSphereCenter(){
+  const hit = getCenterHitIndex();
+  if(hit !== null){
+    sphereCenterIndex = hit;
+    candidateIndex = sphereCenterIndex;
+    candidateFrames = 0;
+    sphereCenteredEnough = true;
+    return;
+  }
+
+  camera.getWorldDirection(camDir);
+
+  let bestIndex = sphereCenterIndex;
+  let bestScore = -Infinity;
+
+  for(let i=0;i<COUNT;i++){
+    meshes[i].getWorldPosition(tmpPos);
+    const toObj = tmpPos.clone().sub(camera.position).normalize();
+    const dot = toObj.dot(camDir);
+    if(dot < 0.45) continue;
+
+    tmpPos.project(camera);
+    if(tmpPos.z < -1 || tmpPos.z > 1) continue;
+
+    const distSq = tmpPos.x*tmpPos.x + tmpPos.y*tmpPos.y;
+    const score = (dot * 1.4) - (distSq * 1.0);
+
+    if(score > bestScore){
+      bestScore = score;
+      bestIndex = i;
+    }
+  }
+
+  if(bestIndex !== sphereCenterIndex){
+    if(candidateIndex !== bestIndex){
+      candidateIndex = bestIndex;
+      candidateFrames = 0;
+    }
+    candidateFrames++;
+    if(candidateFrames >= 4){
+      sphereCenterIndex = candidateIndex;
+      candidateFrames = 0;
+    }
+  }else{
+    candidateFrames = 0;
+  }
+
+  meshes[sphereCenterIndex].getWorldPosition(tmpPos);
+  tmpPos.project(camera);
+  const distSq = tmpPos.x*tmpPos.x + tmpPos.y*tmpPos.y;
+  sphereCenteredEnough = distSq < 0.03;
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+
+  drawTrail();
+
+  particles.rotation.y += 0.0006;
+  particles.rotation.x += 0.0003;
+
+  camera.position.z += (targetCamZ - camera.position.z) * 0.08;
+
+  if(layoutMode==="ring"){
+    group.rotation.set(0,0,0);
+
+    if(ringDrag){ ringIndex+=ringVel; ringVel*=.85; }
+    else ringIndex+=(ringSnap-ringIndex)*.18;
+
+    ringScale+=((ringDrag?ringDragScale:ringBaseScale)-ringScale)*.12;
+
+    currentIndex = ((Math.round(ringIndex)%COUNT)+COUNT)%COUNT;
+    layoutRing();
+
+    const hit = getCenterHitIndex();
+    ringCenterIndex = (hit !== null) ? hit : currentIndex;
+  }else{
+    if(!sphereDragging){
+      targetRotY += velY;
+      targetRotX += velX;
+      velY *= 0.92;
+      velX *= 0.92;
+    }
+
+    group.rotation.y += (targetRotY - group.rotation.y) * 0.08;
+    group.rotation.x += (targetRotX - group.rotation.x) * 0.08;
+
+    meshes.forEach((m,i)=>{
+      m.position.lerp(spherePositions[i], 0.08);
+      m.scale.set(SPHERE_SCALE, SPHERE_SCALE, 1);
+      m.lookAt(camera.position);
+    });
+
+    updateSphereCenter();
+
+    meshes.forEach((m,i)=>{
+      const targetOpacity = (i === sphereCenterIndex) ? CENTER_OPACITY : OTHER_OPACITY;
+      m.material.opacity += (targetOpacity - m.material.opacity) * 0.2;
+    });
+
+    currentIndex = sphereCenterIndex;
+  }
+
+  titleEl.textContent = titles[currentIndex];
+  counterEl.textContent = `${currentIndex+1} / ${COUNT}`;
+
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(meshes);
+  const nowHover = hits.length > 0;
+  hoverObj = nowHover ? hits[0].object : null;
+  if (nowHover !== hovering) {
+    hovering = nowHover;
+    cursor.classList.toggle("gray", hovering);
+    cursor.classList.toggle("hover", hovering);
+  }
+
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+  resizeTrail();
+  updateCenterNDC();
+});
+</script>
+
+</body>
+</html>
