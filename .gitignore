@@ -6,3 +6,5 @@
 *.pdf
 view13.jpeg
 素材管理庫/aaaa.jpeg
+node_modules/
+dist/
