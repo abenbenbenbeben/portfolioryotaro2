@@ -1870,21 +1870,21 @@
 
   // VIEWカード設定（ここだけ編集すれば画像・表示名・遷移URLを自由に変更できます）
   const viewCards = [
-    { image:"view1.jpeg",  title:"重なり", url:"https://1.com" },
-    { image:"view2.jpeg",  title:"リアルタイム色立体", url:"https://2.com" },
-    { image:"view3.jpeg",  title:"リミナルスペース", url:"https://3.com" },
-    { image:"view4.jpeg",  title:"ロゴ制作", url:"https://4.com" },
-    { image:"view5.jpeg",  title:"ゲームエンジンを用いた街制作", url:"https://5.com" },
-    { image:"view6.jpeg",  title:"ライブ背景映像", url:"https://6.com" },
-    { image:"view7.jpeg",  title:"07.com", url:"https://7.com" },
-    { image:"view8.jpeg",  title:"08.com", url:"https://8.com" },
-    { image:"view9.jpeg",  title:"09.com", url:"https://9.com" },
-    { image:"view10.jpeg", title:"10.com", url:"https://10.com" },
-    { image:"view11.jpeg", title:"11.com", url:"https://11.com" },
-    { image:"view12.jpeg", title:"12.com", url:"https://12.com" },
-    { image:"view13.jpeg", title:"13.com", url:"https://13.com" },
-    { image:"view14.jpeg", title:"14.com", url:"https://14.com" },
-    { image:"view15.jpeg", title:"15.com", url:"https://15.com" }
+    { image:"./public/assets/view/view1.jpeg",  title:"重なり", url:"https://1.com" },
+    { image:"./public/assets/view/view2.jpeg",  title:"リアルタイム色立体", url:"https://2.com" },
+    { image:"./public/assets/view/view3.jpeg",  title:"リミナルスペース", url:"https://3.com" },
+    { image:"./public/assets/view/view4.jpeg",  title:"ロゴ制作", url:"https://4.com" },
+    { image:"./public/assets/view/view5.jpeg",  title:"ゲームエンジンを用いた街制作", url:"https://5.com" },
+    { image:"./public/assets/view/view6.jpeg",  title:"ライブ背景映像", url:"https://6.com" },
+    { image:"./public/assets/view/view7.jpeg",  title:"07.com", url:"https://7.com" },
+    { image:"./public/assets/view/view8.jpeg",  title:"08.com", url:"https://8.com" },
+    { image:"./public/assets/view/view9.jpeg",  title:"09.com", url:"https://9.com" },
+    { image:"./public/assets/view/view10.jpeg", title:"10.com", url:"https://10.com" },
+    { image:"./public/assets/view/view11.jpeg", title:"11.com", url:"https://11.com" },
+    { image:"./public/assets/view/view12.jpeg", title:"12.com", url:"https://12.com" },
+    { image:"./public/assets/view/view12.jpeg", title:"13.com", url:"https://13.com" },
+    { image:"./public/assets/view/view14.jpeg", title:"14.com", url:"https://14.com" },
+    { image:"./public/assets/view/view15.jpeg", title:"15.com", url:"https://15.com" }
   ];
   const COUNT = viewCards.length;
   const viewImages = viewCards.map((card)=>card.image);
