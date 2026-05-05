@@ -37,11 +37,11 @@
         setTimeout(function(){
           document.body.classList.add("page-revealed");
           if(typeof afterReveal === "function") afterReveal();
-        }, 90);
+        }, 160);
         setTimeout(function(){
           document.body.classList.remove("is-opening-reveal");
           if(overlay) overlay.classList.remove("is-active");
-        }, 1900);
+        }, 2050);
       }
       window.__startOpeningReveal = __startOpeningReveal;
 
@@ -109,7 +109,7 @@
 
         function collectImgs(){
           return Array.from(document.querySelectorAll(
-            "main img, .sidebar img, .intro-film img"
+            ".sidebar .logo img, .intro-film img, .profile-photo img, #viewGrid .view-card:nth-child(-n+4) img"
           )).filter(function(img){
             return !img.classList.contains("loader-float")
                 && !img.classList.contains("swap-hover"); /* ホバー用は遅延可 */
@@ -140,7 +140,7 @@
         function collectExtraSrcs(){
           try{
             return Array.from(new Set(
-              (window.__EXTRA_PRELOAD_IMAGES__ || [])
+              (window.__EXTRA_PRELOAD_IMAGES__ || []).slice(0, 6)
                 .map(function(src){
                   return typeof src === "string" ? src.trim() : "";
                 })
@@ -350,11 +350,12 @@
   };
 
   const viewMap = {
+    "profile-only": document.getElementById("view-profile-only"),
     profile: document.getElementById("view-profile"),
     design: document.getElementById("view-design"),
     illustration: document.getElementById("view-illustration")
   };
-  const themeViewClasses = ["theme-view-profile", "theme-view-design", "theme-view-illustration"];
+  const themeViewClasses = ["theme-view-profile-only", "theme-view-profile", "theme-view-design", "theme-view-illustration"];
   let currentViewKey = "profile";
   let viewSectionActive = true;
   let introFilmProgressFrame = 0;
@@ -458,12 +459,43 @@
 
   function scrollToViewHero(instant = false){
     if(!heroEl) return;
-    const top = Math.max(0, heroEl.offsetTop);
+    const rect = heroEl.getBoundingClientRect();
+    const currentY = window.scrollY || window.pageYOffset || 0;
+    const top = Math.max(0, currentY + rect.top);
     if(instant){
       safeScrollToY(top);
       return;
     }
     animateProgrammaticScroll(top);
+  }
+
+  function resetViewScrollPosition(view, preferOrbit = false){
+    if(view === "profile" && preferOrbit && heroEl){
+      scrollToViewHero(true);
+    }else{
+      safeScrollToTop();
+    }
+  }
+
+  function finalizeViewScrollReset(view, preferOrbit = false, updateMotion = true){
+    resetViewScrollPosition(view, preferOrbit);
+    slowScrollTargetY = window.scrollY || window.pageYOffset || 0;
+    if(updateMotion){
+      requestIntroFilmProgress();
+      requestCinematicMotion();
+    }
+  }
+
+  function scheduleViewScrollReset(view, preferOrbit = false){
+    requestAnimationFrame(()=>{
+      finalizeViewScrollReset(view, preferOrbit);
+      window.setTimeout(()=>{
+        finalizeViewScrollReset(view, preferOrbit);
+      }, 180);
+      window.setTimeout(()=>{
+        finalizeViewScrollReset(view, preferOrbit, false);
+      }, 760);
+    });
   }
 
   function enterViewFromIntro(){
@@ -1693,7 +1725,9 @@
     const visibleViews = getVisibleViews(view);
     if(!visibleViews.length || visibleViews.some((key)=>!viewMap[key])) return;
     if(view === currentViewKey && forceTop){
-      requestAnimationFrame(()=>{ safeScrollToTop(); });
+      cancelProgrammaticScroll();
+      cancelSlowScroll();
+      scheduleViewScrollReset(view, true);
       return;
     }
     if(view === currentViewKey && !instant) return;
@@ -1737,6 +1771,7 @@
           _staggerView(el);
         });
       }
+      scheduleViewScrollReset(view, forceTop);
     }, ENTER_DELAY);
 
     /* 動画 / 3D */
@@ -1763,12 +1798,6 @@
     /* キャンセル: 前のビューで動いていたプログラマティックスクロールを止める */
     cancelProgrammaticScroll();
     cancelSlowScroll();
-    requestAnimationFrame(()=>{
-      safeScrollToTop();
-      slowScrollTargetY = 0; /* ターゲットもリセット */
-      requestIntroFilmProgress();
-      requestCinematicMotion();
-    });
   }
 
   /* ── Menu click: tap pulse on active item ── */
@@ -1807,11 +1836,18 @@
   
   /* ★最適化＆修正：メインカーソルのズレ（遅延）を解消 */
   let tx=0, ty=0;
+  let cursorMoveFrame = 0;
+  function flushCursorPosition(){
+    cursorMoveFrame = 0;
+    if(!isCoarsePointer && cursor) {
+      cursor.style.transform = `translate3d(${tx}px,${ty}px,0)`;
+    }
+  }
   window.addEventListener("mousemove", (e)=>{ 
     tx = e.clientX; 
     ty = e.clientY; 
-    if(!isCoarsePointer && cursor) {
-      cursor.style.transform = `translate3d(${tx}px,${ty}px,0)`;
+    if(!isCoarsePointer && cursor && !cursorMoveFrame) {
+      cursorMoveFrame = requestAnimationFrame(flushCursorPosition);
     }
   });
 
@@ -2024,7 +2060,9 @@
     const firstRect = legacy3dCards[0].getBoundingClientRect();
     const cardW = Math.max(1, firstRect.width || 260);
     const stageW = Math.max(1, stageRect.width || window.innerWidth || 1);
-    const sideGap = Math.max(cardW * 1.08, Math.min(stageW * 0.5, 740));
+    const sideGap = stageW < 720
+      ? Math.max(cardW * 0.64, stageW * 0.46)
+      : Math.min(Math.max(cardW * 0.78, stageW * 0.34), 560);
     legacy3dRingEl.style.setProperty("--legacy-rotation", "0deg");
     const wrappedCurrent = normalizeLegacyIndex(legacy3dCurrent);
     legacy3dCards.forEach((card, i)=>{
@@ -2266,7 +2304,7 @@
 
   if(useScrollViewSystem && initViewScrollSystem()){
     threeInteractionReady = false;
-    setView("profile", true);
+    setView(currentViewKey, true);
   } else {
   if(typeof THREE === "undefined"){
     if(threeWrap){
@@ -3142,7 +3180,7 @@
 
   resize3D();
   threeInteractionReady = true;
-  setView("profile", true); // Default view set to profile
+  setView(currentViewKey, true); // Default view set to the active profile screen
 
   /* ── Stability: always start the render loop and always dismiss
      the loader, even if an auxiliary init step is missing. Without
@@ -3213,7 +3251,9 @@
     syncSectionLoopVideosByView();
   });
 
-  window.addEventListener("scroll", ()=>{
+  let windowScrollFrame = 0;
+  function syncWindowScrollEffects(){
+    windowScrollFrame = 0;
     ensureIntroProgressState();
     syncTopbarScrollState(false);
     requestIntroFilmProgress();
@@ -3221,6 +3261,10 @@
     if(!slowScrollFrame){
       slowScrollTargetY = window.scrollY || window.pageYOffset || 0;
     }
+  }
+  window.addEventListener("scroll", ()=>{
+    if(windowScrollFrame) return;
+    windowScrollFrame = requestAnimationFrame(syncWindowScrollEffects);
   }, { passive:true });
   window.addEventListener("resize", ()=>{
     syncTopbarScrollState(true);
@@ -3238,7 +3282,9 @@
   (function(){
     const bar = document.getElementById("ux-progress");
     if(!bar) return;
+    let progressFrame = 0;
     function updateProgress(){
+      progressFrame = 0;
       const scrollTop  = window.scrollY || window.pageYOffset;
       const docHeight  = document.documentElement.scrollHeight - window.innerHeight;
       if(docHeight <= 0){ bar.style.width = "0%"; return; }
@@ -3247,7 +3293,10 @@
       /* 最上部・最下部では非表示 */
       bar.style.opacity = (pct < 1 || pct > 99) ? "0" : "1";
     }
-    window.addEventListener("scroll", updateProgress, { passive:true });
+    window.addEventListener("scroll", function(){
+      if(progressFrame) return;
+      progressFrame = requestAnimationFrame(updateProgress);
+    }, { passive:true });
     updateProgress();
   })();
 
@@ -3882,33 +3931,43 @@
     if(!grid) return;
 
     var designItems = shuffle(Array.from(document.querySelectorAll("#view-design .design-item"))).slice(0, 5);
-    var illustrationItems = shuffle(Array.from(document.querySelectorAll("#view-illustration .illus-card"))).slice(0, 3);
+    var illustrationItems = shuffle(Array.from(document.querySelectorAll("#view-illustration .illus-card"))).slice(0, 4);
     var sourceItems = shuffle(designItems.concat(illustrationItems));
     if(!sourceItems.length) return;
 
-    var entries = sourceItems.map(function(item, index){
+    var entries = sourceItems.map(function(item){
       var isDesign = item.classList.contains("design-item");
       var thumb = item.querySelector(isDesign ? ".design-thumb img:not(.swap-hover)" : ".illus-thumb img:not(.swap-hover)");
       return {
         item:item,
         type:isDesign ? "DESIGN" : "ILLUSTRATION",
+        targetView:isDesign ? "design" : "illustration",
         src:thumb ? (thumb.getAttribute("src") || "") : "",
         alt:thumb ? (thumb.getAttribute("alt") || "") : "",
         title:text(item, isDesign ? ".design-title" : ".illus-title"),
-        meta:text(item, isDesign ? ".design-meta" : ".illus-sub"),
-        no:String(index + 1).padStart(2, "0")
+        meta:text(item, isDesign ? ".design-meta" : ".illus-sub")
       };
     }).filter(function(entry){ return entry.src; });
+
+    entries = shuffle(entries).slice(0, 9).map(function(entry, index){
+      entry.no = String(index + 1).padStart(2, "0");
+      return entry;
+    });
+    var slotClasses = [
+      "is-feature", "is-standard", "is-tall", "is-wide", "is-small", "is-standard",
+      "is-wide", "is-small", "is-tall"
+    ];
 
     grid.classList.add("visual-index-grid");
     grid.innerHTML = "";
 
-    entries.forEach(function(entry){
+    entries.forEach(function(entry, index){
       var card = document.createElement("article");
-      card.className = "view-card visual-index-card";
+      card.className = "view-card visual-index-card " + slotClasses[index % slotClasses.length];
       card.tabIndex = 0;
       card.setAttribute("role", "button");
-      card.setAttribute("aria-label", entry.type + " " + entry.title);
+      card.dataset.targetView = entry.targetView;
+      card.setAttribute("aria-label", entry.type + " page: " + entry.title);
 
       var thumb = document.createElement("div");
       thumb.className = "view-thumb";
@@ -3918,34 +3977,62 @@
       img.alt = entry.alt || entry.title;
       img.loading = "lazy";
       img.decoding = "async";
-      img.addEventListener("load", function(){
-        classify(card, img.naturalWidth / Math.max(1, img.naturalHeight));
-      }, { once:true });
       thumb.appendChild(img);
 
       var info = document.createElement("div");
       info.className = "view-info";
+      var targetLabel = entry.targetView === "illustration" ? "ILLUSTRATION / ART" : "DESIGN";
       info.innerHTML =
-        '<p class="view-no">' + entry.no + '</p>' +
+        '<p class="view-no" data-target="' + targetLabel + '">' + entry.no + '</p>' +
         '<p class="view-title">' + entry.title + '</p>' +
         '<p class="view-meta">' + entry.type + ' / ' + entry.meta + '</p>';
 
       card.appendChild(thumb);
       card.appendChild(info);
-      classify(card, 1);
+
+      function getEntryTopOffset(){
+        var topOffset = 0;
+        var sidebar = document.querySelector(".sidebar");
+        if(sidebar){
+          var sidebarRect = sidebar.getBoundingClientRect();
+          var sidebarStyle = window.getComputedStyle(sidebar);
+          var isTopbar = sidebarStyle.position === "fixed" &&
+            sidebarRect.top <= 1 &&
+            sidebarRect.width > window.innerWidth * 0.7 &&
+            sidebarRect.height < window.innerHeight * 0.35;
+          if(isTopbar) topOffset = Math.max(0, sidebarRect.bottom + 34);
+        }
+        return topOffset;
+      }
+
+      function scrollEntryToTop(behavior){
+        try{
+          if(!entry.item) return;
+          if(!document.querySelector('.menu [data-view="' + entry.targetView + '"].active')) return;
+          var topOffset = getEntryTopOffset();
+          var rect = entry.item.getBoundingClientRect();
+          var currentY = window.scrollY || window.pageYOffset || 0;
+          var top = Math.max(0, currentY + rect.top - topOffset);
+          window.scrollTo({ top:top, behavior:behavior || "smooth" });
+        }catch(_){}
+      }
+
+      function settleEntryToTop(){
+        var attempts = 0;
+        function align(){
+          attempts += 1;
+          scrollEntryToTop(attempts <= 2 ? "smooth" : "auto");
+          if(attempts < 7){
+            window.setTimeout(align, attempts <= 2 ? 420 : 560);
+          }
+        }
+        window.setTimeout(align, 900);
+      }
 
       function openTarget(){
-        if(window.__openWorkFromElement && window.__openWorkFromElement(entry.item, { scrollLong:true })) return;
-        entry.item.click();
-        setTimeout(function(){
-          var scrollEl = document.getElementById("wv-scroll");
-          var longWrap = document.getElementById("wv-long-wrap");
-          try{
-            if(scrollEl && longWrap && longWrap.style.display !== "none"){
-              scrollEl.scrollTo({ top:Math.max(0, longWrap.offsetTop - 72), behavior:"smooth" });
-            }
-          }catch(_){}
-        }, 720);
+        var nav = document.querySelector('.menu [data-view="' + entry.targetView + '"]');
+        if(nav) nav.click();
+        settleEntryToTop();
       }
 
       card.addEventListener("click", openTarget);
@@ -3956,6 +4043,71 @@
       });
       grid.appendChild(card);
     });
+  });
+})();
+
+
+(function(){
+  "use strict";
+
+  function ready(fn){
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn, { once:true });
+    else fn();
+  }
+
+  function text(el, selector){
+    var node = el.querySelector(selector);
+    return node ? (node.textContent || "").trim() : "";
+  }
+
+  function countPipeItems(value){
+    if(!value) return 0;
+    return String(value).split("|").map(function(item){ return item.trim(); }).filter(Boolean).length;
+  }
+
+  function describeWorkStatus(card){
+    var isDesign = card.classList.contains("design-item");
+    var descText = text(card, isDesign ? ".design-desc" : ".illus-desc");
+    var hasLong = !!(card.getAttribute("data-long") || "").trim();
+    var hasDescription = hasLong || !!descText;
+    var galleryCount = countPipeItems(card.getAttribute("data-gallery"));
+    var themeCount = countPipeItems(card.getAttribute("data-theme-gallery"));
+    var videoCount = (card.getAttribute("data-youtube") || "").trim() ? 1 : 0;
+    var fileCount = galleryCount + themeCount + videoCount;
+
+    return {
+      hasDescription:hasDescription,
+      fileCount:fileCount,
+      label:hasDescription ? "説明あり" : "説明なし",
+      fileLabel:fileCount > 0 ? String(fileCount) : "-"
+    };
+  }
+
+  function applyWorkStatusIcon(card){
+    if(!(card instanceof HTMLElement)) return;
+    var thumb = card.querySelector(".design-thumb, .illus-thumb");
+    if(!thumb) return;
+
+    var previous = thumb.querySelector(":scope > .work-detail-badge");
+    if(previous) previous.remove();
+
+    var status = describeWorkStatus(card);
+    card.dataset.detailState = status.hasDescription ? "has-description" : "no-description";
+    card.dataset.detailFiles = String(status.fileCount);
+
+    var badge = document.createElement("div");
+    badge.className = "work-detail-badge" + (status.hasDescription ? " has-description" : " no-description");
+    badge.setAttribute("aria-label", status.label + " / 関連ファイル " + status.fileLabel);
+    badge.title = status.label + " / 関連ファイル " + status.fileLabel;
+    badge.innerHTML =
+      '<span class="work-detail-icon" aria-hidden="true"></span>' +
+      '<span class="work-detail-label">' + status.label + '</span>' +
+      '<span class="work-detail-file-count" aria-hidden="true">' + status.fileLabel + '</span>';
+    thumb.appendChild(badge);
+  }
+
+  ready(function(){
+    document.querySelectorAll("#view-design .design-item, #view-illustration .illus-card").forEach(applyWorkStatusIcon);
   });
 })();
 
@@ -4096,9 +4248,11 @@
       baseImg.classList.add("swap-base");
       var hoverImg = document.createElement("img");
       hoverImg.className = "swap-hover";
-      hoverImg.src = swapSrc;
       hoverImg.alt = baseImg.alt || "";
+      hoverImg.loading = "lazy";
+      hoverImg.decoding = "async";
       hoverImg.setAttribute("aria-hidden","true");
+      hoverImg.src = swapSrc;
       thumbEl.appendChild(hoverImg);
       if(typeof wireImageFallback === "function") wireImageFallback(hoverImg);
 
@@ -4130,13 +4284,39 @@
 
       /* 候補を順に試し、最初に成功したものを採用。全部失敗したら何もしない */
       function tryNext(i){
-        if(i >= candidates.length) return;
-        preloadImage(candidates[i])
+        if(i >= candidates.length) return Promise.resolve();
+        return preloadImage(candidates[i])
           .then(function(){ attach(baseImg, thumbEl, itemEl, candidates[i]); })
-          .catch(function(){ tryNext(i + 1); });
+          .catch(function(){ return tryNext(i + 1); });
       }
-      tryNext(0);
-      return true;
+      return function(){ return tryNext(0); };
+    }
+
+    function idle(fn){
+      if("requestIdleCallback" in window){
+        window.requestIdleCallback(fn, { timeout:1200 });
+      }else{
+        window.setTimeout(fn, 80);
+      }
+    }
+
+    function runJobs(jobs){
+      var index = 0;
+      var active = 0;
+      var maxActive = 2;
+      function pump(){
+        while(active < maxActive && index < jobs.length){
+          active += 1;
+          Promise.resolve()
+            .then(jobs[index++])
+            .catch(function(){})
+            .then(function(){
+              active -= 1;
+              idle(pump);
+            });
+        }
+      }
+      idle(pump);
     }
 
     var tasks = [];
@@ -4152,15 +4332,26 @@
       var th=el.querySelector(".view-thumb"), bi=th?th.querySelector(":scope>img:not(.swap-hover)"):null;
       var t = wire(el,th,bi); if(t) tasks.push(t);
     });
-    /* 並列プリロードを投げ放っておく（Promise.allSettled は待たない） */
+    if(document.readyState === "complete"){
+      runJobs(tasks);
+    }else{
+      window.addEventListener("load", function(){ runJobs(tasks); }, { once:true });
+    }
   })();
 
   /* ─── E. スクロールバー フェードアウト ─────────────── */
   var scrollTimer = null;
+  var scrollingClassOn = false;
   window.addEventListener("scroll", function(){
-    document.body.classList.add("is-scrolling");
+    if(!scrollingClassOn){
+      scrollingClassOn = true;
+      requestAnimationFrame(function(){
+        document.body.classList.add("is-scrolling");
+      });
+    }
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(function(){
+      scrollingClassOn = false;
       document.body.classList.remove("is-scrolling");
     }, 900);
   }, { passive:true });
@@ -4171,9 +4362,10 @@
 
 (function(){
   var VIEW_LABELS = {
-    profile: { label:"PROFILE / VIEW", no:"01" },
-    design:  { label:"DESIGN",          no:"02" },
-    illustration: { label:"ILLUSTRATION / ART", no:"03" }
+    profile: { label:"VIEW", no:"01" },
+    design:  { label:"DESIGN", no:"02" },
+    illustration: { label:"ILLUSTRATION / ART", no:"03" },
+    "profile-only": { label:"PROFILE", no:"04" }
   };
   var meta = document.querySelector(".sidebar-meta");
   if(!meta) return;
@@ -4667,10 +4859,7 @@
 
   function start(){
     try{
-      /* 4 セクション全部に noise-square を生成。RYOTARO（profile）含めて
-         全部フル数で復活。アニメは CSS 側で view のみ静止扱い。 */
-      spawn(document.querySelector(".profile-page"),       COUNT_PROFILE);
-      spawn(document.querySelector(".view-section-wrap"),  COUNT_VIEW);
+      /* profile / VIEW の noise layer は最終CSSで非表示なので、DOM自体を作らない。 */
       spawn(document.querySelector(".design-list"),        COUNT_DESIGN);
       spawn(document.querySelector(".illus-grid"),         COUNT_ILLUS);
       bindVisibility();
