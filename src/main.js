@@ -1185,8 +1185,8 @@
     introFilmVideoEl.setAttribute("preload", "auto");
     const rawCandidates = [
       introFilmVideoEl.getAttribute("src"),
-      "/media/sasisho.mov",
       "/media/sasisho.mp4",
+      "/media/sasisho.mov",
       "/media/saisho.mov",
       "/media/saisho.mp4",
       "/media/sasisho.MOV",
