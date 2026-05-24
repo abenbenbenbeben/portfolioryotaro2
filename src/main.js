@@ -109,7 +109,7 @@
 
         function collectImgs(){
           return Array.from(document.querySelectorAll(
-            ".sidebar .logo img, .intro-film img, .profile-photo img, #viewGrid .view-card:nth-child(-n+4) img"
+            ".sidebar .logo img"
           )).filter(function(img){
             return !img.classList.contains("loader-float")
                 && !img.classList.contains("swap-hover"); /* ホバー用は遅延可 */
@@ -140,7 +140,7 @@
         function collectExtraSrcs(){
           try{
             return Array.from(new Set(
-              (window.__EXTRA_PRELOAD_IMAGES__ || []).slice(0, 6)
+              (window.__EXTRA_PRELOAD_IMAGES__ || []).slice(0, 2)
                 .map(function(src){
                   return typeof src === "string" ? src.trim() : "";
                 })
@@ -353,9 +353,22 @@
     "profile-only": document.getElementById("view-profile-only"),
     profile: document.getElementById("view-profile"),
     design: document.getElementById("view-design"),
+    photo: document.getElementById("view-photo"),
     illustration: document.getElementById("view-illustration")
   };
-  const themeViewClasses = ["theme-view-profile-only", "theme-view-profile", "theme-view-design", "theme-view-illustration"];
+  const themeViewClasses = ["theme-view-profile-only", "theme-view-profile", "theme-view-design", "theme-view-photo", "theme-view-illustration"];
+  const viewTransitionMeta = {
+    profile: { label: "VIEW", no: "01 / INDEX", kicker: "MUSEUM TRANSFER" },
+    design: { label: "DESIGN", no: "02 / INDEX", kicker: "BLACK INDEX" },
+    photo: { label: "PHOTO", no: "03 / INDEX", kicker: "EXPOSURE SHIFT" },
+    illustration: { label: "ILLUSTRATION / ART", no: "04 / INDEX", kicker: "LINE RENDER" },
+    "profile-only": { label: "PROFILE", no: "05 / INDEX", kicker: "IDENTITY SCAN" }
+  };
+  const viewTransitionEl = document.getElementById("nav-curtain");
+  let viewTransitionTimer = 0;
+  let viewTransitionUnlockTimer = 0;
+  let viewTransitionSeq = 0;
+  let pendingViewKey = "";
   let currentViewKey = "profile";
   let viewSectionActive = true;
   let introFilmProgressFrame = 0;
@@ -486,7 +499,18 @@
     }
   }
 
+  function consumeViewScrollResetSkip(view){
+    var pending = window.__portfolioSkipNextViewScrollReset;
+    if(!pending || pending.view !== view) return false;
+    window.__portfolioSkipNextViewScrollReset = null;
+    slowScrollTargetY = window.scrollY || window.pageYOffset || 0;
+    requestIntroFilmProgress();
+    requestCinematicMotion();
+    return true;
+  }
+
   function scheduleViewScrollReset(view, preferOrbit = false){
+    if(consumeViewScrollResetSkip(view)) return;
     requestAnimationFrame(()=>{
       finalizeViewScrollReset(view, preferOrbit);
       window.setTimeout(()=>{
@@ -504,6 +528,8 @@
     if(introFilmStageEl && introFilmStageEl.classList.contains("is-missing")) return;
     introAutoEnterLocked = true;
     scrollToViewHero(false);
+    window.setTimeout(requestIntroFilmProgress, 320);
+    window.setTimeout(requestIntroFilmProgress, 680);
     window.setTimeout(()=>{
       introAutoEnterLocked = false;
       requestIntroFilmProgress();
@@ -618,7 +644,8 @@
   function attachHoverSwap(baseImg, thumbEl, itemEl){
     if(!baseImg || !thumbEl || !itemEl) return;
     const baseSrc = baseImg.getAttribute("src");
-    const swapSrc = makeSwapSrc(baseSrc);
+    const explicitSwapSrc = baseImg.getAttribute("data-hover-src") || itemEl.getAttribute("data-hover-src");
+    const swapSrc = explicitSwapSrc || makeSwapSrc(baseSrc);
     if(!swapSrc || swapSrc === baseSrc) return;
 
     if(baseImg.classList.contains("swap-base")) return;
@@ -644,7 +671,9 @@
         thumbEl.appendChild(img);
         wireImageFallback(img);
         if(pointerInside){
-          itemEl.classList.add("is-hover-swapping");
+          requestAnimationFrame(function(){
+            itemEl.classList.add("is-hover-swapping");
+          });
         }
       }, { once:true });
       img.addEventListener("error", ()=>{
@@ -1147,11 +1176,13 @@
     introFilmVideoEl.loop = true;
     introFilmVideoEl.autoplay = true;
     introFilmVideoEl.playsInline = true;
+    introFilmVideoEl.preload = "auto";
     introFilmVideoEl.setAttribute("muted", "");
     introFilmVideoEl.setAttribute("playsinline", "");
     introFilmVideoEl.setAttribute("webkit-playsinline", "");
     introFilmVideoEl.setAttribute("autoplay", "");
     introFilmVideoEl.setAttribute("loop", "");
+    introFilmVideoEl.setAttribute("preload", "auto");
     const rawCandidates = [
       introFilmVideoEl.getAttribute("src"),
       "/media/sasisho.mov",
@@ -1195,7 +1226,10 @@
   }
 
   function syncIntroMode(progress){
-    const shouldHideUi = viewSectionActive && progress < 0.96;
+    const heroReached =
+      !!heroEl &&
+      heroEl.getBoundingClientRect().top <= Math.min(160, (window.innerHeight || 0) * 0.24);
+    const shouldHideUi = viewSectionActive && progress < 0.96 && !heroReached;
     document.body.classList.toggle("is-intro-mode", shouldHideUi);
   }
 
@@ -1297,9 +1331,11 @@
     const p  = Math.max(0, Math.min(1, (window.scrollY - _cachedIntroTop) / _cachedIntroTravel));
     /* p の変化が極小、または既に最終値で止まっているなら全 write を skip */
     if(_lastIntroP >= 0 && Math.abs(p - _lastIntroP) < 0.002){
+      syncIntroMode(p);
       return;
     }
     if(_lastIntroP === 1 && p === 1){
+      syncIntroMode(1);
       return;
     }
     /* intro が完全に画面外（p === 1）になったら、最終値を一度だけ書いてから
@@ -1335,7 +1371,7 @@
 
     /* video */
     if(introFilmVideoEl){
-      introFilmVideoEl.style.transform = `translate3d(${p * -1.2 * vw / 100}px,${p * -1.4 * vh / 100}px,0) scale(${(1.055 + easedP * 0.19).toFixed(4)})`;
+      introFilmVideoEl.style.transform = `translate3d(${p * -0.42 * vw / 100}px,${p * -0.5 * vh / 100}px,0) scale(${(1 + easedP * 0.018).toFixed(4)})`;
     }
 
     /* .intro-film-copy */
@@ -1368,7 +1404,10 @@
   /* intro が完全に流れ切った後はスクロール毎の rAF を完全停止するためのフラグ */
   let _introProgressDisabled = false;
   function requestIntroFilmProgress(){
-    if(_introProgressDisabled) return;
+    if(_introProgressDisabled){
+      syncIntroMode(1);
+      return;
+    }
     if(introFilmProgressFrame) return;
     introFilmProgressFrame = requestAnimationFrame(applyIntroFilmProgress);
   }
@@ -1720,6 +1759,36 @@
        view 自体のフェードはもう CSS でやらないので、ここも no-op にする。 */
   }
 
+  function playViewTransition(view, instant){
+    if(instant || prefersReducedMotion || !viewTransitionEl) return 0;
+    const meta = viewTransitionMeta[view] || { label: String(view || "VIEW").toUpperCase(), no: "00 / INDEX", kicker: "MUSEUM TRANSFER" };
+    viewTransitionEl.dataset.view = view || "";
+    viewTransitionEl.dataset.label = meta.label;
+    viewTransitionEl.dataset.no = meta.no;
+
+    const kickerEl = viewTransitionEl.querySelector(".nav-curtain-kicker");
+    const labelEl = viewTransitionEl.querySelector(".nav-curtain-label");
+    const countEl = viewTransitionEl.querySelector(".nav-curtain-count");
+    if(kickerEl) kickerEl.textContent = meta.kicker || "MUSEUM TRANSFER";
+    if(labelEl) labelEl.textContent = meta.label;
+    if(countEl) countEl.textContent = meta.no;
+
+    viewTransitionEl.classList.remove("flash", "is-transitioning");
+    void viewTransitionEl.offsetWidth;
+    viewTransitionEl.classList.add("is-transitioning");
+    document.body.classList.add("is-view-transitioning");
+
+    const seq = ++viewTransitionSeq;
+    if(viewTransitionUnlockTimer) clearTimeout(viewTransitionUnlockTimer);
+    viewTransitionUnlockTimer = window.setTimeout(()=>{
+      if(seq !== viewTransitionSeq) return;
+      viewTransitionEl.classList.remove("is-transitioning");
+      document.body.classList.remove("is-view-transitioning");
+    }, 1080);
+
+    return 470;
+  }
+
   /* ── setView ────────────────────────────────────────── */
   function setView(view, instant = false, forceTop = false){
     const visibleViews = getVisibleViews(view);
@@ -1730,74 +1799,88 @@
       scheduleViewScrollReset(view, true);
       return;
     }
-    if(view === currentViewKey && !instant) return;
-
-    /* 退場: 高さ0 + opacity fade だけ — position は変えない */
-    const leavingEls = Object.values(viewMap).filter(el=>el.classList.contains("is-active"));
-    leavingEls.forEach(el=>{
-      el.classList.add("is-leaving");
-      el.classList.remove("is-active");
-    });
-
-    /* カーテン（ごく薄くフラッシュ） */
-    if(!instant){
-      const _curtain = document.getElementById("nav-curtain");
-      if(_curtain){
-        _curtain.classList.remove("flash");
-        /* double-rAF: reflow なしでアニメーションリセット */
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{
-          _curtain.classList.add("flash");
-        }));
+    if(viewTransitionTimer && view === pendingViewKey && !instant) return;
+    if(view === currentViewKey && !instant){
+      if(viewTransitionTimer){
+        clearTimeout(viewTransitionTimer);
+        viewTransitionTimer = 0;
+        pendingViewKey = "";
       }
+      return;
     }
-
-    /* メニュー更新 */
-    viewSwitchLinks.forEach((a)=>a.classList.toggle("active", a.dataset.view === view));
-    currentViewKey = view;
-    syncThemeViewClass(view);
-    requestAnimationFrame(()=> _updateIndicator(false));
-
-    /* 新ビュー: 透明で挿入 → 画像ロード完了後にフェードイン */
-    const ENTER_DELAY = instant ? 0 : 50;
-    setTimeout(()=>{
-      leavingEls.forEach(el=>el.classList.remove("is-leaving"));
-      const enterEls = visibleViews.map((key)=>viewMap[key]).filter(Boolean);
-
-      if(instant){
-        enterEls.forEach((el)=>el.classList.add("is-active"));
-      } else {
-        enterEls.forEach((el)=>{
-          el.classList.add("is-active");
-          _staggerView(el);
-        });
-      }
-      scheduleViewScrollReset(view, forceTop);
-    }, ENTER_DELAY);
-
-    /* 動画 / 3D */
-    viewSectionActive = visibleViews.includes("profile");
-    if(viewSectionActive){
-      if(threeInteractionReady){
-        viewScrollSpinCarry = 0;
-        viewScrollSpinDirection = 0;
-        if(typeof resize3D === "function"){
-          try{ resize3D(); }catch(_e){}
-        }
-        requestViewRenderLoop();
-      }
-      playIntroFilm();
-      playCurrentShowreel();
-    }else{
-      pauseIntroFilm();
-      pauseAllShowreels();
-      syncIntroMode(1);
-    }
-    syncSectionLoopVideosByView();
-    if(window.innerWidth <= 820){ setSidebarCollapsed(true); }
 
     /* キャンセル: 前のビューで動いていたプログラマティックスクロールを止める */
     cancelProgrammaticScroll();
     cancelSlowScroll();
+
+    if(viewTransitionTimer){
+      clearTimeout(viewTransitionTimer);
+      viewTransitionTimer = 0;
+    }
+    pendingViewKey = instant ? "" : view;
+
+    const commitViewSwitch = ()=>{
+      viewTransitionTimer = 0;
+      pendingViewKey = "";
+
+      /* 退場: パネルで隠れている間に差し替える */
+      const leavingEls = Object.values(viewMap).filter(el=>el.classList.contains("is-active"));
+      leavingEls.forEach(el=>{
+        el.classList.add("is-leaving");
+        el.classList.remove("is-active");
+      });
+
+      /* メニュー更新 */
+      viewSwitchLinks.forEach((a)=>a.classList.toggle("active", a.dataset.view === view));
+      currentViewKey = view;
+      syncThemeViewClass(view);
+      requestAnimationFrame(()=> _updateIndicator(false));
+
+      /* 新ビュー: グラスの抜けだけで一度見せる。ページ側の二重フェードはしない。 */
+      const ENTER_DELAY = 0;
+      window.setTimeout(()=>{
+        leavingEls.forEach(el=>el.classList.remove("is-leaving"));
+        const enterEls = visibleViews.map((key)=>viewMap[key]).filter(Boolean);
+
+        if(instant){
+          enterEls.forEach((el)=>el.classList.add("is-active"));
+        } else {
+          enterEls.forEach((el)=>{
+            el.classList.add("is-active");
+            _staggerView(el);
+          });
+        }
+        scheduleViewScrollReset(view, forceTop);
+      }, ENTER_DELAY);
+
+      /* 動画 / 3D */
+      viewSectionActive = visibleViews.includes("profile");
+      if(viewSectionActive){
+        if(threeInteractionReady){
+          viewScrollSpinCarry = 0;
+          viewScrollSpinDirection = 0;
+          if(typeof resize3D === "function"){
+            try{ resize3D(); }catch(_e){}
+          }
+          requestViewRenderLoop();
+        }
+        playIntroFilm();
+        playCurrentShowreel();
+      }else{
+        pauseIntroFilm();
+        pauseAllShowreels();
+        syncIntroMode(1);
+      }
+      syncSectionLoopVideosByView();
+      if(window.innerWidth <= 820){ setSidebarCollapsed(true); }
+    };
+
+    const switchDelay = playViewTransition(view, instant);
+    if(switchDelay > 0){
+      viewTransitionTimer = window.setTimeout(commitViewSwitch, switchDelay);
+    }else{
+      commitViewSwitch();
+    }
   }
 
   /* ── Menu click: tap pulse on active item ── */
@@ -1839,6 +1922,7 @@
   let cursorMoveFrame = 0;
   function flushCursorPosition(){
     cursorMoveFrame = 0;
+    if(window.__stablePortfolioCursor) return;
     if(!isCoarsePointer && cursor) {
       cursor.style.transform = `translate3d(${tx}px,${ty}px,0)`;
     }
@@ -2408,7 +2492,7 @@
     { image:VIEW_TEXTURE_BASE + "view7.jpeg",  title:"07.com", url:"https://7.com" },
     { image:VIEW_TEXTURE_BASE + "view8.jpeg",  title:"08.com", url:"https://8.com" },
     { image:VIEW_TEXTURE_BASE + "view9.jpeg",  title:"09.com", url:"https://9.com" },
-    { image:VIEW_TEXTURE_BASE + "view10.jpeg", title:"10.com", url:"https://10.com" },
+    { image:VIEW_TEXTURE_BASE + "view13.jpeg", title:"10.com", url:"https://10.com" },
     { image:VIEW_TEXTURE_BASE + "view11.jpeg", title:"11.com", url:"https://11.com" },
     { image:VIEW_TEXTURE_BASE + "view12.jpeg", title:"12.com", url:"https://12.com" },
     { image:VIEW_TEXTURE_BASE + "view12.jpeg", title:"13.com", url:"https://13.com" },
@@ -2874,7 +2958,7 @@
     hoverObj = null;
     if(hovering){
       hovering = false;
-      if(cursor){
+      if(cursor && !window.__stablePortfolioCursor){
         cursor.classList.remove("gray", "hover");
       }
     }
@@ -2896,7 +2980,7 @@
     if(isCoarsePointer) return;
     if(e.button !== 0) return;
     if(isUIEvent(e)) return;
-    if(cursor) cursor.classList.add("active");
+    if(cursor && !window.__stablePortfolioCursor) cursor.classList.add("active");
 
     if(layoutMode === "ring"){
       if(isRingAutoSpinning()) return;
@@ -2948,7 +3032,7 @@
   });
 
   window.addEventListener("mouseup", ()=>{
-    if(cursor) cursor.classList.remove("active");
+    if(cursor && !window.__stablePortfolioCursor) cursor.classList.remove("active");
 
     if(layoutMode === "ring"){
       if(isRingAutoSpinning()) return;
@@ -3168,7 +3252,7 @@
       pointerDirty = false;
       if(nowHover !== hovering){
         hovering = nowHover;
-        if(cursor){
+        if(cursor && !window.__stablePortfolioCursor){
           cursor.classList.toggle("gray", hovering);
           cursor.classList.toggle("hover", hovering);
         }
@@ -3278,6 +3362,448 @@
   });
 })();
 
+
+
+/* ── ILLUSTRATION / ART lightbox: photo-style large view ── */
+(function(){
+  "use strict";
+  return;
+
+  var root = document.getElementById("view-illustration");
+  if(!root) return;
+
+  var frames = [];
+  var overlay = null;
+  var imageEl = null;
+  var captionEl = null;
+  var prevBtn = null;
+  var nextBtn = null;
+  var currentIndex = 0;
+
+  function refreshFrames(){
+    frames = Array.from(root.querySelectorAll(".illus-art-frame"));
+    frames.forEach(function(frame, index){
+      frame.setAttribute("role", "button");
+      frame.setAttribute("tabindex", "0");
+      frame.setAttribute("aria-label", "Open illustration " + String(index + 1).padStart(2, "0"));
+    });
+  }
+
+  function getFrameData(index){
+    var frame = frames[index];
+    if(!frame) return null;
+    var img = frame.querySelector("img");
+    var item = frame.closest(".illus-art-item");
+    var caption = item ? item.querySelector("figcaption") : null;
+    var no = caption ? caption.querySelector("span") : null;
+    var title = caption ? caption.querySelector("strong") : null;
+    return {
+      src: img ? (img.getAttribute("data-full-src") || img.currentSrc || img.src || "") : "",
+      alt: img ? (img.alt || "") : "",
+      label: [no ? no.textContent : "", title ? title.textContent : ""].filter(Boolean).join(" / ")
+    };
+  }
+
+  function ensureOverlay(){
+    if(overlay) return;
+
+    overlay = document.createElement("div");
+    overlay.className = "photo-lightbox";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = [
+      '<button class="photo-lightbox-close" type="button" aria-label="Close">×</button>',
+      '<button class="photo-lightbox-nav photo-lightbox-prev" type="button" aria-label="Previous">←</button>',
+      '<figure class="photo-lightbox-stage">',
+      '  <img alt="">',
+      '  <figcaption></figcaption>',
+      '</figure>',
+      '<button class="photo-lightbox-nav photo-lightbox-next" type="button" aria-label="Next">→</button>'
+    ].join("");
+    document.body.appendChild(overlay);
+
+    imageEl = overlay.querySelector("img");
+    captionEl = overlay.querySelector("figcaption");
+    prevBtn = overlay.querySelector(".photo-lightbox-prev");
+    nextBtn = overlay.querySelector(".photo-lightbox-next");
+
+    overlay.addEventListener("click", function(event){
+      if(event.target === overlay || event.target.closest(".photo-lightbox-close")){
+        close();
+      }
+    });
+    prevBtn.addEventListener("click", function(event){
+      event.stopPropagation();
+      show(currentIndex - 1);
+    });
+    nextBtn.addEventListener("click", function(event){
+      event.stopPropagation();
+      show(currentIndex + 1);
+    });
+
+    document.addEventListener("keydown", function(event){
+      if(!overlay || !overlay.classList.contains("is-open")) return;
+      if(event.key === "Escape") close();
+      if(event.key === "ArrowLeft") show(currentIndex - 1);
+      if(event.key === "ArrowRight") show(currentIndex + 1);
+    });
+  }
+
+  function show(index){
+    if(!frames.length) refreshFrames();
+    if(!frames.length) return;
+    currentIndex = (index + frames.length) % frames.length;
+    var data = getFrameData(currentIndex);
+    if(!data || !data.src) return;
+
+    ensureOverlay();
+    overlay.classList.add("is-loading");
+    imageEl.style.opacity = "0";
+    imageEl.src = data.src;
+    imageEl.alt = data.alt;
+    captionEl.textContent = data.label;
+
+    imageEl.onload = function(){
+      overlay.classList.remove("is-loading");
+      requestAnimationFrame(function(){
+        imageEl.style.opacity = "1";
+      });
+    };
+
+    prevBtn.disabled = frames.length < 2;
+    nextBtn.disabled = frames.length < 2;
+  }
+
+  function open(index){
+    ensureOverlay();
+    show(index);
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.classList.add("is-open");
+    document.body.classList.add("photo-lightbox-open");
+  }
+
+  function close(){
+    if(!overlay) return;
+    overlay.classList.remove("is-open", "is-loading");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("photo-lightbox-open");
+  }
+
+  function bind(){
+    refreshFrames();
+    root.addEventListener("click", function(event){
+      var frame = event.target.closest ? event.target.closest(".illus-art-frame") : null;
+      if(!frame || !root.contains(frame)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      open(frames.indexOf(frame));
+    });
+    root.addEventListener("keydown", function(event){
+      if(event.key !== "Enter" && event.key !== " ") return;
+      var frame = event.target.closest ? event.target.closest(".illus-art-frame") : null;
+      if(!frame || !root.contains(frame)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      open(frames.indexOf(frame));
+    });
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", bind, { once:true });
+  }else{
+    bind();
+  }
+})();
+
+/* ── ILLUSTRATION / ART folder view: open a whole work folder, photo-style ── */
+(function(){
+  "use strict";
+
+  var root = document.getElementById("view-illustration");
+  if(!root) return;
+
+  var overlay = null;
+  var titleEl = null;
+  var countEl = null;
+  var gridEl = null;
+  var zoomEl = null;
+  var zoomImg = null;
+  var zoomCaption = null;
+
+  function getTitleFromTarget(target){
+    var card = target && target.closest ? target.closest(".illus-card") : null;
+    if(card){
+      var cardTitle = card.querySelector(".illus-title");
+      return cardTitle ? cardTitle.textContent.trim() : "";
+    }
+    var item = target && target.closest ? target.closest(".illus-art-item") : null;
+    var title = item ? item.querySelector("figcaption strong") : null;
+    return title ? title.textContent.trim() : "";
+  }
+
+  function getNoFromFrame(frame){
+    var item = frame && frame.closest ? frame.closest(".illus-art-item") : null;
+    var no = item ? item.querySelector("figcaption span") : null;
+    return no ? no.textContent.trim() : "";
+  }
+
+  function getImageFromFrame(frame){
+    var img = frame ? frame.querySelector("img") : null;
+    if(!img) return null;
+    return {
+      src: img.getAttribute("data-full-src") || img.currentSrc || img.src || "",
+      alt: img.alt || "",
+      no: getNoFromFrame(frame)
+    };
+  }
+
+  function getAllFrames(){
+    return Array.from(root.querySelectorAll(".illus-art-frame"));
+  }
+
+  function getGroupFrames(title){
+    if(!title) return [];
+    var folderTitle = title;
+    if(title === "SILENT FRAME" || title === "AFTER IMAGE" || title === "SOFT DISTANCE" || title === "ECHO OF LIGHT"){
+      folderTitle = "DESSIN";
+    }
+    return getAllFrames().filter(function(frame){
+      return getTitleFromTarget(frame) === folderTitle;
+    });
+  }
+
+  function ensureOverlay(){
+    if(overlay) return;
+
+    overlay = document.createElement("div");
+    overlay.className = "illus-folder-overlay";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = [
+      '<button class="illus-folder-close" type="button" aria-label="Close">×</button>',
+      '<section class="illus-folder-panel" aria-label="Illustration folder gallery">',
+      '  <header class="illus-folder-head">',
+      '    <p>ILLUSTRATION / ART</p>',
+      '    <h2></h2>',
+      '    <span></span>',
+      '  </header>',
+      '  <div class="illus-folder-grid"></div>',
+      '</section>'
+    ].join("");
+    document.body.appendChild(overlay);
+
+    titleEl = overlay.querySelector(".illus-folder-head h2");
+    countEl = overlay.querySelector(".illus-folder-head span");
+    gridEl = overlay.querySelector(".illus-folder-grid");
+
+    overlay.addEventListener("click", function(event){
+      if(event.target === overlay || event.target.closest(".illus-folder-close")){
+        close();
+      }
+    });
+
+    document.addEventListener("keydown", function(event){
+      if(!overlay || !overlay.classList.contains("is-open")) return;
+      if(zoomEl && zoomEl.classList.contains("is-open") && event.key === "Escape"){
+        closeZoom();
+        return;
+      }
+      if(event.key === "Escape") close();
+    });
+  }
+
+  function ensureZoom(){
+    if(zoomEl) return;
+
+    zoomEl = document.createElement("div");
+    zoomEl.className = "illus-folder-zoom";
+    zoomEl.setAttribute("aria-hidden", "true");
+    zoomEl.innerHTML = [
+      '<button class="illus-folder-zoom-close" type="button" aria-label="Close image">×</button>',
+      '<figure class="illus-folder-zoom-stage">',
+      '  <img alt="">',
+      '  <figcaption></figcaption>',
+      '</figure>'
+    ].join("");
+    document.body.appendChild(zoomEl);
+
+    zoomImg = zoomEl.querySelector("img");
+    zoomCaption = zoomEl.querySelector("figcaption");
+
+    zoomEl.addEventListener("click", function(event){
+      if(event.target === zoomEl || event.target.closest(".illus-folder-zoom-close")){
+        closeZoom();
+      }
+    });
+  }
+
+  function openZoom(item, title, index){
+    if(!item || !item.src) return;
+    ensureZoom();
+    zoomImg.style.opacity = "0";
+    zoomImg.src = item.src;
+    zoomImg.alt = item.alt || "";
+    zoomCaption.textContent = [item.no || String(index + 1).padStart(2, "0"), title].filter(Boolean).join(" / ");
+    zoomImg.onload = function(){
+      requestAnimationFrame(function(){
+        zoomImg.style.opacity = "1";
+      });
+    };
+    zoomEl.setAttribute("aria-hidden", "false");
+    zoomEl.classList.add("is-open");
+  }
+
+  function closeZoom(){
+    if(!zoomEl) return;
+    zoomEl.classList.remove("is-open");
+    zoomEl.setAttribute("aria-hidden", "true");
+  }
+
+  function open(target){
+    var title = getTitleFromTarget(target);
+    var group = getGroupFrames(title).map(getImageFromFrame).filter(function(item){
+      return item && item.src;
+    });
+    if(!group.length) return;
+
+    ensureOverlay();
+    titleEl.textContent = title;
+    countEl.textContent = String(group.length).padStart(2, "0") + " IMAGES";
+    gridEl.innerHTML = "";
+
+    group.forEach(function(item, index){
+      var figure = document.createElement("figure");
+      figure.className = "illus-folder-item";
+      figure.innerHTML = [
+        '<div class="illus-folder-frame">',
+        '  <img alt="">',
+        '</div>',
+        '<figcaption><span></span><strong></strong></figcaption>'
+      ].join("");
+      var img = figure.querySelector("img");
+      var frameEl = figure.querySelector(".illus-folder-frame");
+      var no = figure.querySelector("figcaption span");
+      var label = figure.querySelector("figcaption strong");
+      img.src = item.src;
+      img.alt = item.alt || (title + " " + String(index + 1).padStart(2, "0"));
+      img.loading = index < 4 ? "eager" : "lazy";
+      img.decoding = "async";
+      no.textContent = item.no || String(index + 1).padStart(2, "0");
+      label.textContent = title;
+      frameEl.setAttribute("role", "button");
+      frameEl.setAttribute("tabindex", "0");
+      frameEl.setAttribute("aria-label", "Open " + title + " image " + String(index + 1).padStart(2, "0"));
+      frameEl.addEventListener("click", function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        openZoom(item, title, index);
+      });
+      frameEl.addEventListener("keydown", function(event){
+        if(event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        event.stopPropagation();
+        openZoom(item, title, index);
+      });
+      gridEl.appendChild(figure);
+    });
+
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.classList.add("is-open");
+    document.body.classList.add("photo-lightbox-open");
+    requestAnimationFrame(function(){
+      overlay.classList.add("is-ready");
+    });
+  }
+
+  function close(){
+    if(!overlay) return;
+    closeZoom();
+    overlay.classList.remove("is-open", "is-ready");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("photo-lightbox-open");
+  }
+
+  function bind(){
+    Array.from(root.querySelectorAll("#illusGrid .illus-card")).forEach(function(card, index){
+      var title = getTitleFromTarget(card);
+      card.setAttribute("role", "button");
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("aria-label", "Open " + (title || "illustration") + " folder");
+      card.dataset.illusFolderIndex = String(index);
+    });
+
+    root.addEventListener("click", function(event){
+      var card = event.target.closest ? event.target.closest("#illusGrid .illus-card") : null;
+      if(!card || !root.contains(card)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      open(card);
+    }, true);
+
+    root.addEventListener("keydown", function(event){
+      if(event.key !== "Enter" && event.key !== " ") return;
+      var card = event.target.closest ? event.target.closest("#illusGrid .illus-card") : null;
+      if(!card || !root.contains(card)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      open(card);
+    }, true);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", bind, { once:true });
+  }else{
+    bind();
+  }
+})();
+
+/* Cursor guard: keep the visible ring glued to the pointer even if earlier
+   visual scripts exit before binding their mousemove handler. */
+(function(){
+  "use strict";
+  var finePointer = !window.matchMedia || window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var cursor = document.getElementById("cursor");
+  if(!cursor) return;
+
+  if(!finePointer){
+    cursor.style.display = "none";
+    document.documentElement.style.cursor = "auto";
+    document.body.style.cursor = "auto";
+    return;
+  }
+
+  var x = -120;
+  var y = -120;
+  var frame = 0;
+  var ready = false;
+
+  function apply(){
+    frame = 0;
+    if(window.__stablePortfolioCursor) return;
+    cursor.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
+    if(!ready){
+      ready = true;
+      document.body.classList.add("cursor-ready");
+    }
+  }
+
+  function move(event){
+    if(window.__stablePortfolioCursor) return;
+    if(typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
+    x = event.clientX;
+    y = event.clientY;
+    if(!frame) frame = requestAnimationFrame(apply);
+  }
+
+  function leave(){
+    ready = false;
+    document.body.classList.remove("cursor-ready");
+  }
+
+  window.addEventListener("pointermove", move, { passive:true, capture:true });
+  document.addEventListener("mousemove", move, { passive:true, capture:true });
+  document.addEventListener("mouseleave", leave, { passive:true });
+  document.addEventListener("mouseenter", move, { passive:true });
+})();
+
   /* ── Reading progress bar ─────────────────────────────── */
   (function(){
     const bar = document.getElementById("ux-progress");
@@ -3339,8 +3865,83 @@
   var processEl, processWrap, toolsEl;
   var lbSrcs = [], lbIdx = 0;
   var videoTimer = 0;
+  var storyImageObserver = null;
+  var workTransitionEl = null;
+  var workTransitioning = false;
+  var workTransitionOpenTimer = 0;
+  var workTransitionEndTimer = 0;
+
+  var DESSIN_GALLERY = [
+    "/assets/illustration-art/dessin/15-1.jpg",
+    "/assets/illustration-art/dessin/16-148bb317-221c-44c6-9677-a813199f2828-rw-600.jpg",
+    "/assets/illustration-art/dessin/17-27b737c9-14db-45e1-8f83-ede676fdd9ba-rw-600.jpg",
+    "/assets/illustration-art/dessin/18-2e16a966-9f73-4fc7-a8eb-54c52b30d6f1-rw-600.jpg",
+    "/assets/illustration-art/dessin/19-55b10221-4e42-45c3-aa3f-6a9f7ab2b788-rw-600.jpg",
+    "/assets/illustration-art/dessin/20-6090bc12-3beb-4bb8-a0f2-9c73755a0206-rw-600.jpg",
+    "/assets/illustration-art/dessin/21-638eb497-6d72-49ef-a147-98ccc24fdfca-rw-600.jpg",
+    "/assets/illustration-art/dessin/22-67bb1924-7afd-4c68-852a-4fba40ee3ae5-rw-1200.jpg",
+    "/assets/illustration-art/dessin/23-681ba677-78d3-46fa-8922-5e4dab930c18-rw-1200.jpg",
+    "/assets/illustration-art/dessin/24-7f7149ed-d6f9-4796-b61c-cac14689ff2d-rw-600.jpg",
+    "/assets/illustration-art/dessin/25-8de3efe7-1d2d-4a75-997f-2a2251c74935-rw-600.jpg",
+    "/assets/illustration-art/dessin/26-8e306f86-d6bc-4c31-9db6-a80010fb6290-rw-600.jpg",
+    "/assets/illustration-art/dessin/27-9da7d944-db81-4f58-89fe-bca45c6ed558-rw-600.jpg",
+    "/assets/illustration-art/dessin/28-a8545dca-246b-4194-b652-56872e259283-rw-600.jpg",
+    "/assets/illustration-art/dessin/29-a90727ee-4d05-411e-a5a7-ef19763e6c03-rw-600.jpg",
+    "/assets/illustration-art/dessin/30-a9406c3e-5862-46ca-b8f9-17398ea46549-rw-600.jpg",
+    "/assets/illustration-art/dessin/31-aad8a899-e577-4639-b816-e481a589a4dc-rw-600.jpg",
+    "/assets/illustration-art/dessin/32-b564f9b3-2614-4ba9-8867-b5610e601df3-rw-600.jpg",
+    "/assets/illustration-art/dessin/33-c6d151a8-a8d1-4cf2-931d-1b6a8d257c6a-rw-600.jpg",
+    "/assets/illustration-art/dessin/34-d142ed24-5f2b-4080-92e1-0ae0a39acc8e-rw-1200.jpg",
+    "/assets/illustration-art/dessin/35-d4687d6a-25e0-4d09-9d9c-f74143b4ae92-rw-1200.jpg",
+    "/assets/illustration-art/dessin/36-d6a29c0f-24c9-4b73-83a6-f8e9364f8b14-rw-1200.jpg",
+    "/assets/illustration-art/dessin/37-d851c9e8-05a0-4446-ad82-33ea0c0d2571-rw-600.jpg",
+    "/assets/illustration-art/dessin/38-d8b7c4f7-5d10-47e0-a8d4-04351e77cfef-rw-600.jpg",
+    "/assets/illustration-art/dessin/39-illustration5-2.jpeg",
+    "/assets/illustration-art/dessin/40-sikisaiii.jpg",
+    "/assets/illustration-art/dessin/41-s.jpeg"
+  ];
+
+  var ILLUSTRATION_FOLDER_GALLERIES = {
+    "MONOCHROME FLOW": [
+      "/assets/illustration-art/monochrome-flow/01-view7.jpeg",
+      "/assets/illustration-art/monochrome-flow/02-view8.jpeg"
+    ],
+    "CITY NOISE": [
+      "/assets/illustration-art/city-noise/03-bill.jpg",
+      "/assets/illustration-art/city-noise/04-meka.jpg",
+      "/assets/illustration-art/city-noise/05-meka2.jpg"
+    ],
+    "DUST & LIGHT": [
+      "/assets/illustration-art/dust-and-light/06-img-9457-2.jpg",
+      "/assets/illustration-art/dust-and-light/07-img-9458-3.jpg",
+      "/assets/illustration-art/dust-and-light/08-img-9459.jpg",
+      "/assets/illustration-art/dust-and-light/09-img-9460-3.jpg",
+      "/assets/illustration-art/dust-and-light/10-img-9461-2.jpg",
+      "/assets/illustration-art/dust-and-light/11-img-9464.jpg",
+      "/assets/illustration-art/dust-and-light/12-img-9465-2.jpg",
+      "/assets/illustration-art/dust-and-light/13-img-9508.jpg"
+    ],
+    "QUIET SURFACE": [
+      "/assets/illustration-art/quiet-surface/14-view8.jpeg"
+    ],
+    "SILENT FRAME": DESSIN_GALLERY.slice(0, 7),
+    "AFTER IMAGE": DESSIN_GALLERY.slice(7, 14),
+    "SOFT DISTANCE": DESSIN_GALLERY.slice(14, 21),
+    "ECHO OF LIGHT": DESSIN_GALLERY.slice(21)
+  };
+
+  function applyIllustrationFolderGalleries(){
+    document.querySelectorAll("#illusGrid .illus-card").forEach(function(card){
+      var title = tx(card, ".illus-title").toUpperCase();
+      var gallery = ILLUSTRATION_FOLDER_GALLERIES[title];
+      if(!gallery || !gallery.length) return;
+      card.dataset.gallery = gallery.join("|");
+      card.dataset.galleryLayout = "photo-grid";
+    });
+  }
 
   function build(){
+    applyIllustrationFolderGalleries();
     items = Array.from(document.querySelectorAll(SELECTOR));
     if(!items.length) return;
 
@@ -3416,13 +4017,21 @@
       lbIdx = idx;
       var src = lbSrcs[lbIdx];
       lightboxImg.style.opacity = "0";
+      lightboxImg.onload = function(){
+        if(lightbox.classList.contains("is-native")){
+          requestAnimationFrame(function(){
+            lightbox.scrollLeft = Math.max(0, (lightbox.scrollWidth - lightbox.clientWidth) / 2);
+            lightbox.scrollTop = Math.max(0, (lightbox.scrollHeight - lightbox.clientHeight) / 2);
+          });
+        }
+      };
       lightboxImg.src = src;
       lightbox.classList.add("on");
       requestAnimationFrame(function(){ lightboxImg.style.opacity = "1"; });
       lightbox.querySelector("#wv-lb-prev").classList.toggle("hidden", lbIdx === 0);
       lightbox.querySelector("#wv-lb-next").classList.toggle("hidden", lbIdx === lbSrcs.length - 1);
     }
-    function lbClose(){ lightbox.classList.remove("on"); }
+    function lbClose(){ lightbox.classList.remove("on", "is-native"); }
 
     lightbox.addEventListener("click", function(e){
       if(e.target === lightbox || e.target.id === "wv-lb-x"){ lbClose(); }
@@ -3434,6 +4043,16 @@
       if(e.key === "ArrowLeft" && lbIdx > 0){ lbShow(lbIdx - 1); }
       if(e.key === "ArrowRight" && lbIdx < lbSrcs.length - 1){ lbShow(lbIdx + 1); }
       if(e.key === "Escape"){ lbClose(); }
+    });
+    lightboxImg.addEventListener("click", function(e){
+      e.stopPropagation();
+      lightbox.classList.toggle("is-native");
+      if(lightbox.classList.contains("is-native")){
+        requestAnimationFrame(function(){
+          lightbox.scrollLeft = Math.max(0, (lightbox.scrollWidth - lightbox.clientWidth) / 2);
+          lightbox.scrollTop = Math.max(0, (lightbox.scrollHeight - lightbox.clientHeight) / 2);
+        });
+      }
     });
 
     /* refs */
@@ -3470,23 +4089,24 @@
     items.forEach(function(el, i){
       el.style.cursor = "pointer";
       el.addEventListener("click", function(e){
-        e.stopPropagation(); openAt(i);
+        e.stopPropagation();
+        openWithShowcaseTransition(i, el);
       }, true);
     });
 
     window.__openWorkFromElement = function(targetEl, opts){
       var idx = items.indexOf(targetEl);
       if(idx < 0) return false;
-      openAt(idx);
-      if(opts && opts.scrollLong){
+      openWithShowcaseTransition(idx, targetEl, function(){
+        if(!(opts && opts.scrollLong)) return;
         setTimeout(function(){
           try{
             if(scrollEl && longWrap && longWrap.style.display !== "none"){
               scrollEl.scrollTo({ top:Math.max(0, longWrap.offsetTop - 72), behavior:"smooth" });
             }
           }catch(_){}
-        }, 360);
-      }
+        }, 420);
+      });
       return true;
     };
 
@@ -3568,7 +4188,8 @@
 
   function getData(el){
     var imgEl = el.querySelector("img.swap-base") || el.querySelector("img:not(.swap-hover)");
-    var src   = imgEl ? (imgEl.getAttribute("src") || "") : "";
+    var fallbackSrc = imgEl ? (imgEl.getAttribute("src") || "") : "";
+    var src   = imgEl ? (imgEl.getAttribute("data-full-src") || fallbackSrc) : "";
     var title = tx(el, ".design-title,.illus-title,.view-title") || tx(el,"h2,h3") || "";
     var catTx = tx(el, ".design-meta,.illus-sub,.view-meta,.design-index,.view-no") || "";
     var desc  = tx(el, ".design-desc,.illus-desc,.view-desc") || "";
@@ -3580,16 +4201,21 @@
     var gRaw  = ds.gallery || "";
     var gallery = gRaw ? gRaw.split("|").map(function(s){ return s.trim(); }).filter(Boolean) : [];
     var galleryLayout = ds.galleryLayout || "";
-    var youtube = ds.youtube || "";
+    var youtubeRaw = ds.youtube || "";
+    var youtubeListRaw = ds.youtubeList || "";
+    var youtubeList = youtubeListRaw
+      ? youtubeListRaw.split("|").map(getYoutubeId).filter(Boolean)
+      : (youtubeRaw ? youtubeRaw.split("|").map(getYoutubeId).filter(Boolean) : []);
+    var youtube = youtubeList[0] || "";
     var themeRaw = ds.themeGallery || "";
     var themeGallery = themeRaw ? themeRaw.split("|").map(function(s){ return s.trim(); }).filter(Boolean) : [];
     var href  = ds.url || ds.href ||
                 (el.querySelector("a[href]") ? el.querySelector("a[href]").href : "") || "";
     var process = ds.process || "";
     var tools   = ds.tools   || "";
-    return { src:src, title:title, cat:catTx, desc:desc,
+    return { src:src, fallbackSrc:fallbackSrc, title:title, cat:catTx, desc:desc,
              long:long, year:year, role:role, media:media,
-             gallery:gallery, galleryLayout:galleryLayout, youtube:youtube, themeGallery:themeGallery, href:href,
+             gallery:gallery, galleryLayout:galleryLayout, youtube:youtube, youtubeList:youtubeList, themeGallery:themeGallery, href:href,
              process:process, tools:tools };
   }
 
@@ -3602,6 +4228,62 @@
     return String(s).replace(/[&<>"']/g, function(c){
       return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
     });
+  }
+
+  function getYoutubeId(value){
+    var raw = String(value || "").trim();
+    if(!raw) return "";
+    if(/^[A-Za-z0-9_-]{8,}$/.test(raw) && raw.indexOf("/") < 0){
+      return raw;
+    }
+    try{
+      var url = new URL(raw, window.location.href);
+      var host = url.hostname.replace(/^www\./, "");
+      if(host === "youtu.be"){
+        return (url.pathname.split("/").filter(Boolean)[0] || "").trim();
+      }
+      var queryId = url.searchParams.get("v");
+      if(queryId) return queryId.trim();
+      var parts = url.pathname.split("/").filter(Boolean);
+      for(var i = 0; i < parts.length - 1; i++){
+        if(parts[i] === "embed" || parts[i] === "shorts"){
+          return parts[i + 1].trim();
+        }
+      }
+    }catch(_){}
+    var match = raw.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|shorts\/)|[?&]v=)([A-Za-z0-9_-]{8,})/);
+    return match ? match[1] : raw;
+  }
+
+  function getYoutubeEmbedSrc(id, opts){
+    var videoId = getYoutubeId(id);
+    var muted = !opts || opts.muted !== false;
+    var autoplay = !!(opts && opts.autoplay);
+    var loop = !!(opts && opts.loop);
+    var controls = opts && opts.controls ? "1" : "0";
+    var params = [
+      "playsinline=1",
+      "rel=0",
+      "controls=" + controls,
+      "disablekb=" + (controls === "1" ? "0" : "1"),
+      "fs=" + (controls === "1" ? "1" : "0"),
+      "iv_load_policy=3",
+      "enablejsapi=1",
+      "vq=hd1080",
+      "origin=" + encodeURIComponent(window.location.origin || "http://localhost")
+    ];
+    if(autoplay) params.push("autoplay=1");
+    if(muted) params.push("mute=1");
+    if(loop){
+      params.push("loop=1");
+      params.push("playlist=" + encodeURIComponent(videoId));
+    }
+    return "https://www.youtube.com/embed/" + encodeURIComponent(videoId) + "?" + params.join("&");
+  }
+
+  function getYoutubeWatchUrl(id){
+    var videoId = getYoutubeId(id);
+    return videoId ? "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId) : "";
   }
 
   function renderMeta(d){
@@ -3635,19 +4317,59 @@
   ];
 
   function renderGallery(d){
+    if(storyImageObserver){
+      try{ storyImageObserver.disconnect(); }catch(_){}
+      storyImageObserver = null;
+    }
     galleryEl.innerHTML = "";
     galleryWrap.classList.remove("is-visual-film-gallery");
+    galleryWrap.classList.remove("is-photo-grid-gallery");
     galleryEl.classList.remove("is-visual-film-gallery");
+    galleryEl.classList.remove("is-photo-grid-gallery");
     if(!d.gallery || !d.gallery.length){ galleryWrap.style.display="none"; return; }
     galleryWrap.style.display = "";
     var isVisualFilm = d.galleryLayout === "visual-film";
+    var isPhotoGrid = d.galleryLayout === "photo-grid";
     galleryWrap.classList.toggle("is-visual-film-gallery", isVisualFilm);
     galleryEl.classList.toggle("is-visual-film-gallery", isVisualFilm);
+    galleryWrap.classList.toggle("is-photo-grid-gallery", isPhotoGrid);
+    galleryEl.classList.toggle("is-photo-grid-gallery", isPhotoGrid);
     lbSrcs = d.gallery.slice(); /* store all gallery srcs for prev/next */
+    function revealBlock(revealEl, delay){
+      revealEl.style.transitionDelay = delay + "ms";
+      requestAnimationFrame(function(){
+        revealEl.classList.add("is-revealed");
+      });
+    }
+    function loadStoryImage(image){
+      if(!image) return;
+      var pendingSrc = image.getAttribute("data-src");
+      if(!pendingSrc) return;
+      image.removeAttribute("data-src");
+      image.src = pendingSrc;
+    }
+    function observeStoryImage(image){
+      if(!image) return;
+      if(!("IntersectionObserver" in window)){
+        loadStoryImage(image);
+        return;
+      }
+      if(!storyImageObserver){
+        storyImageObserver = new IntersectionObserver(function(entries){
+          entries.forEach(function(entry){
+            if(!entry.isIntersecting) return;
+            storyImageObserver.unobserve(entry.target);
+            loadStoryImage(entry.target);
+          });
+        }, { root:scrollEl || null, rootMargin:"720px 0px", threshold:0.01 });
+      }
+      storyImageObserver.observe(image);
+    }
     d.gallery.forEach(function(src, gi){
       var block = document.createElement("div");
       block.className = "wv-story-block";
       if(isVisualFilm) block.classList.add("is-visual-film-frame");
+      if(isPhotoGrid) block.classList.add("is-photo-grid-frame");
 
       /* image wrap */
       var imgWrap = document.createElement("div");
@@ -3659,18 +4381,9 @@
       im.alt = "";
       im.draggable = false;
       im.decoding = "async";
-      im.loading = isVisualFilm ? "eager" : (gi < 2 ? "eager" : "lazy");
-      if(isVisualFilm){
-        im.sizes = "(max-width: 920px) calc(100vw - 28px), 680px";
-      }
+      im.loading = gi < 2 ? "eager" : "lazy";
       imgWrap.appendChild(numSpan);
       imgWrap.appendChild(im);
-
-      /* Put the URL on the real image immediately so it never stays blank
-         if a preloader races with the modal's scroll container. */
-      if(isVisualFilm){
-        im.srcset = src + " 3500w";
-      }
       im.onload = function(){
         im.classList.add("lo");
       };
@@ -3679,17 +4392,19 @@
         var host = im.closest(".wv-story-img-wrap");
         if(host) host.classList.add("is-error");
       };
-      im.src = src;
-      requestAnimationFrame(function(){
-        im.classList.add("lo");
-      });
+      if(gi < 2){
+        im.src = src;
+      }else{
+        im.setAttribute("data-src", src);
+        observeStoryImage(im);
+      }
 
       /* lightbox on click */
       imgWrap.addEventListener("click", function(){ lbShow(gi); });
 
       /* text block */
       var txt = null;
-      if(!isVisualFilm){
+      if(!isVisualFilm && !isPhotoGrid){
         var cap = STORY_CAPTIONS[gi] || ["制作の一場面。"];
         txt = document.createElement("div");
         txt.className = "wv-story-text";
@@ -3701,12 +4416,7 @@
       block.appendChild(imgWrap);
       if(txt) block.appendChild(txt);
       galleryEl.appendChild(block);
-      (function(revealBlock, delay){
-        revealBlock.style.transitionDelay = delay + "ms";
-        requestAnimationFrame(function(){
-          revealBlock.classList.add("is-revealed");
-        });
-      })(block, isVisualFilm ? gi * 45 : gi * 65);
+      revealBlock(block, isVisualFilm ? gi * 45 : gi * 65);
     });
   }
 
@@ -3738,17 +4448,20 @@
     if(!videoWrap || !videoFrame) return;
     clearTimeout(videoTimer);
     videoFrame.innerHTML = "";
-    if(!d.youtube){
+    videoFrame.classList.remove("is-playing");
+    var previousExternal = videoWrap.querySelector(".wv-video-external");
+    if(previousExternal) previousExternal.remove();
+    var videos = d.youtubeList && d.youtubeList.length
+      ? d.youtubeList
+      : (d.youtube ? [d.youtube] : []);
+    if(!videos.length){
       videoWrap.style.display = "none";
       return;
     }
     videoWrap.style.display = "block";
-    videoFrame.classList.remove("is-playing");
     var iframe = document.createElement("iframe");
     iframe.title = d.title ? d.title + " film preview" : "Film preview";
-    iframe.src = "https://www.youtube.com/embed/" + encodeURIComponent(d.youtube) +
-      "?playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&vq=hd1080&origin=" +
-      encodeURIComponent(window.location.origin || "http://localhost");
+    iframe.src = getYoutubeEmbedSrc(videos[0], { autoplay:false, muted:true, loop:false, controls:false });
     iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     iframe.allowFullscreen = true;
     iframe.setAttribute("allowfullscreen", "");
@@ -3768,14 +4481,43 @@
         iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":[]}', "*");
       }
       videoFrame.classList.add("is-playing");
-      iframe.src = "https://www.youtube.com/embed/" + encodeURIComponent(d.youtube) +
-        "?autoplay=1&mute=0&playsinline=1&rel=0&controls=1&iv_load_policy=3&enablejsapi=1&vq=hd1080&origin=" +
-        encodeURIComponent(window.location.origin || "http://localhost");
+      iframe.src = getYoutubeEmbedSrc(videos[0], { autoplay:true, muted:false, loop:false, controls:true });
       iframe.addEventListener("load", postPlay, { once:true });
       setTimeout(postPlay, 120);
       setTimeout(postPlay, 520);
     });
     videoFrame.appendChild(playButton);
+
+    var watchUrl = getYoutubeWatchUrl(videos[0]);
+    if(watchUrl){
+      var externalLink = document.createElement("a");
+      externalLink.className = "wv-video-external";
+      externalLink.href = watchUrl;
+      externalLink.target = "_blank";
+      externalLink.rel = "noopener noreferrer";
+      externalLink.textContent = "OPEN YOUTUBE";
+      externalLink.setAttribute("aria-label", "Open this film on YouTube");
+      externalLink.addEventListener("pointerdown", function(event){
+        event.stopPropagation();
+      });
+      externalLink.addEventListener("click", function(event){
+        event.stopPropagation();
+        if(event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey){
+          return;
+        }
+        event.preventDefault();
+        var opened = null;
+        try{
+          opened = window.open(watchUrl, "_blank", "noopener,noreferrer");
+        }catch(_){}
+        if(opened){
+          try{ opened.opener = null; opened.focus(); }catch(_){}
+          return;
+        }
+        window.location.href = watchUrl;
+      });
+      videoWrap.appendChild(externalLink);
+    }
   }
 
   function renderThemeGallery(d){
@@ -3801,13 +4543,14 @@
     try{ themeTrack.scrollLeft = 0; }catch(_){}
   }
 
-  function loadImg(src, dir){
+  function loadImg(src, dir, fallbackSrc){
     img.classList.remove("vis","wv-out-l","wv-out-r","wv-in-r","wv-in-l");
     wrap.classList.remove("loaded");
     if(!src){ wrap.classList.add("loaded"); return; }
     var t = new Image();
+    var activeSrc = src;
     t.onload = function(){
-      img.src = src;
+      img.src = activeSrc;
       requestAnimationFrame(function(){
         if(dir === "right")     img.classList.add("wv-in-r");
         else if(dir === "left") img.classList.add("wv-in-l");
@@ -3815,13 +4558,25 @@
         wrap.classList.add("loaded");
       });
     };
-    t.onerror = function(){ wrap.classList.add("loaded"); };
-    t.src = src;
+    t.onerror = function(){
+      if(fallbackSrc && fallbackSrc !== activeSrc){
+        activeSrc = fallbackSrc;
+        t.src = activeSrc;
+        return;
+      }
+      wrap.classList.add("loaded");
+    };
+    t.src = activeSrc;
   }
 
   function render(idx, dir){
+    var item = items[idx];
     var d = getData(items[idx]);
-    if(ov) ov.classList.toggle("is-visual-film", d.galleryLayout === "visual-film");
+    var isIllustrationWork = !!(item && item.classList && item.classList.contains("illus-card"));
+    if(ov){
+      ov.classList.toggle("is-visual-film", d.galleryLayout === "visual-film");
+      ov.classList.toggle("is-illustration-work", isIllustrationWork);
+    }
 
     /* breadcrumb */
     var bc = document.getElementById("wv-breadcrumb-title");
@@ -3859,9 +4614,9 @@
     if(dir){
       var outCls = dir === "right" ? "wv-out-l" : "wv-out-r";
       img.classList.add(outCls);
-      setTimeout(function(){ loadImg(d.src, dir); }, 160);
+      setTimeout(function(){ loadImg(d.src, dir, d.fallbackSrc); }, 160);
     } else {
-      loadImg(d.src, null);
+      loadImg(d.src, null, d.fallbackSrc);
     }
   }
 
@@ -3870,6 +4625,113 @@
   function go(idx, dir){
     if(idx < 0 || idx >= items.length) return;
     cur = idx; render(cur, dir);
+  }
+
+  function ensureWorkTransition(){
+    if(workTransitionEl) return workTransitionEl;
+    workTransitionEl = document.createElement("div");
+    workTransitionEl.id = "work-open-transition";
+    workTransitionEl.className = "work-open-transition";
+    workTransitionEl.setAttribute("aria-hidden", "true");
+    workTransitionEl.innerHTML =
+      '<span class="work-trans-panel"></span>' +
+      '<span class="work-trans-panel"></span>' +
+      '<span class="work-trans-panel"></span>' +
+      '<div class="work-trans-grid"></div>' +
+      '<div class="work-trans-copy">' +
+        '<span class="work-trans-kicker">SELECTED WORK</span>' +
+        '<strong class="work-trans-title"></strong>' +
+        '<em class="work-trans-meta"></em>' +
+      '</div>' +
+      '<div class="work-trans-media"><img alt="" draggable="false"></div>' +
+      '<span class="work-trans-line"></span>';
+    document.body.appendChild(workTransitionEl);
+    return workTransitionEl;
+  }
+
+  function getSourceImage(card){
+    if(!card) return null;
+    return card.querySelector(".design-thumb img:not(.swap-hover), .illus-thumb img:not(.swap-hover), img.swap-base, img:not(.swap-hover), img");
+  }
+
+  function openWithShowcaseTransition(idx, sourceEl, afterOpen){
+    if(idx < 0 || idx >= items.length) return;
+    var reduce = false;
+    try{ reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(_){}
+    if(workTransitioning) return;
+    if(reduce){
+      openAt(idx);
+      if(typeof afterOpen === "function") afterOpen();
+      return;
+    }
+
+    var d = getData(items[idx]);
+    var tr = ensureWorkTransition();
+    var sourceImg = getSourceImage(sourceEl || items[idx]);
+    var sourceRect = sourceImg ? sourceImg.getBoundingClientRect() : (sourceEl || items[idx]).getBoundingClientRect();
+    var media = tr.querySelector(".work-trans-media");
+    var mediaImg = media ? media.querySelector("img") : null;
+    var title = tr.querySelector(".work-trans-title");
+    var meta = tr.querySelector(".work-trans-meta");
+
+    if(title) title.textContent = d.title || "UNTITLED";
+    if(meta) meta.textContent = (d.cat || d.year || "WORK") + " / " + pad(idx + 1);
+    if(mediaImg){
+      mediaImg.src = (sourceImg && (sourceImg.currentSrc || sourceImg.src)) || d.src || "";
+      mediaImg.alt = d.title || "";
+    }
+
+    clearTimeout(workTransitionOpenTimer);
+    clearTimeout(workTransitionEndTimer);
+    workTransitioning = true;
+    tr.classList.remove("is-running", "is-ending");
+    tr.style.display = "block";
+
+    var vw = window.innerWidth || 1440;
+    var vh = window.innerHeight || 900;
+    var targetW = Math.min(vw * 0.36, 620);
+    var targetH = Math.min(vh * 0.48, 430);
+    if(vw < 760){
+      targetW = Math.min(vw - 36, 560);
+      targetH = Math.min(vh * 0.42, 420);
+    }
+    var targetLeft = vw < 760 ? 18 : Math.max(vw * 0.56, vw - targetW - 68);
+    var targetTop = vw < 760 ? Math.max(116, vh * 0.2) : Math.max(112, vh * 0.2);
+
+    if(media){
+      media.style.left = Math.round(sourceRect.left) + "px";
+      media.style.top = Math.round(sourceRect.top) + "px";
+      media.style.width = Math.max(48, Math.round(sourceRect.width)) + "px";
+      media.style.height = Math.max(48, Math.round(sourceRect.height)) + "px";
+    }
+
+    void tr.offsetWidth;
+    tr.classList.add("is-running");
+    requestAnimationFrame(function(){
+      if(media){
+        media.style.left = Math.round(targetLeft) + "px";
+        media.style.top = Math.round(targetTop) + "px";
+        media.style.width = Math.round(targetW) + "px";
+        media.style.height = Math.round(targetH) + "px";
+      }
+    });
+
+    workTransitionOpenTimer = setTimeout(function(){
+      if(ov) ov.classList.add("is-showcase-opening");
+      openAt(idx);
+      if(typeof afterOpen === "function") afterOpen();
+    }, 320);
+
+    workTransitionEndTimer = setTimeout(function(){
+      tr.classList.add("is-ending");
+      setTimeout(function(){
+        tr.classList.remove("is-running", "is-ending");
+        tr.style.display = "none";
+        if(media) media.removeAttribute("style");
+        if(ov) ov.classList.remove("is-showcase-opening");
+        workTransitioning = false;
+      }, 180);
+    }, 680);
   }
 
   function openAt(idx){
@@ -3960,6 +4822,8 @@
 
     grid.classList.add("visual-index-grid");
     grid.innerHTML = "";
+    var visualIndexScrollToken = 0;
+    var visualIndexScrollFrame = 0;
 
     entries.forEach(function(entry, index){
       var card = document.createElement("article");
@@ -4005,41 +4869,139 @@
         return topOffset;
       }
 
-      function scrollEntryToTop(behavior){
-        try{
-          if(!entry.item) return;
-          if(!document.querySelector('.menu [data-view="' + entry.targetView + '"].active')) return;
-          var topOffset = getEntryTopOffset();
-          var rect = entry.item.getBoundingClientRect();
+      function isEntryViewActive(){
+        return !!document.querySelector('.menu [data-view="' + entry.targetView + '"].active');
+      }
+
+      function getEntryScrollTop(){
+        if(!entry.item || !isEntryViewActive()) return null;
+        var topOffset = getEntryTopOffset();
+        var rect = entry.item.getBoundingClientRect();
+        var currentY = window.scrollY || window.pageYOffset || 0;
+        return Math.max(0, currentY + rect.top - topOffset);
+      }
+
+      function glideToEntry(duration, settleDuration){
+        if(visualIndexScrollFrame){
+          window.cancelAnimationFrame(visualIndexScrollFrame);
+          visualIndexScrollFrame = 0;
+        }
+        var startY = window.scrollY || window.pageYOffset || 0;
+        var targetY = getEntryScrollTop();
+        if(targetY == null) return false;
+        targetY = Math.max(0, targetY);
+        if(Math.abs(targetY - startY) < 1){
+          window.scrollTo({ top:targetY, behavior:"auto" });
+          return true;
+        }
+        var startedAt = performance.now();
+        var runFor = Math.max(720, duration || 1180);
+        var followFor = Math.max(420, settleDuration || 820);
+        var easeInOutCubic = function(t){
+          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        };
+        var softStop = function(t){ return 1 - Math.pow(1 - t, 3); };
+        function step(now){
+          var p = Math.max(0, Math.min(1, (now - startedAt) / runFor));
+          var liveTarget = getEntryScrollTop();
+          if(liveTarget == null){
+            visualIndexScrollFrame = 0;
+            return;
+          }
+          liveTarget = Math.max(0, liveTarget);
+          targetY += (liveTarget - targetY) * (p < 0.92 ? 0.16 : 0.28);
           var currentY = window.scrollY || window.pageYOffset || 0;
-          var top = Math.max(0, currentY + rect.top - topOffset);
-          window.scrollTo({ top:top, behavior:behavior || "smooth" });
+          var y;
+          if(p < 1){
+            y = startY + ((targetY - startY) * easeInOutCubic(p));
+          }else{
+            var settleP = Math.max(0, Math.min(1, (now - startedAt - runFor) / followFor));
+            y = currentY + ((liveTarget - currentY) * (0.08 + softStop(settleP) * 0.2));
+          }
+          y = Math.max(0, y);
+          window.scrollTo({ top:y, behavior:"auto" });
+          if(p >= 1 && now - startedAt >= runFor + followFor){
+            visualIndexScrollFrame = 0;
+            return;
+          }
+          visualIndexScrollFrame = window.requestAnimationFrame(step);
+        }
+        visualIndexScrollFrame = window.requestAnimationFrame(step);
+        return true;
+      }
+
+      function scrollEntryToTop(behavior, duration, settleDuration){
+        try{
+          var top = getEntryScrollTop();
+          if(top == null) return false;
+          if(behavior === "smooth"){
+            return glideToEntry(duration, settleDuration);
+          }else{
+            window.scrollTo({ top:top, behavior:"auto" });
+          }
+          return true;
+        }catch(_){}
+        return false;
+      }
+
+      function correctEntryToTop(){
+        try{
+          var top = getEntryScrollTop();
+          if(top == null) return;
+          var currentY = window.scrollY || window.pageYOffset || 0;
+          if(Math.abs(top - currentY) > 26 && !visualIndexScrollFrame){
+            glideToEntry(620, 620);
+          }
         }catch(_){}
       }
 
-      function settleEntryToTop(){
-        var attempts = 0;
-        function align(){
-          attempts += 1;
-          scrollEntryToTop(attempts <= 2 ? "smooth" : "auto");
-          if(attempts < 7){
-            window.setTimeout(align, attempts <= 2 ? 420 : 560);
-          }
+      function settleEntryToTop(alreadyActive){
+        var token = ++visualIndexScrollToken;
+        if(visualIndexScrollFrame){
+          window.cancelAnimationFrame(visualIndexScrollFrame);
+          visualIndexScrollFrame = 0;
         }
-        window.setTimeout(align, 900);
+        var firstDelay = alreadyActive ? 80 : 920;
+        function scheduleQuietCorrections(){
+          window.setTimeout(function(){
+            if(token === visualIndexScrollToken) correctEntryToTop();
+          }, 1320);
+          window.setTimeout(function(){
+            if(token === visualIndexScrollToken) correctEntryToTop();
+          }, 2200);
+        }
+        window.setTimeout(function(){
+          if(token !== visualIndexScrollToken) return;
+          if(scrollEntryToTop("smooth", alreadyActive ? 980 : 1240, alreadyActive ? 620 : 980)){
+            scheduleQuietCorrections();
+            return;
+          }
+          window.setTimeout(function(){
+            if(token !== visualIndexScrollToken) return;
+            scrollEntryToTop("smooth", 1120, 820);
+            scheduleQuietCorrections();
+          }, 260);
+        }, firstDelay);
       }
 
-      function openTarget(){
+      function openTarget(event){
+        if(event){
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        var alreadyActive = isEntryViewActive();
         var nav = document.querySelector('.menu [data-view="' + entry.targetView + '"]');
-        if(nav) nav.click();
-        settleEntryToTop();
+        if(nav && !alreadyActive){
+          window.__portfolioSkipNextViewScrollReset = { view:entry.targetView };
+          nav.click();
+        }
+        settleEntryToTop(alreadyActive);
       }
 
       card.addEventListener("click", openTarget);
       card.addEventListener("keydown", function(event){
         if(event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        openTarget();
+        openTarget(event);
       });
       grid.appendChild(card);
     });
@@ -4072,7 +5034,8 @@
     var hasDescription = hasLong || !!descText;
     var galleryCount = countPipeItems(card.getAttribute("data-gallery"));
     var themeCount = countPipeItems(card.getAttribute("data-theme-gallery"));
-    var videoCount = (card.getAttribute("data-youtube") || "").trim() ? 1 : 0;
+    var videoListCount = countPipeItems(card.getAttribute("data-youtube-list"));
+    var videoCount = videoListCount || ((card.getAttribute("data-youtube") || "").trim() ? 1 : 0);
     var fileCount = galleryCount + themeCount + videoCount;
 
     return {
@@ -4216,10 +5179,10 @@
     }
   });
 
-  /* ─── D. ホバースワップ実装（31.html 由来の軽量版） ──────────── */
-  /*    ・setup 時に Promise ベースで一括プリロード → 初回ホバーも即応
-        ・decode()/double-RAF/ric を廃し、クラス切替だけに絞る
-        ・重複処理を排除、1 系統のみに統一                              */
+  /* ─── D. ホバースワップ実装（初回 hover まで画像読み込みを待つ） ───── */
+  /*    巨大な -2 / gallery 画像を load 後に全件プリロードすると、
+        見えていない作品まで数十MB単位で読み込む。見た目は同じまま、
+        hover された作品だけを必要な時に読み込む。 */
   (function(){
     var canHover = window.matchMedia("(hover: hover)").matches;
     if(!canHover) return;
@@ -4244,7 +5207,7 @@
       });
     }
 
-    function attach(baseImg, thumbEl, itemEl, swapSrc){
+    function attach(baseImg, thumbEl, swapSrc){
       baseImg.classList.add("swap-base");
       var hoverImg = document.createElement("img");
       hoverImg.className = "swap-hover";
@@ -4255,13 +5218,6 @@
       hoverImg.src = swapSrc;
       thumbEl.appendChild(hoverImg);
       if(typeof wireImageFallback === "function") wireImageFallback(hoverImg);
-
-      itemEl.addEventListener("mouseenter", function(){
-        itemEl.classList.add("is-hover-swapping");
-      });
-      itemEl.addEventListener("mouseleave", function(){
-        itemEl.classList.remove("is-hover-swapping");
-      });
     }
 
     function wire(itemEl, thumbEl, baseImg){
@@ -4269,6 +5225,8 @@
       var raw = baseImg.getAttribute("src") || "";
       var isIllus = itemEl && itemEl.classList && itemEl.classList.contains("illus-card");
       var candidates = [];
+      var explicitSwap = baseImg.getAttribute("data-hover-src") || itemEl.getAttribute("data-hover-src");
+      if(explicitSwap && explicitSwap !== raw) candidates.push(explicitSwap);
       var swap = makeSwap(raw);
       if(swap && swap !== raw) candidates.push(swap);
       /* design のみ: -2が見つからない場合のみ data-gallery を予備候補に追加
@@ -4284,59 +5242,62 @@
 
       /* 候補を順に試し、最初に成功したものを採用。全部失敗したら何もしない */
       function tryNext(i){
-        if(i >= candidates.length) return Promise.resolve();
+        if(i >= candidates.length) return Promise.resolve("");
         return preloadImage(candidates[i])
-          .then(function(){ attach(baseImg, thumbEl, itemEl, candidates[i]); })
+          .then(function(){ return candidates[i]; })
           .catch(function(){ return tryNext(i + 1); });
       }
-      return function(){ return tryNext(0); };
-    }
 
-    function idle(fn){
-      if("requestIdleCallback" in window){
-        window.requestIdleCallback(fn, { timeout:1200 });
-      }else{
-        window.setTimeout(fn, 80);
-      }
-    }
+      var loaded = false;
+      var loading = false;
+      var hoverActive = false;
 
-    function runJobs(jobs){
-      var index = 0;
-      var active = 0;
-      var maxActive = 2;
-      function pump(){
-        while(active < maxActive && index < jobs.length){
-          active += 1;
-          Promise.resolve()
-            .then(jobs[index++])
-            .catch(function(){})
-            .then(function(){
-              active -= 1;
-              idle(pump);
+      function ensureLoaded(){
+        if(loaded || loading) return;
+        loading = true;
+        tryNext(0).then(function(src){
+          loading = false;
+          if(!src) return;
+          attach(baseImg, thumbEl, src);
+          loaded = true;
+          if(hoverActive){
+            requestAnimationFrame(function(){
+              itemEl.classList.add("is-hover-swapping");
             });
-        }
+          }
+        }).catch(function(){
+          loading = false;
+        });
       }
-      idle(pump);
+
+      itemEl.addEventListener("mouseenter", function(){
+        hoverActive = true;
+        if(loaded){
+          itemEl.classList.add("is-hover-swapping");
+          return;
+        }
+        ensureLoaded();
+      });
+      itemEl.addEventListener("mouseleave", function(){
+        hoverActive = false;
+        itemEl.classList.remove("is-hover-swapping");
+      });
+
+      return null;
     }
 
-    var tasks = [];
     document.querySelectorAll(".design-item").forEach(function(el){
       var th=el.querySelector(".design-thumb"), bi=th?th.querySelector(":scope>img"):null;
-      var t = wire(el,th,bi); if(t) tasks.push(t);
+      wire(el,th,bi);
     });
     document.querySelectorAll(".illus-card").forEach(function(el){
       var th=el.querySelector(".illus-thumb"), bi=th?th.querySelector(":scope>img"):null;
-      var t = wire(el,th,bi); if(t) tasks.push(t);
+      wire(el,th,bi);
     });
     document.querySelectorAll(".view-card").forEach(function(el){
       var th=el.querySelector(".view-thumb"), bi=th?th.querySelector(":scope>img:not(.swap-hover)"):null;
-      var t = wire(el,th,bi); if(t) tasks.push(t);
+      wire(el,th,bi);
     });
-    if(document.readyState === "complete"){
-      runJobs(tasks);
-    }else{
-      window.addEventListener("load", function(){ runJobs(tasks); }, { once:true });
-    }
   })();
 
   /* ─── E. スクロールバー フェードアウト ─────────────── */
@@ -4364,8 +5325,9 @@
   var VIEW_LABELS = {
     profile: { label:"VIEW", no:"01" },
     design:  { label:"DESIGN", no:"02" },
-    illustration: { label:"ILLUSTRATION / ART", no:"03" },
-    "profile-only": { label:"PROFILE", no:"04" }
+    photo: { label:"PHOTO", no:"03" },
+    illustration: { label:"ILLUSTRATION / ART", no:"04" },
+    "profile-only": { label:"PROFILE", no:"05" }
   };
   var meta = document.querySelector(".sidebar-meta");
   if(!meta) return;
@@ -4413,17 +5375,19 @@
 
 (function(){
   "use strict";
+  return;
+  /* eslint-disable-next-line no-unreachable */
   if(window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
   var cursor = document.getElementById("cursor");
   if(!cursor) return;
   var hoverSelector = [
     "a", "button", "[role=button]", "[data-view]",
-    ".view-card", ".design-item", ".illus-card",
+    ".view-card", ".design-item", ".photo-item", ".illus-card", ".illus-art-item",
     ".view-legacy-card", ".view-legacy-controls button",
-    ".design-thumb", ".design-companion", ".illus-thumb", ".view-thumb",
+    ".design-thumb", ".design-companion", ".photo-frame", ".illus-art-frame", ".illus-thumb", ".view-thumb",
     ".wv-story-img-wrap", ".wv-g-item", ".wvdot"
   ].join(",");
-  var zoomSelector = ".design-thumb, .design-companion, .illus-thumb, .view-thumb, .wv-story-img-wrap, .view-legacy-card";
+  var zoomSelector = ".design-thumb, .design-companion, .photo-frame, .illus-thumb, .view-thumb, .wv-story-img-wrap, .view-legacy-card";
 
   function syncCursor(target){
     var el = target && target.closest ? target.closest(hoverSelector) : null;
@@ -4457,6 +5421,230 @@
   document.addEventListener("mouseup", function(){
     cursor.classList.remove("active");
   }, { passive:true });
+})();
+
+/* Final cursor stabilizer: one source of truth for the visible cursor position. */
+(function(){
+  "use strict";
+  if(window.__stablePortfolioCursor) return;
+  window.__stablePortfolioCursor = true;
+
+  var cursor = document.getElementById("cursor");
+  if(!cursor) return;
+
+  var fineQuery = window.matchMedia ? window.matchMedia("(hover: hover) and (pointer: fine)") : null;
+  var enabled = false;
+  var x = -120;
+  var y = -120;
+  var frame = 0;
+  var nativeZone = false;
+  var active = false;
+  var nativeZoneSelector = "iframe, embed, object, video[controls], #wv-video-frame.is-playing, .native-cursor-zone";
+  var hoverSelector = [
+    "a", "button", "[role=button]", "[data-view]",
+    ".view-card", ".design-item", ".photo-item", ".illus-card", ".illus-art-item",
+    ".view-legacy-card", ".view-legacy-controls button",
+    ".design-thumb", ".design-companion", ".photo-frame", ".illus-art-frame", ".illus-thumb", ".view-thumb",
+    ".wv-story-img-wrap", ".wv-g-item", ".wvdot", ".wvbtn",
+    "#wv-x", "#wv-top-fab", ".wv-hd-pill", ".wv-theme-btn", ".wv-video-play", ".wv-video-external",
+    ".photo-lightbox-close", ".photo-lightbox-nav"
+  ].join(",");
+  var zoomSelector = [
+    ".design-thumb", ".design-companion", ".photo-frame", ".illus-art-frame", ".illus-thumb", ".view-thumb",
+    ".wv-story-img-wrap", ".view-legacy-card", "#wv-lb", ".photo-lightbox-stage"
+  ].join(",");
+
+  function hasFinePointer(){
+    return !fineQuery || fineQuery.matches;
+  }
+
+  function writePosition(){
+    frame = 0;
+    if(!enabled) return;
+    cursor.style.setProperty("--cursor-x", x.toFixed(1) + "px");
+    cursor.style.setProperty("--cursor-y", y.toFixed(1) + "px");
+    if(!nativeZone){
+      document.body.classList.add("cursor-ready");
+    }
+  }
+
+  function schedulePosition(){
+    if(frame) return;
+    frame = requestAnimationFrame(writePosition);
+  }
+
+  function move(event){
+    if(!enabled) return;
+    if(typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
+    x = event.clientX;
+    y = event.clientY;
+    syncNativeZoneFromPoint(x, y, event.target);
+    schedulePosition();
+  }
+
+  function isNativeTarget(target){
+    return !!(target && target.closest && target.closest(nativeZoneSelector));
+  }
+
+  function isInsideViewport(event){
+    if(!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return true;
+    return event.clientX >= 0 && event.clientY >= 0 &&
+      event.clientX <= (window.innerWidth || 0) &&
+      event.clientY <= (window.innerHeight || 0);
+  }
+
+  function syncHover(target){
+    if(!enabled || nativeZone){
+      cursor.classList.remove("hover");
+      document.body.classList.remove("cursor-zoom", "cursor-link");
+      return;
+    }
+    var hoverEl = target && target.closest ? target.closest(hoverSelector) : null;
+    var zoomEl = target && target.closest ? target.closest(zoomSelector) : null;
+    cursor.classList.toggle("hover", !!hoverEl);
+    document.body.classList.toggle("cursor-zoom", !!zoomEl);
+    document.body.classList.toggle("cursor-link", !!hoverEl && !zoomEl);
+  }
+
+  function setNativeZone(value){
+    value = !!value;
+    if(nativeZone === value) return;
+    nativeZone = value;
+    document.documentElement.classList.toggle("cursor-native-zone", nativeZone);
+    document.body.classList.toggle("cursor-native-zone", nativeZone);
+    if(nativeZone){
+      document.body.classList.remove("cursor-ready", "cursor-zoom", "cursor-link");
+      cursor.classList.remove("hover", "active", "gray");
+      active = false;
+    }else if(enabled){
+      schedulePosition();
+    }
+  }
+
+  function syncNativeZoneFromPoint(pointX, pointY, eventTarget){
+    if(isNativeTarget(eventTarget)){
+      setNativeZone(true);
+      return;
+    }
+    var pointTarget = null;
+    try{
+      pointTarget = document.elementFromPoint(pointX, pointY);
+    }catch(_){}
+    setNativeZone(isNativeTarget(pointTarget));
+    syncHover(pointTarget || eventTarget);
+  }
+
+  function setEnabled(){
+    enabled = hasFinePointer();
+    document.documentElement.classList.toggle("has-custom-cursor", enabled);
+    if(enabled){
+      cursor.style.display = "block";
+      document.documentElement.style.cursor = "none";
+      document.body.style.cursor = "none";
+      schedulePosition();
+      return;
+    }
+    nativeZone = false;
+    document.documentElement.classList.remove("cursor-native-zone");
+    document.body.classList.remove("cursor-ready", "cursor-zoom", "cursor-link", "cursor-native-zone");
+    cursor.classList.remove("hover", "active", "gray");
+    active = false;
+    cursor.style.display = "none";
+    document.documentElement.style.cursor = "auto";
+    document.body.style.cursor = "auto";
+  }
+
+  window.addEventListener("pointermove", move, { passive:true, capture:true });
+  window.addEventListener("mousemove", move, { passive:true, capture:true });
+  window.addEventListener("pointerdown", move, { passive:true, capture:true });
+  document.addEventListener("pointerover", function(event){
+    if(!enabled) return;
+    syncNativeZoneFromPoint(event.clientX, event.clientY, event.target);
+    syncHover(event.target);
+  }, { passive:true, capture:true });
+  document.addEventListener("mouseover", function(event){
+    if(!enabled) return;
+    syncNativeZoneFromPoint(event.clientX, event.clientY, event.target);
+    syncHover(event.target);
+  }, { passive:true, capture:true });
+  document.addEventListener("pointerout", function(event){
+    if(!enabled) return;
+    var next = event.relatedTarget;
+    if(isNativeTarget(next)){
+      setNativeZone(true);
+      return;
+    }
+    if(!isInsideViewport(event)){
+      document.body.classList.remove("cursor-ready");
+      cursor.classList.remove("hover", "active");
+      document.body.classList.remove("cursor-zoom", "cursor-link");
+      active = false;
+      return;
+    }
+    syncNativeZoneFromPoint(event.clientX, event.clientY, next || event.target);
+    syncHover(next);
+  }, { passive:true, capture:true });
+  document.addEventListener("mouseout", function(event){
+    if(!enabled) return;
+    var next = event.relatedTarget;
+    if(isNativeTarget(next)){
+      setNativeZone(true);
+      return;
+    }
+    if(!isInsideViewport(event)){
+      document.body.classList.remove("cursor-ready");
+      cursor.classList.remove("hover", "active");
+      document.body.classList.remove("cursor-zoom", "cursor-link");
+      active = false;
+      return;
+    }
+    syncNativeZoneFromPoint(event.clientX, event.clientY, next || event.target);
+    syncHover(next);
+  }, { passive:true, capture:true });
+  document.addEventListener("mouseenter", move, { passive:true, capture:true });
+  document.addEventListener("mouseleave", function(){
+    document.body.classList.remove("cursor-ready");
+    cursor.classList.remove("hover", "active");
+    document.body.classList.remove("cursor-zoom", "cursor-link");
+    active = false;
+  }, { passive:true });
+  document.addEventListener("pointerdown", function(event){
+    if(!enabled || nativeZone) return;
+    active = true;
+    cursor.classList.add("active");
+    move(event);
+  }, { passive:true, capture:true });
+  document.addEventListener("pointerup", function(){
+    active = false;
+    cursor.classList.remove("active");
+  }, { passive:true, capture:true });
+  document.addEventListener("pointercancel", function(){
+    active = false;
+    cursor.classList.remove("active");
+  }, { passive:true, capture:true });
+  document.addEventListener("dragstart", function(){
+    active = false;
+    cursor.classList.remove("active");
+  }, { passive:true, capture:true });
+  window.addEventListener("blur", function(){
+    if(!enabled) return;
+    active = false;
+    cursor.classList.remove("active");
+    setNativeZone(isNativeTarget(document.activeElement));
+  }, { passive:true });
+  window.addEventListener("focus", function(){
+    if(!enabled) return;
+    setNativeZone(false);
+    schedulePosition();
+  }, { passive:true });
+
+  if(fineQuery && typeof fineQuery.addEventListener === "function"){
+    fineQuery.addEventListener("change", setEnabled);
+  }else if(fineQuery && typeof fineQuery.addListener === "function"){
+    fineQuery.addListener(setEnabled);
+  }
+
+  setEnabled();
 })();
 
 
@@ -4706,11 +5894,11 @@
         resolve();
         return;
       }
-      if(video.readyState >= 2){
+      if(video.readyState >= 1){
         resolve();
         return;
       }
-      video.addEventListener("loadeddata", resolve, { once:true });
+      video.addEventListener("loadedmetadata", resolve, { once:true });
       video.addEventListener("error", resolve, { once:true });
       try{
         video.preload = "metadata";
@@ -4729,16 +5917,9 @@
   function start(){
     var startedAt = Date.now();
     var criticalImages = Array.from(document.querySelectorAll(
-      ".sidebar .logo img, .profile-photo img, #viewGrid .view-card:nth-child(-n+4) img"
+      ".sidebar .logo img"
     ));
-    var criticalViewTextures = [
-      "/assets/view-webgl/view1.jpeg",
-      "/assets/view-webgl/view2.jpeg",
-      "/assets/view-webgl/view3.jpeg",
-      "/assets/view-webgl/view4.jpeg",
-      "/assets/view-webgl/view5.jpeg",
-      "/assets/view-webgl/view6.jpeg"
-    ];
+    var criticalViewTextures = [];
     var introVideo = document.getElementById("introFilmVideo");
 
     Promise.all([
@@ -4818,8 +5999,8 @@
       sq.style.setProperty("--dx",  rand(isProfileHost ? -52 : -50, isProfileHost ? 52 : 50).toFixed(1)  + "px");
       sq.style.setProperty("--dy",  rand(isProfileHost ? -82 : -80, isProfileHost ? 82 : 80).toFixed(1)  + "px");
       sq.style.setProperty("--rot", rand(isProfileHost ? -9 : -10, isProfileHost ? 9 : 10).toFixed(2)  + "deg");
-      sq.style.setProperty("--dur",  rand(isProfileHost ? 4.2 : 7, isProfileHost ? 7.4 : 16).toFixed(2)   + "s");
-      sq.style.setProperty("--delay", (-rand(0, isProfileHost ? 10 : 16)).toFixed(2) + "s");
+      sq.style.setProperty("--dur",  rand(isProfileHost ? 5.8 : 13, isProfileHost ? 9.5 : 24).toFixed(2)   + "s");
+      sq.style.setProperty("--delay", (-rand(0, isProfileHost ? 12 : 22)).toFixed(2) + "s");
       /* 控えめな濃さ：薄く漂う */
       sq.style.setProperty("--baseOp", rand(isProfileHost ? 0.12 : 0.18, isProfileHost ? 0.28 : 0.42).toFixed(2));
 
@@ -4843,8 +6024,8 @@
      サイズ分布を維持しているので、見た目はほぼ同じ。 */
   var COUNT_PROFILE = IS_MOBILE ? 14 : 26;
   var COUNT_VIEW    = IS_MOBILE ? 14 : 28;
-  var COUNT_DESIGN  = IS_MOBILE ? 10 : 22;
-  var COUNT_ILLUS   = IS_MOBILE ? 10 : 22;
+  var COUNT_DESIGN  = IS_MOBILE ? 6 : 10;
+  var COUNT_ILLUS   = IS_MOBILE ? 6 : 10;
 
   /* ── タブが裏に回ったら body にクラスを立て、CSS でアニメ全停止 ── */
   function bindVisibility(){
@@ -5025,8 +6206,10 @@
   }
   function ensure(){
     /* now-viewing と view-section の両方を一括再生 */
-    document.querySelectorAll(".nowback-video, .viewback-video").forEach(function(v){
-      tryPlay(v);
+    document.querySelectorAll(".sidebar-bg-video, .nowback-video, .viewback-video").forEach(function(v){
+      if(v.currentSrc || v.getAttribute("src")){
+        tryPlay(v);
+      }
     });
   }
   function bind(){
@@ -5059,6 +6242,8 @@
   var SELECTOR = [
     ".view-thumb",
     ".design-thumb",
+    ".photo-frame",
+    ".illus-art-frame",
     ".illus-thumb",
     ".profile-photo",
     ".wv-story-img-wrap",
@@ -5076,6 +6261,11 @@
   function reveal(el){
     if(!el || !el.classList) return;
     el.classList.add("is-lux-visible");
+    var visibleItem = el.closest ? el.closest(".photo-item, .illus-art-item") : null;
+    if(visibleItem) visibleItem.classList.add("is-photo-visible");
+    window.setTimeout(function(){
+      if(el && el.classList) el.classList.add("is-lux-complete");
+    }, 1500);
   }
 
   function register(el, index){
@@ -5150,5 +6340,162 @@
     document.addEventListener("DOMContentLoaded", init, { once:true });
   }else{
     init();
+  }
+})();
+
+
+
+/* ── PHOTO lightbox: large view without preloading original files ── */
+(function(){
+  "use strict";
+
+  var root = document.getElementById("view-photo");
+  if(!root) return;
+
+  var frames = [];
+  var overlay = null;
+  var imageEl = null;
+  var captionEl = null;
+  var prevBtn = null;
+  var nextBtn = null;
+  var currentIndex = 0;
+
+  function refreshFrames(){
+    frames = Array.from(root.querySelectorAll(".photo-frame"));
+    frames.forEach(function(frame, index){
+      frame.setAttribute("role", "button");
+      frame.setAttribute("tabindex", "0");
+      frame.setAttribute("aria-label", "Open photo " + String(index + 1).padStart(2, "0"));
+    });
+  }
+
+  function getFrameData(index){
+    var frame = frames[index];
+    if(!frame) return null;
+    var img = frame.querySelector("img");
+    var item = frame.closest(".photo-item");
+    var caption = item ? item.querySelector("figcaption") : null;
+    var no = caption ? caption.querySelector("span") : null;
+    var title = caption ? caption.querySelector("strong") : null;
+    var src = "";
+    if(img){
+      src = img.getAttribute("data-full-src") || "";
+      if(!src){
+        var raw = img.getAttribute("src") || img.currentSrc || img.src || "";
+        src = raw.replace(/\/assets\/optimized\/photo\/([^/?#]+)\.jpg([?#].*)?$/i, "/assets/photo/$1.JPG$2");
+      }
+    }
+    return {
+      src: src,
+      alt: img ? (img.alt || "") : "",
+      label: [no ? no.textContent : "", title ? title.textContent : ""].filter(Boolean).join(" / ")
+    };
+  }
+
+  function ensureOverlay(){
+    if(overlay) return;
+
+    overlay = document.createElement("div");
+    overlay.className = "photo-lightbox";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = [
+      '<button class="photo-lightbox-close" type="button" aria-label="Close">×</button>',
+      '<button class="photo-lightbox-nav photo-lightbox-prev" type="button" aria-label="Previous">←</button>',
+      '<figure class="photo-lightbox-stage">',
+      '  <img alt="">',
+      '  <figcaption></figcaption>',
+      '</figure>',
+      '<button class="photo-lightbox-nav photo-lightbox-next" type="button" aria-label="Next">→</button>'
+    ].join("");
+    document.body.appendChild(overlay);
+
+    imageEl = overlay.querySelector("img");
+    captionEl = overlay.querySelector("figcaption");
+    prevBtn = overlay.querySelector(".photo-lightbox-prev");
+    nextBtn = overlay.querySelector(".photo-lightbox-next");
+
+    overlay.addEventListener("click", function(event){
+      if(event.target === overlay || event.target.closest(".photo-lightbox-close")){
+        close();
+      }
+    });
+    prevBtn.addEventListener("click", function(event){
+      event.stopPropagation();
+      show(currentIndex - 1);
+    });
+    nextBtn.addEventListener("click", function(event){
+      event.stopPropagation();
+      show(currentIndex + 1);
+    });
+
+    document.addEventListener("keydown", function(event){
+      if(!overlay || !overlay.classList.contains("is-open")) return;
+      if(event.key === "Escape") close();
+      if(event.key === "ArrowLeft") show(currentIndex - 1);
+      if(event.key === "ArrowRight") show(currentIndex + 1);
+    });
+  }
+
+  function show(index){
+    if(!frames.length) refreshFrames();
+    if(!frames.length) return;
+    currentIndex = (index + frames.length) % frames.length;
+    var data = getFrameData(currentIndex);
+    if(!data || !data.src) return;
+
+    ensureOverlay();
+    overlay.classList.add("is-loading");
+    imageEl.style.opacity = "0";
+    imageEl.src = data.src;
+    imageEl.alt = data.alt;
+    captionEl.textContent = data.label;
+
+    imageEl.onload = function(){
+      overlay.classList.remove("is-loading");
+      requestAnimationFrame(function(){
+        imageEl.style.opacity = "1";
+      });
+    };
+
+    prevBtn.disabled = frames.length < 2;
+    nextBtn.disabled = frames.length < 2;
+  }
+
+  function open(index){
+    ensureOverlay();
+    show(index);
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.classList.add("is-open");
+    document.body.classList.add("photo-lightbox-open");
+  }
+
+  function close(){
+    if(!overlay) return;
+    overlay.classList.remove("is-open", "is-loading");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("photo-lightbox-open");
+  }
+
+  function bind(){
+    refreshFrames();
+    root.addEventListener("click", function(event){
+      var frame = event.target.closest ? event.target.closest(".photo-frame") : null;
+      if(!frame || !root.contains(frame)) return;
+      event.preventDefault();
+      open(frames.indexOf(frame));
+    });
+    root.addEventListener("keydown", function(event){
+      if(event.key !== "Enter" && event.key !== " ") return;
+      var frame = event.target.closest ? event.target.closest(".photo-frame") : null;
+      if(!frame || !root.contains(frame)) return;
+      event.preventDefault();
+      open(frames.indexOf(frame));
+    });
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", bind, { once:true });
+  }else{
+    bind();
   }
 })();

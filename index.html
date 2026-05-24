@@ -66,18 +66,17 @@
     <nav class="menu">
       <a class="active" href="javascript:void(0)" data-view="profile" data-force-top="1">VIEW</a>
       <a href="javascript:void(0)" data-view="design" data-force-top="1">DESIGN</a>
+      <a href="javascript:void(0)" data-view="photo" data-force-top="1">PHOTO</a>
       <a href="javascript:void(0)" data-view="illustration" data-force-top="1">ILLUSTRATION / ART</a>
       <a href="javascript:void(0)" data-view="profile-only" data-force-top="1">PROFILE</a>
     </nav>
     <div class="sidebar-meta">
       <video
         class="nowback-video"
-        src="/media/nowback.mp4"
-        autoplay
         muted
         loop
         playsinline
-        preload="metadata"
+        preload="none"
         aria-hidden="true"
       ></video>
       <div>Based in Tokyo / Japan</div>
@@ -89,7 +88,18 @@
   <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Close navigation" aria-pressed="false"></button>
 
   <main>
-    <div id="nav-curtain" aria-hidden="true"></div>
+    <div id="nav-curtain" aria-hidden="true">
+      <span class="nav-curtain-slice"></span>
+      <span class="nav-curtain-slice"></span>
+      <span class="nav-curtain-slice"></span>
+      <span class="nav-curtain-slice"></span>
+      <span class="nav-curtain-line"></span>
+      <span class="nav-curtain-meta">
+        <span class="nav-curtain-kicker">SWITCHING VIEW</span>
+        <strong class="nav-curtain-label">VIEW</strong>
+        <em class="nav-curtain-count">01 / INDEX</em>
+      </span>
+    </div>
     <section id="view-profile-only" class="view">
       <section class="profile-only-page" aria-label="Profile">
         <div class="profile-only-wrap">
@@ -107,10 +117,19 @@
           </section>
 
           <figure class="profile-only-portrait">
-            <img class="profile-only-main-img" src="/assets/profile/profile1.jpg" alt="Ryotaro portrait" />
-            <img class="profile-only-sub-img" src="/assets/profile/profile2.jpg" alt="" aria-hidden="true" />
+            <img class="profile-only-main-img" src="/assets/optimized/profile/profile2-3.jpg" alt="Ryotaro portrait" loading="lazy" decoding="async" fetchpriority="low" />
             <figcaption>Visual direction / Motion / 3D image</figcaption>
           </figure>
+
+          <section class="profile-only-gallery" aria-label="Profile image set">
+            <figure><img src="/assets/optimized/profile/profile1-1.jpg" alt="" loading="lazy" decoding="async" /></figure>
+            <figure><img src="/assets/optimized/profile/profile1-2.jpg" alt="" loading="lazy" decoding="async" /></figure>
+            <figure><img src="/assets/optimized/profile/profile2-1.jpg" alt="" loading="lazy" decoding="async" /></figure>
+            <figure><img src="/assets/optimized/profile/profile2-2.jpg" alt="" loading="lazy" decoding="async" /></figure>
+            <figure><img src="/assets/optimized/profile/profile2-4.jpg" alt="" loading="lazy" decoding="async" /></figure>
+            <figure><img src="/assets/optimized/profile/profile2-5.jpg" alt="" loading="lazy" decoding="async" /></figure>
+            <figure><img src="/assets/optimized/profile/profile3-1.jpg" alt="" loading="lazy" decoding="async" /></figure>
+          </section>
 
           <section class="profile-only-detail" aria-label="Profile details">
             <div>
@@ -145,7 +164,7 @@
             muted
             loop
             playsinline
-            preload="metadata"
+            preload="auto"
           ></video>
           <div class="intro-film-veil" aria-hidden="true"></div>
           <div class="intro-film-ui">
@@ -207,7 +226,7 @@
               <img src="/assets/view-webgl/view9.jpeg" alt="LIGHT FIELD" loading="lazy" decoding="async">
             </figure>
             <figure class="view-legacy-card" style="--a:231.428deg" data-title="MOTION FRAME" data-meta="VIEW 10">
-              <img src="/assets/view-webgl/view10.jpeg" alt="MOTION FRAME" loading="lazy" decoding="async">
+              <img src="/assets/view-webgl/view13.jpeg" alt="MOTION FRAME" loading="lazy" decoding="async">
             </figure>
             <figure class="view-legacy-card" style="--a:257.142deg" data-title="MATERIAL TEST" data-meta="VIEW 11">
               <img src="/assets/view-webgl/view11.jpeg" alt="MATERIAL TEST" loading="lazy" decoding="async">
@@ -251,8 +270,8 @@
 
           <section class="bottom-profile">
             <div class="profile-photo">
-              <img class="profile-photo-main" src="/assets/profile/profile1.jpg" alt="Ryotaro portrait" />
-              <img class="profile-photo-accent" src="/assets/profile/profile2.jpg" alt="" aria-hidden="true" />
+              <img class="profile-photo-main" src="/assets/optimized/profile/profile1-1.jpg" alt="Ryotaro portrait" loading="lazy" decoding="async" fetchpriority="low" />
+              <img class="profile-photo-accent" src="/assets/optimized/profile/profile3-1.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" fetchpriority="low" />
               <div class="profile-photo-mark" aria-hidden="true">RYOTARO</div>
             </div>
             <div class="profile-copy">
@@ -321,7 +340,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view1.jpeg" alt="View 01" fetchpriority="high" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view1.jpg" alt="View 01" loading="lazy" decoding="async" fetchpriority="low">
                 </div>
                 <div class="view-info">
                   <p class="view-no">01</p>
@@ -332,7 +351,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view2.jpeg" alt="View 02" loading="lazy" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view2.jpg" alt="View 02" loading="lazy" decoding="async">
                 </div>
                 <div class="view-info">
                   <p class="view-no">02</p>
@@ -343,7 +362,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view3.jpeg" alt="View 03" loading="lazy" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view3.jpg" alt="View 03" loading="lazy" decoding="async">
                 </div>
                 <div class="view-info">
                   <p class="view-no">03</p>
@@ -354,7 +373,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view4.jpeg" alt="View 04" loading="lazy" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view4.jpg" alt="View 04" loading="lazy" decoding="async">
                 </div>
                 <div class="view-info">
                   <p class="view-no">04</p>
@@ -365,7 +384,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view5.jpeg" alt="View 05" loading="lazy" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view5.jpg" alt="View 05" loading="lazy" decoding="async">
                 </div>
                 <div class="view-info">
                   <p class="view-no">05</p>
@@ -376,7 +395,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view6.jpeg" alt="View 06" loading="lazy" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view6.jpg" alt="View 06" loading="lazy" decoding="async">
                 </div>
                 <div class="view-info">
                   <p class="view-no">06</p>
@@ -387,7 +406,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view7.jpeg" alt="View 07" loading="lazy" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view7.jpg" alt="View 07" loading="lazy" decoding="async">
                 </div>
                 <div class="view-info">
                   <p class="view-no">07</p>
@@ -398,7 +417,7 @@
 
               <div class="view-card">
                 <div class="view-thumb">
-                  <img class="swap-base" src="/assets/view/view8.jpeg" alt="View 08" loading="lazy" decoding="async">
+                  <img class="swap-base" src="/assets/optimized/view/view8.jpg" alt="View 08" loading="lazy" decoding="async">
                 </div>
                 <div class="view-info">
                   <p class="view-no">08</p>
@@ -423,9 +442,9 @@
           </section>
 
           <section class="design-list">
-            <article class="design-item" data-gallery-layout="visual-film" data-youtube="QozLYKNsplY" data-theme-gallery="/assets/project-theme/1.jpeg|/assets/project-theme/2.jpg|/assets/project-theme/3.jpg|/assets/project-theme/4.jpg|/assets/project-theme/5.jpg|/assets/project-theme/6.jpg" data-long="「静けさ」と「光」をキーワードに構成した映像作品。ミューズの歌声に合わせた光のグラデーションと、スローモーションの水面を組み合わせることで、言葉では届かない感情の輪郭を映像で描きました。撮影から編集、カラーグレーディングまで一貫して手がけ、特にハイライトのロールオフにこだわった仕上がりです。" data-year="2024" data-role="Direction / Edit / Color" data-media="4K ProRes" data-gallery="/assets/visual-film/1-1.jpg?v=hires|/assets/visual-film/1-2.jpg?v=hires|/assets/visual-film/1-3.jpg?v=hires|/assets/visual-film/1-4.jpg?v=hires|/assets/visual-film/1-5.jpg?v=hires|/assets/visual-film/1-6.jpg?v=hires|/assets/visual-film/1-7.jpg?v=hires|/assets/visual-film/1-8.jpg?v=hires|/assets/visual-film/1-9.jpg?v=hires|/assets/visual-film/1-10.jpg?v=hires|/assets/visual-film/1-11.jpg?v=hires|/assets/visual-film/1-12.jpg?v=hires|/assets/visual-film/1-13.jpg?v=hires|/assets/visual-film/1-14.jpg?v=hires">
-              <div class="design-thumb"><img src="/assets/design/design1.jpeg" alt="work 01" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/project-theme/2.jpg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-gallery-layout="visual-film" data-youtube="QozLYKNsplY" data-theme-gallery="/assets/project-theme/1.jpeg|/assets/project-theme/2.jpg|/assets/project-theme/3.jpg|/assets/project-theme/4.jpg|/assets/project-theme/5.jpg|/assets/project-theme/6.jpg" data-long="「静けさ」と「光」をキーワードに構成した映像作品。ミューズの歌声に合わせた光のグラデーションと、スローモーションの水面を組み合わせることで、言葉では届かない感情の輪郭を映像で描きました。撮影から編集、カラーグレーディングまで一貫して手がけ、特にハイライトのロールオフにこだわった仕上がりです。" data-year="2024" data-role="Direction / Edit / Color" data-media="4K ProRes" data-gallery="/assets/visual-film/1-1.jpg?v=hires|/assets/visual-film/1-2.jpg?v=hires|/assets/visual-film/1-3.jpg?v=hires|/assets/visual-film/1-4.jpg?v=hires|/assets/visual-film/1-5.jpg?v=hires|/assets/visual-film/1-6.jpg?v=hires|/assets/visual-film/1-7.jpg?v=hires|/assets/visual-film/1-8.jpg?v=hires|/assets/visual-film/1-9.jpg?v=hires|/assets/visual-film/1-10.jpg?v=hires|/assets/visual-film/1-11.jpg?v=hires|/assets/visual-film/1-12.jpg?v=hires|/assets/visual-film/1-13.jpg?v=hires|/assets/visual-film/1-14.jpg?v=hires|/assets/visual-film/1-15.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design1.jpg" data-full-src="/assets/optimized/design/design1.jpg?v=hires" alt="work 01" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/project-theme-2.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">PROJECT / VISUAL FILM</div>
                 <div class="design-meta">MV / 2024</div>
@@ -433,9 +452,9 @@
               </div>
             </article>
 
-            <article class="design-item" data-gallery-layout="visual-film" data-youtube="x-_SRk7HIa0" data-theme-gallery="/assets/live-tour-opening-theme/1.jpeg|/assets/live-tour-opening-theme/2.png|/assets/live-tour-opening-theme/3.png" data-long="全国ツアーのオープニング映像として制作。開演直前の張り詰めた空気感を維持したまま、アーティストの世界観へと観客を引き込む60秒のシークエンスです。舞台照明との同期タイミングをコンサートリハーサルで綿密に調整し、会場規模に合わせた輝度設計を行いました。" data-year="2024" data-role="VJ / Motion Direction" data-media="1080p / ProRes" data-gallery="/assets/live-tour-opening/2-1.jpg?v=hires|/assets/live-tour-opening/2-2.jpg?v=hires|/assets/live-tour-opening/2-3.jpg?v=hires|/assets/live-tour-opening/2-4.jpg?v=hires|/assets/live-tour-opening/2-5.jpg?v=hires|/assets/live-tour-opening/2-6.jpg?v=hires|/assets/live-tour-opening/2-7.jpg?v=hires|/assets/live-tour-opening/2-8.jpg?v=hires|/assets/live-tour-opening/2-9.jpg?v=hires|/assets/live-tour-opening/2-10.jpg?v=hires|/assets/live-tour-opening/2-11.jpg?v=hires">
-              <div class="design-thumb"><img src="/assets/design/design2.jpeg" alt="work 02" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design2-2.jpeg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-gallery-layout="visual-film" data-youtube="x-_SRk7HIa0" data-theme-gallery="/assets/live-tour-opening-theme/1.jpeg|/assets/live-tour-opening-theme/2.png|/assets/live-tour-opening-theme/3.png" data-long="全国ツアーのオープニング映像として制作。開演直前の張り詰めた空気感を維持したまま、アーティストの世界観へと観客を引き込む60秒のシークエンスです。舞台照明との同期タイミングをコンサートリハーサルで綿密に調整し、会場規模に合わせた輝度設計を行いました。" data-year="2024" data-role="VJ / Motion Direction" data-media="1080p / ProRes" data-gallery="/assets/live-tour-opening/2-1.jpg?v=hires|/assets/live-tour-opening/2-2.jpg?v=hires|/assets/live-tour-opening/2-3.jpg?v=hires|/assets/live-tour-opening/2-4.jpg?v=hires|/assets/live-tour-opening/2-5.jpg?v=hires|/assets/live-tour-opening/2-6.jpg?v=hires|/assets/live-tour-opening/2-7.jpg?v=hires|/assets/live-tour-opening/2-8.jpg?v=hires|/assets/live-tour-opening/2-9.jpg?v=hires|/assets/live-tour-opening/2-10.jpg?v=hires|/assets/live-tour-opening/2-11.jpg?v=hires|/assets/live-tour-opening/2-12.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design2.jpg" data-full-src="/assets/design/design2.jpeg" alt="work 02" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design2-2.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">LIVE TOUR OPENING</div>
                 <div class="design-meta">LIVE / 2024</div>
@@ -443,9 +462,9 @@
               </div>
             </article>
 
-            <article class="design-item" data-long="ラグジュアリーブランドのブランドフィルム。「不完全さの中にある美」をコンセプトに、素材のテクスチャをマクロで捉えた映像と、抽象的なCGレイヤーを重ねました。台本なしのドキュメンタリー的アプローチで撮影し、後工程でリズムとナラティブを構築しています。" data-year="2023" data-role="Direction / Cinematography" data-media="6K RAW" data-gallery="https://picsum.photos/seed/31/800/500|https://picsum.photos/seed/32/800/500|https://picsum.photos/seed/33/800/500|https://picsum.photos/seed/34/800/500|https://picsum.photos/seed/35/800/500">
-              <div class="design-thumb"><img src="/assets/design/design3.jpeg" alt="work 03" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design3-2.jpeg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-gallery-layout="visual-film" data-youtube="_hiudGZnPTk" data-theme-gallery="/assets/brand-movie-theme/1.jpeg|/assets/brand-movie-theme/2.jpg|/assets/brand-movie-theme/3.jpg|/assets/brand-movie-theme/4.jpg|/assets/brand-movie-theme/5.jpg|/assets/brand-movie-theme/6.jpg|/assets/brand-movie-theme/7.jpg|/assets/brand-movie-theme/8.jpg|/assets/brand-movie-theme/9.jpg|/assets/brand-movie-theme/10.jpeg|/assets/brand-movie-theme/11.jpg" data-long="ラグジュアリーブランドのブランドフィルム。「不完全さの中にある美」をコンセプトに、素材のテクスチャをマクロで捉えた映像と、抽象的なCGレイヤーを重ねました。台本なしのドキュメンタリー的アプローチで撮影し、後工程でリズムとナラティブを構築しています。" data-year="2023" data-role="Direction / Cinematography" data-media="6K RAW" data-gallery="/assets/brand-movie-gallery/4-1.jpg?v=hires|/assets/brand-movie-gallery/4-2.jpg?v=hires|/assets/brand-movie-gallery/4-3.jpg?v=hires|/assets/brand-movie-gallery/4-4.jpg?v=hires|/assets/brand-movie-gallery/4-5.jpg?v=hires|/assets/brand-movie-gallery/4-6.jpg?v=hires|/assets/brand-movie-gallery/4-7.jpg?v=hires|/assets/brand-movie-gallery/4-8.jpg?v=hires|/assets/brand-movie-gallery/4-9.jpg?v=hires|/assets/brand-movie-gallery/4-10.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design3.jpg" data-full-src="/assets/optimized/design/design3.jpg?v=hires" alt="work 03" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design3-2.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">BRAND MOVIE</div>
                 <div class="design-meta">BRAND / 2023</div>
@@ -453,9 +472,9 @@
               </div>
             </article>
 
-            <article class="design-item" data-long="CGソフトウェアのみを使って構成した純粋なコンピューターグラフィックス作品。物理シミュレーションと手付けアニメーションを組み合わせ、重力と浮力が拮抗するような視覚的矛盾を表現しました。レンダリング時間の制約から逆算し、効率的なシーン設計を心がけています。" data-year="2023" data-role="CG / Compositing" data-media="Blender / Houdini" data-gallery="https://picsum.photos/seed/41/800/500|https://picsum.photos/seed/42/800/500|https://picsum.photos/seed/43/800/500|https://picsum.photos/seed/44/800/500|https://picsum.photos/seed/45/800/500">
-              <div class="design-thumb"><img src="/assets/design/design4.jpeg" alt="work 04" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design4-2.jpeg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-gallery-layout="visual-film" data-youtube="Zm18wg63j34" data-theme-gallery="/assets/cg-works-theme-lite/1.jpg|/assets/cg-works-theme-lite/2.jpg|/assets/cg-works-theme-lite/3.jpg|/assets/cg-works-theme-lite/4.jpg|/assets/cg-works-theme-lite/5.jpg|/assets/cg-works-theme-lite/6.jpg" data-long="CGソフトウェアのみを使って構成した純粋なコンピューターグラフィックス作品。物理シミュレーションと手付けアニメーションを組み合わせ、重力と浮力が拮抗するような視覚的矛盾を表現しました。レンダリング時間の制約から逆算し、効率的なシーン設計を心がけています。" data-year="2023" data-role="CG / Compositing" data-media="Blender / Houdini" data-gallery="/assets/cg-works/3-1.jpg?v=hires|/assets/cg-works/3-2.jpg?v=hires|/assets/cg-works/3-3.jpg?v=hires|/assets/cg-works/3-4.jpg?v=hires|/assets/cg-works/3-5.jpg?v=hires|/assets/cg-works/3-6.jpg?v=hires|/assets/cg-works/3-7.jpg?v=hires|/assets/cg-works/3-8.jpg?v=hires|/assets/cg-works/3-9.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design4.jpg" data-full-src="/assets/design/design4.jpeg" alt="work 04" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design4-2.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">CG WORKS</div>
                 <div class="design-meta">CG / 2023</div>
@@ -463,19 +482,9 @@
               </div>
             </article>
 
-            <article class="design-item" data-long="大規模ライブ公演のオーディオビジュアル演出。楽曲の周波数解析データをリアルタイムに映像へ反映し、音と光が同期する没入空間を構築しました。照明／音響チームとの緊密な連携のもと、会場スケールに合わせたピクセル密度の最適化を行っています。" data-year="2023" data-role="A/V Direction" data-media="TouchDesigner / Ableton" data-gallery="https://picsum.photos/seed/51/800/500|https://picsum.photos/seed/52/800/500|https://picsum.photos/seed/53/800/500|https://picsum.photos/seed/54/800/500|https://picsum.photos/seed/55/800/500">
-              <div class="design-thumb"><img src="/assets/design/design5.jpeg" alt="work 05" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design5-2.jpeg" alt="" loading="lazy" decoding="async"></div>
-              <div class="design-info">
-                <div class="design-title">AUDIO VISUAL LIVE</div>
-                <div class="design-meta">A/V / 2023</div>
-                <div class="design-desc">周波数解析のリアルタイムデータを映像に反映し、音と光が完全に同期する没入空間を設計。TouchDesigner と Ableton を軸に、照明・音響チームとピクセル密度までを共調整しました。</div>
-              </div>
-            </article>
-
-            <article class="design-item" data-long="モーショングラフィックスのみで構成された1分尺の実験フィルム。タイポグラフィを主役に据え、文字そのものが光源や被写体として振る舞う構造を試みました。書体のベクターパスを直接アニメートする手法で、印刷物と映像の境界を溶かすことを狙っています。" data-year="2022" data-role="Motion / Typography" data-media="AfterEffects / Cinema4D" data-gallery="https://picsum.photos/seed/61/800/500|https://picsum.photos/seed/62/800/500|https://picsum.photos/seed/63/800/500|https://picsum.photos/seed/64/800/500|https://picsum.photos/seed/65/800/500">
-              <div class="design-thumb"><img src="/assets/design/design6.jpeg" alt="work 06" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design6-2.jpeg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-gallery-layout="visual-film" data-long="モーショングラフィックスのみで構成された1分尺の実験フィルム。タイポグラフィを主役に据え、文字そのものが光源や被写体として振る舞う構造を試みました。書体のベクターパスを直接アニメートする手法で、印刷物と映像の境界を溶かすことを狙っています。" data-year="2022" data-role="Motion / Typography" data-media="AfterEffects / Cinema4D" data-gallery="/assets/motion-typography/1.jpg?v=hires|/assets/motion-typography/2.jpg?v=hires|/assets/motion-typography/3.jpg?v=hires|/assets/motion-typography/4.jpg?v=hires|/assets/motion-typography/5.jpg?v=hires|/assets/motion-typography/6.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design6.jpg" data-full-src="/assets/optimized/design/design6.jpg?v=hires" alt="work 06" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design6-2.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">MOTION TYPOGRAPHY</div>
                 <div class="design-meta">MOTION / 2022</div>
@@ -483,8 +492,8 @@
               </div>
             </article>
 
-            <article class="design-item" data-long="空間に設置された半透過スクリーン群に映像を投影する展示インスタレーション。複数のプロジェクションが重なるレイヤー設計により、観客が歩みながら映像の遠近感を感じる体験を構築しました。現地測量からコンテンツ設計まで一貫して担当しています。" data-year="2022" data-role="Installation" data-media="Projection Mapping" data-gallery="https://picsum.photos/seed/71/800/500|https://picsum.photos/seed/72/800/500|https://picsum.photos/seed/73/800/500|https://picsum.photos/seed/74/800/500|https://picsum.photos/seed/75/800/500">
-              <div class="design-thumb"><img src="/assets/design/design7.jpeg" alt="work 07" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-long="空間に設置された半透過スクリーン群に映像を投影する展示インスタレーション。複数のプロジェクションが重なるレイヤー設計により、観客が歩みながら映像の遠近感を感じる体験を構築しました。現地測量からコンテンツ設計まで一貫して担当しています。" data-year="2022" data-role="Installation" data-media="Projection Mapping" data-gallery="/assets/optimized/design/design7.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design7.jpg" data-full-src="/assets/optimized/design/design7.jpg?v=hires" alt="work 07" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">INSTALLATION</div>
                 <div class="design-meta">SPACE / 2022</div>
@@ -492,9 +501,9 @@
               </div>
             </article>
 
-            <article class="design-item" data-long="新興ブランドのビジュアルアイデンティティ構築。ロゴマーク・書体組版・写真トーンまでを一貫して設計し、Web／印刷／映像が同じ語彙で語られるシステムを整備しました。ガイドラインは運用現場での実用性を最優先に、シンプルに仕上げています。" data-year="2021" data-role="Brand / Identity" data-media="Illustrator / Figma" data-gallery="https://picsum.photos/seed/81/800/500|https://picsum.photos/seed/82/800/500|https://picsum.photos/seed/83/800/500|https://picsum.photos/seed/84/800/500|https://picsum.photos/seed/85/800/500">
-              <div class="design-thumb"><img src="/assets/design/design8.jpeg" alt="work 08" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design8-2.jpeg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-long="新興ブランドのビジュアルアイデンティティ構築。ロゴマーク・書体組版・写真トーンまでを一貫して設計し、Web／印刷／映像が同じ語彙で語られるシステムを整備しました。ガイドラインは運用現場での実用性を最優先に、シンプルに仕上げています。" data-year="2021" data-role="Brand / Identity" data-media="Illustrator / Figma" data-gallery="/assets/design/design8.jpeg|/assets/design/design8-2.jpeg">
+              <div class="design-thumb"><img src="/assets/optimized/design/design8.jpg" data-full-src="/assets/design/design8.jpeg" alt="work 08" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design8-2.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">VISUAL IDENTITY</div>
                 <div class="design-meta">BRAND / 2021</div>
@@ -502,19 +511,19 @@
               </div>
             </article>
 
-            <article class="design-item" data-long="アパレルブランドのシーズンキャンペーン映像。モデル撮影と素材クローズアップを交互に編集し、衣服のテクスチャと身体の動きを等価に扱う構成です。カラーグレーディングでは素材色の再現性を最優先し、低彩度でも豊かな階調を保つルックを設計しました。" data-year="2025" data-role="Direction / Edit" data-media="6K / DaVinci Resolve" data-gallery="https://picsum.photos/seed/91/800/500|https://picsum.photos/seed/92/800/500|https://picsum.photos/seed/93/800/500|https://picsum.photos/seed/94/800/500|https://picsum.photos/seed/95/800/500">
-              <div class="design-thumb"><img src="/assets/design/design1-2.jpeg" alt="work 09" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design1.jpeg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-hover-src="/assets/optimized/design/design9-2.jpg" data-gallery-layout="visual-film" data-youtube="dtQ8YR8yCmA" data-theme-gallery="/assets/Visualizing Viewpoints-theme/desgin9.jpeg|/assets/Visualizing Viewpoints-theme/design9-2.jpg|/assets/Visualizing Viewpoints-theme/スクリーンショット 2026-05-20 13.46.50.png|/assets/Visualizing Viewpoints-theme/スクリーンショット 2026-05-23 14.33.51.png" data-long="タイポグラフィ、写真、余白のバランスを整理したグラフィックワーク。画面上での見え方と印刷物としての密度を両立させるため、情報量を抑えながら視線が自然に流れる構成にしています。" data-year="2025" data-role="Graphic / Layout" data-media="Visual Design" data-gallery="/assets/GRAPHIC SYSTEM/1.jpg|/assets/GRAPHIC SYSTEM/2.jpg|/assets/GRAPHIC SYSTEM/3.jpg|/assets/GRAPHIC SYSTEM/4.jpg|/assets/GRAPHIC SYSTEM/5.jpg|/assets/GRAPHIC SYSTEM/6.jpg|/assets/GRAPHIC SYSTEM/7.jpg">
+              <div class="design-thumb"><img src="/assets/optimized/design/desgin9.jpg" data-full-src="/assets/design/desgin9.jpeg" data-hover-src="/assets/optimized/design/design9-2.jpg" alt="work 09" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design9-2.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
-                <div class="design-title">FASHION CAMPAIGN</div>
-                <div class="design-meta">FASHION / 2025</div>
-                <div class="design-desc">モデル撮影と素材クローズアップを等価に編み込んだシーズンキャンペーン。低彩度でも階調豊かに残る独自ルックを DaVinci Resolve で設計しました。</div>
+                <div class="design-title">GRAPHIC SYSTEM</div>
+                <div class="design-meta">GRAPHIC / 2025</div>
+                <div class="design-desc">写真と文字の配置を軸にしたグラフィック制作。余白、サイズ差、視線誘導を整え、静かな強さが残るビジュアルとしてまとめています。</div>
               </div>
             </article>
 
-            <article class="design-item" data-long="写真作品を主役にしたアートブック。印刷会社と紙種・インキを選定する工程から関わり、ページめくりのリズムを編集デザインで制御しました。デジタル版も併走制作し、紙と画面で体験が異なる「もう一つの作品」として成立するよう設計しています。" data-year="2024" data-role="Editorial / Book" data-media="Offset Print" data-gallery="https://picsum.photos/seed/101/800/500|https://picsum.photos/seed/102/800/500|https://picsum.photos/seed/103/800/500|https://picsum.photos/seed/104/800/500|https://picsum.photos/seed/105/800/500">
-              <div class="design-thumb"><img src="/assets/design/design8-2.jpeg" alt="work 10" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/design/design8.jpeg" alt="" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-long="写真作品を主役にしたアートブック。印刷会社と紙種・インキを選定する工程から関わり、ページめくりのリズムを編集デザインで制御しました。デジタル版も併走制作し、紙と画面で体験が異なる「もう一つの作品」として成立するよう設計しています。" data-year="2024" data-role="Editorial / Book" data-media="Offset Print" data-gallery="/assets/design/design8-2.jpeg|/assets/design/design8.jpeg">
+              <div class="design-thumb"><img src="/assets/optimized/design/design8-2.jpg" data-full-src="/assets/design/design8-2.jpeg" alt="work 09" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design8.jpg" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
                 <div class="design-title">EDITORIAL BOOK</div>
                 <div class="design-meta">EDITORIAL / 2024</div>
@@ -522,6 +531,57 @@
               </div>
             </article>
 
+          </section>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-photo" class="view">
+      <section class="photo-page" aria-label="Photo">
+        <div class="photo-wrap">
+          <section class="photo-hero">
+            <p class="section-kicker">PHOTO</p>
+            <h1>PHOTO</h1>
+            <p>光、距離、偶然の表情をそのまま残した写真のアーカイブです。</p>
+          </section>
+
+          <section class="photo-index" aria-label="Photo works">
+            <div class="photo-column">
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00125.jpg" alt="Photo 01" loading="lazy" decoding="async"></div><figcaption><span>01</span><strong>DSC00125</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00150.jpg" alt="Photo 04" loading="lazy" decoding="async"></div><figcaption><span>04</span><strong>DSC00150</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00250.jpg" alt="Photo 08" loading="lazy" decoding="async"></div><figcaption><span>08</span><strong>DSC00250</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00279.jpg" alt="Photo 12" loading="lazy" decoding="async"></div><figcaption><span>12</span><strong>DSC00279</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00298.jpg" alt="Photo 15" loading="lazy" decoding="async"></div><figcaption><span>15</span><strong>DSC00298</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00313.jpg" alt="Photo 18" loading="lazy" decoding="async"></div><figcaption><span>18</span><strong>DSC00313</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00373.jpg" alt="Photo 24" loading="lazy" decoding="async"></div><figcaption><span>24</span><strong>DSC00373</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00389.jpg" alt="Photo 27" loading="lazy" decoding="async"></div><figcaption><span>27</span><strong>DSC00389</strong></figcaption></figure>
+            </div>
+
+            <div class="photo-column">
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00126.jpg" alt="Photo 02" loading="lazy" decoding="async"></div><figcaption><span>02</span><strong>DSC00126</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00178.jpg" alt="Photo 05" loading="lazy" decoding="async"></div><figcaption><span>05</span><strong>DSC00178</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00255.jpg" alt="Photo 09" loading="lazy" decoding="async"></div><figcaption><span>09</span><strong>DSC00255</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00286.jpg" alt="Photo 14" loading="lazy" decoding="async"></div><figcaption><span>14</span><strong>DSC00286</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00309.jpg" alt="Photo 17" loading="lazy" decoding="async"></div><figcaption><span>17</span><strong>DSC00309</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00319.jpg" alt="Photo 20" loading="lazy" decoding="async"></div><figcaption><span>20</span><strong>DSC00319</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00339.jpg" alt="Photo 22" loading="lazy" decoding="async"></div><figcaption><span>22</span><strong>DSC00339</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00374.jpg" alt="Photo 25" loading="lazy" decoding="async"></div><figcaption><span>25</span><strong>DSC00374</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00423.jpg" alt="Photo 28" loading="lazy" decoding="async"></div><figcaption><span>28</span><strong>DSC00423</strong></figcaption></figure>
+            </div>
+
+            <div class="photo-column">
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00131.jpg" alt="Photo 03" loading="lazy" decoding="async"></div><figcaption><span>03</span><strong>DSC00131</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00211.jpg" alt="Photo 06" loading="lazy" decoding="async"></div><figcaption><span>06</span><strong>DSC00211</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00220.jpg" alt="Photo 07" loading="lazy" decoding="async"></div><figcaption><span>07</span><strong>DSC00220</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00261.jpg" alt="Photo 10" loading="lazy" decoding="async"></div><figcaption><span>10</span><strong>DSC00261</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00277.jpg" alt="Photo 11" loading="lazy" decoding="async"></div><figcaption><span>11</span><strong>DSC00277</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00281.jpg" alt="Photo 13" loading="lazy" decoding="async"></div><figcaption><span>13</span><strong>DSC00281</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00301.jpg" alt="Photo 16" loading="lazy" decoding="async"></div><figcaption><span>16</span><strong>DSC00301</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00316.jpg" alt="Photo 19" loading="lazy" decoding="async"></div><figcaption><span>19</span><strong>DSC00316</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00330.jpg" alt="Photo 21" loading="lazy" decoding="async"></div><figcaption><span>21</span><strong>DSC00330</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00355.jpg" alt="Photo 23" loading="lazy" decoding="async"></div><figcaption><span>23</span><strong>DSC00355</strong></figcaption></figure>
+              <figure class="photo-item"><div class="photo-frame"><img src="/assets/optimized/photo/DSC00385.jpg" alt="Photo 26" loading="lazy" decoding="async"></div><figcaption><span>26</span><strong>DSC00385</strong></figcaption></figure>
+            </div>
           </section>
         </div>
       </section>
@@ -536,65 +596,115 @@
             <p>スケッチ、質感研究、モノクロームの実験など、静かな熱量を持ったイメージ群をまとめています。</p>
           </section>
 
+          <section class="illus-art-index" id="illustrationArtIndex" aria-label="Illustration art archive">
+            <div class="illus-art-column">
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/monochrome-flow/01-view7.jpeg" data-full-src="/assets/illustration-art/monochrome-flow/01-view7.jpeg" alt="MONOCHROME FLOW 01" loading="lazy" decoding="async"></div><figcaption><span>01</span><strong>MONOCHROME FLOW</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/city-noise/04-meka.jpg" data-full-src="/assets/illustration-art/city-noise/04-meka.jpg" alt="CITY NOISE 04" loading="lazy" decoding="async"></div><figcaption><span>04</span><strong>CITY NOISE</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/07-img-9458-3.jpg" data-full-src="/assets/illustration-art/dust-and-light/07-img-9458-3.jpg" alt="DUST & LIGHT 07" loading="lazy" decoding="async"></div><figcaption><span>07</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/10-img-9461-2.jpg" data-full-src="/assets/illustration-art/dust-and-light/10-img-9461-2.jpg" alt="DUST & LIGHT 10" loading="lazy" decoding="async"></div><figcaption><span>10</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/13-img-9508.jpg" data-full-src="/assets/illustration-art/dust-and-light/13-img-9508.jpg" alt="DUST & LIGHT 13" loading="lazy" decoding="async"></div><figcaption><span>13</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/16-148bb317-221c-44c6-9677-a813199f2828-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/16-148bb317-221c-44c6-9677-a813199f2828-rw-600.jpg" alt="DESSIN 16" loading="lazy" decoding="async"></div><figcaption><span>16</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/19-55b10221-4e42-45c3-aa3f-6a9f7ab2b788-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/19-55b10221-4e42-45c3-aa3f-6a9f7ab2b788-rw-600.jpg" alt="DESSIN 19" loading="lazy" decoding="async"></div><figcaption><span>19</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/22-67bb1924-7afd-4c68-852a-4fba40ee3ae5-rw-1200.jpg" data-full-src="/assets/illustration-art/dessin/22-67bb1924-7afd-4c68-852a-4fba40ee3ae5-rw-1200.jpg" alt="DESSIN 22" loading="lazy" decoding="async"></div><figcaption><span>22</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/25-8de3efe7-1d2d-4a75-997f-2a2251c74935-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/25-8de3efe7-1d2d-4a75-997f-2a2251c74935-rw-600.jpg" alt="DESSIN 25" loading="lazy" decoding="async"></div><figcaption><span>25</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/28-a8545dca-246b-4194-b652-56872e259283-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/28-a8545dca-246b-4194-b652-56872e259283-rw-600.jpg" alt="DESSIN 28" loading="lazy" decoding="async"></div><figcaption><span>28</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/31-aad8a899-e577-4639-b816-e481a589a4dc-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/31-aad8a899-e577-4639-b816-e481a589a4dc-rw-600.jpg" alt="DESSIN 31" loading="lazy" decoding="async"></div><figcaption><span>31</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/34-d142ed24-5f2b-4080-92e1-0ae0a39acc8e-rw-1200.jpg" data-full-src="/assets/illustration-art/dessin/34-d142ed24-5f2b-4080-92e1-0ae0a39acc8e-rw-1200.jpg" alt="DESSIN 34" loading="lazy" decoding="async"></div><figcaption><span>34</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/37-d851c9e8-05a0-4446-ad82-33ea0c0d2571-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/37-d851c9e8-05a0-4446-ad82-33ea0c0d2571-rw-600.jpg" alt="DESSIN 37" loading="lazy" decoding="async"></div><figcaption><span>37</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/40-sikisaiii.jpg" data-full-src="/assets/illustration-art/dessin/40-sikisaiii.jpg" alt="DESSIN 40" loading="lazy" decoding="async"></div><figcaption><span>40</span><strong>DESSIN</strong></figcaption></figure>
+            </div>
+            <div class="illus-art-column">
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/monochrome-flow/02-view8.jpeg" data-full-src="/assets/illustration-art/monochrome-flow/02-view8.jpeg" alt="MONOCHROME FLOW 02" loading="lazy" decoding="async"></div><figcaption><span>02</span><strong>MONOCHROME FLOW</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/city-noise/05-meka2.jpg" data-full-src="/assets/illustration-art/city-noise/05-meka2.jpg" alt="CITY NOISE 05" loading="lazy" decoding="async"></div><figcaption><span>05</span><strong>CITY NOISE</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/08-img-9459.jpg" data-full-src="/assets/illustration-art/dust-and-light/08-img-9459.jpg" alt="DUST & LIGHT 08" loading="lazy" decoding="async"></div><figcaption><span>08</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/11-img-9464.jpg" data-full-src="/assets/illustration-art/dust-and-light/11-img-9464.jpg" alt="DUST & LIGHT 11" loading="lazy" decoding="async"></div><figcaption><span>11</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/quiet-surface/14-view8.jpeg" data-full-src="/assets/illustration-art/quiet-surface/14-view8.jpeg" alt="QUIET SURFACE 14" loading="lazy" decoding="async"></div><figcaption><span>14</span><strong>QUIET SURFACE</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/17-27b737c9-14db-45e1-8f83-ede676fdd9ba-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/17-27b737c9-14db-45e1-8f83-ede676fdd9ba-rw-600.jpg" alt="DESSIN 17" loading="lazy" decoding="async"></div><figcaption><span>17</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/20-6090bc12-3beb-4bb8-a0f2-9c73755a0206-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/20-6090bc12-3beb-4bb8-a0f2-9c73755a0206-rw-600.jpg" alt="DESSIN 20" loading="lazy" decoding="async"></div><figcaption><span>20</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/23-681ba677-78d3-46fa-8922-5e4dab930c18-rw-1200.jpg" data-full-src="/assets/illustration-art/dessin/23-681ba677-78d3-46fa-8922-5e4dab930c18-rw-1200.jpg" alt="DESSIN 23" loading="lazy" decoding="async"></div><figcaption><span>23</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/26-8e306f86-d6bc-4c31-9db6-a80010fb6290-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/26-8e306f86-d6bc-4c31-9db6-a80010fb6290-rw-600.jpg" alt="DESSIN 26" loading="lazy" decoding="async"></div><figcaption><span>26</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/29-a90727ee-4d05-411e-a5a7-ef19763e6c03-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/29-a90727ee-4d05-411e-a5a7-ef19763e6c03-rw-600.jpg" alt="DESSIN 29" loading="lazy" decoding="async"></div><figcaption><span>29</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/32-b564f9b3-2614-4ba9-8867-b5610e601df3-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/32-b564f9b3-2614-4ba9-8867-b5610e601df3-rw-600.jpg" alt="DESSIN 32" loading="lazy" decoding="async"></div><figcaption><span>32</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/35-d4687d6a-25e0-4d09-9d9c-f74143b4ae92-rw-1200.jpg" data-full-src="/assets/illustration-art/dessin/35-d4687d6a-25e0-4d09-9d9c-f74143b4ae92-rw-1200.jpg" alt="DESSIN 35" loading="lazy" decoding="async"></div><figcaption><span>35</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/38-d8b7c4f7-5d10-47e0-a8d4-04351e77cfef-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/38-d8b7c4f7-5d10-47e0-a8d4-04351e77cfef-rw-600.jpg" alt="DESSIN 38" loading="lazy" decoding="async"></div><figcaption><span>38</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/41-s.jpeg" data-full-src="/assets/illustration-art/dessin/41-s.jpeg" alt="DESSIN 41" loading="lazy" decoding="async"></div><figcaption><span>41</span><strong>DESSIN</strong></figcaption></figure>
+            </div>
+            <div class="illus-art-column">
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/city-noise/03-bill.jpg" data-full-src="/assets/illustration-art/city-noise/03-bill.jpg" alt="CITY NOISE 03" loading="lazy" decoding="async"></div><figcaption><span>03</span><strong>CITY NOISE</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/06-img-9457-2.jpg" data-full-src="/assets/illustration-art/dust-and-light/06-img-9457-2.jpg" alt="DUST & LIGHT 06" loading="lazy" decoding="async"></div><figcaption><span>06</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/09-img-9460-3.jpg" data-full-src="/assets/illustration-art/dust-and-light/09-img-9460-3.jpg" alt="DUST & LIGHT 09" loading="lazy" decoding="async"></div><figcaption><span>09</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dust-and-light/12-img-9465-2.jpg" data-full-src="/assets/illustration-art/dust-and-light/12-img-9465-2.jpg" alt="DUST & LIGHT 12" loading="lazy" decoding="async"></div><figcaption><span>12</span><strong>DUST & LIGHT</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/15-1.jpg" data-full-src="/assets/illustration-art/dessin/15-1.jpg" alt="DESSIN 15" loading="lazy" decoding="async"></div><figcaption><span>15</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/18-2e16a966-9f73-4fc7-a8eb-54c52b30d6f1-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/18-2e16a966-9f73-4fc7-a8eb-54c52b30d6f1-rw-600.jpg" alt="DESSIN 18" loading="lazy" decoding="async"></div><figcaption><span>18</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/21-638eb497-6d72-49ef-a147-98ccc24fdfca-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/21-638eb497-6d72-49ef-a147-98ccc24fdfca-rw-600.jpg" alt="DESSIN 21" loading="lazy" decoding="async"></div><figcaption><span>21</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/24-7f7149ed-d6f9-4796-b61c-cac14689ff2d-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/24-7f7149ed-d6f9-4796-b61c-cac14689ff2d-rw-600.jpg" alt="DESSIN 24" loading="lazy" decoding="async"></div><figcaption><span>24</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/27-9da7d944-db81-4f58-89fe-bca45c6ed558-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/27-9da7d944-db81-4f58-89fe-bca45c6ed558-rw-600.jpg" alt="DESSIN 27" loading="lazy" decoding="async"></div><figcaption><span>27</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/30-a9406c3e-5862-46ca-b8f9-17398ea46549-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/30-a9406c3e-5862-46ca-b8f9-17398ea46549-rw-600.jpg" alt="DESSIN 30" loading="lazy" decoding="async"></div><figcaption><span>30</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/33-c6d151a8-a8d1-4cf2-931d-1b6a8d257c6a-rw-600.jpg" data-full-src="/assets/illustration-art/dessin/33-c6d151a8-a8d1-4cf2-931d-1b6a8d257c6a-rw-600.jpg" alt="DESSIN 33" loading="lazy" decoding="async"></div><figcaption><span>33</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/36-d6a29c0f-24c9-4b73-83a6-f8e9364f8b14-rw-1200.jpg" data-full-src="/assets/illustration-art/dessin/36-d6a29c0f-24c9-4b73-83a6-f8e9364f8b14-rw-1200.jpg" alt="DESSIN 36" loading="lazy" decoding="async"></div><figcaption><span>36</span><strong>DESSIN</strong></figcaption></figure>
+              <figure class="illus-art-item"><div class="illus-art-frame"><img src="/assets/illustration-art/dessin/39-illustration5-2.jpeg" data-full-src="/assets/illustration-art/dessin/39-illustration5-2.jpeg" alt="DESSIN 39" loading="lazy" decoding="async"></div><figcaption><span>39</span><strong>DESSIN</strong></figcaption></figure>
+            </div>
+          </section>
+
           <section class="illus-grid" id="illusGrid">
-            <article class="illus-card" data-long="モノクロームだけで表現した「流れ」の探求。水墨の滲みをデジタルブラシで再現しつつ、アナログには出せないレイヤー構造を重ね、静止した画面の中に時間の流れを閉じ込めることを試みた作品です。" data-year="2025" data-role="Original / Digital" data-media="Procreate" data-gallery="https://picsum.photos/seed/111/800/500|https://picsum.photos/seed/112/800/500|https://picsum.photos/seed/113/800/500|https://picsum.photos/seed/114/800/500|https://picsum.photos/seed/115/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration1.jpeg" alt="illustration 01" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="モノクロームだけで表現した「流れ」の探求。水墨の滲みをデジタルブラシで再現しつつ、アナログには出せないレイヤー構造を重ね、静止した画面の中に時間の流れを閉じ込めることを試みた作品です。" data-year="2025" data-role="Original / Digital" data-media="Procreate" data-gallery="/assets/illustration/illustration1.jpeg">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration1.jpg" data-full-src="/assets/illustration/illustration1.jpeg" alt="illustration 01" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">MONOCHROME FLOW</h2>
                 <p class="illus-sub">Original study / 2025</p>
               </div>
             </article>
 
-            <article class="illus-card" data-long="都市の音をビジュアル化した実験的なイラストシリーズ。街角で録音したフィールドレコーディングを波形として取り込み、その形状をグラフィックモチーフとして昇華させました。音の密度が高いほど線が増殖し、静寂な場所ほど余白が広がります。" data-year="2024" data-role="Series / Mixed media" data-media="iPad + Photoshop" data-gallery="https://picsum.photos/seed/121/800/500|https://picsum.photos/seed/122/800/500|https://picsum.photos/seed/123/800/500|https://picsum.photos/seed/124/800/500|https://picsum.photos/seed/125/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration2.jpeg" alt="illustration 02" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="都市の音をビジュアル化した実験的なイラストシリーズ。街角で録音したフィールドレコーディングを波形として取り込み、その形状をグラフィックモチーフとして昇華させました。音の密度が高いほど線が増殖し、静寂な場所ほど余白が広がります。" data-year="2024" data-role="Series / Mixed media" data-media="iPad + Photoshop" data-gallery="/assets/illustration/illustration2.jpeg|/assets/illustration/illustration2-2.jpeg">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration2.jpg" data-full-src="/assets/illustration/illustration2.jpeg" alt="illustration 02" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">CITY NOISE</h2>
                 <p class="illus-sub">Urban visual / 2024</p>
               </div>
             </article>
 
-            <article class="illus-card" data-long="午後の光が床に落ちる瞬間の「ほこりの浮遊感」をテーマにした静物的な一枚。質感の観察と描写力の訓練として始めたスタディが、独立した作品として完成した例です。グレインを積極的に取り入れ、デジタルの清潔感を意図的に崩しています。" data-year="2024" data-role="Study / Texture" data-media="Procreate" data-gallery="https://picsum.photos/seed/131/800/500|https://picsum.photos/seed/132/800/500|https://picsum.photos/seed/133/800/500|https://picsum.photos/seed/134/800/500|https://picsum.photos/seed/135/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration3.jpeg" alt="illustration 03" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="午後の光が床に落ちる瞬間の「ほこりの浮遊感」をテーマにした静物的な一枚。質感の観察と描写力の訓練として始めたスタディが、独立した作品として完成した例です。グレインを積極的に取り入れ、デジタルの清潔感を意図的に崩しています。" data-year="2024" data-role="Study / Texture" data-media="Procreate" data-gallery="/assets/optimized/illustration/illustration3.jpg?v=hires|/assets/illustration/illustration3-2.jpeg?v=hires">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration3.jpg" data-full-src="/assets/optimized/illustration/illustration3.jpg?v=hires" alt="illustration 03" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">DUST & LIGHT</h2>
                 <p class="illus-sub">Dust series / 2024</p>
               </div>
             </article>
 
-            <article class="illus-card" data-long="構図の骨格だけを残し、装飾をすべて排除したモノクロームのコンポジション研究。フレーム内の重心と視線誘導のみで画面を成立させることができるか、という問いに対するひとつの回答として制作しました。" data-year="2023" data-role="Composition study" data-media="Pencil / Digital" data-gallery="https://picsum.photos/seed/141/800/500|https://picsum.photos/seed/142/800/500|https://picsum.photos/seed/143/800/500|https://picsum.photos/seed/144/800/500|https://picsum.photos/seed/145/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration4.jpeg" alt="illustration 04" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="構図の骨格だけを残し、装飾をすべて排除したモノクロームのコンポジション研究。フレーム内の重心と視線誘導のみで画面を成立させることができるか、という問いに対するひとつの回答として制作しました。" data-year="2023" data-role="Composition study" data-media="Pencil / Digital" data-gallery="/assets/illustration/illustration4.jpeg|/assets/illustration/illustration4-2.jpeg">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration4.jpg" data-full-src="/assets/illustration/illustration4.jpeg" alt="illustration 04" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">SILENT FRAME</h2>
                 <p class="illus-sub">Composition study / 2023</p>
               </div>
             </article>
 
-            <article class="illus-card" data-long="露光時間が長すぎた写真に着想を得た作品。光の軌跡が重なり合い、本来の輪郭が消えていく現象を、イラストの文法で再解釈しました。余残像の美しさを「描く」という行為に翻訳する試みです。" data-year="2024" data-role="Light study" data-media="Procreate" data-gallery="https://picsum.photos/seed/151/800/500|https://picsum.photos/seed/152/800/500|https://picsum.photos/seed/153/800/500|https://picsum.photos/seed/154/800/500|https://picsum.photos/seed/155/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration5.jpeg" alt="illustration 05" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="露光時間が長すぎた写真に着想を得た作品。光の軌跡が重なり合い、本来の輪郭が消えていく現象を、イラストの文法で再解釈しました。余残像の美しさを「描く」という行為に翻訳する試みです。" data-year="2024" data-role="Light study" data-media="Procreate" data-gallery="/assets/optimized/illustration/illustration5.jpg?v=hires|/assets/optimized/illustration/illustration5-2.jpg?v=hires">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration5.jpg" data-full-src="/assets/optimized/illustration/illustration5.jpg?v=hires" alt="illustration 05" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">AFTER IMAGE</h2>
                 <p class="illus-sub">Light study / 2024</p>
               </div>
             </article>
 
-            <article class="illus-card" data-long="表面に凹凸のある素材の触覚的な美しさをビジュアルに閉じ込めたシリーズ。目で触れることを意識して、ブラシのテクスチャと色の薄さ・濃さだけで質量感を表現しました。" data-year="2025" data-role="Texture series" data-media="iPad Pro" data-gallery="https://picsum.photos/seed/161/800/500|https://picsum.photos/seed/162/800/500|https://picsum.photos/seed/163/800/500|https://picsum.photos/seed/164/800/500|https://picsum.photos/seed/165/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration6.jpeg" alt="illustration 06" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="表面に凹凸のある素材の触覚的な美しさをビジュアルに閉じ込めたシリーズ。目で触れることを意識して、ブラシのテクスチャと色の薄さ・濃さだけで質量感を表現しました。" data-year="2025" data-role="Texture series" data-media="iPad Pro" data-gallery="/assets/illustration/illustration6.jpeg">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration6.jpg" data-full-src="/assets/illustration/illustration6.jpeg" alt="illustration 06" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">QUIET SURFACE</h2>
                 <p class="illus-sub">Texture series / 2025</p>
               </div>
             </article>
 
-            <article class="illus-card" data-long="遠くにあるものの持つ柔らかさ、大気の霞、届かない距離感をテーマにした一枚。ガウシアンぼかしと手描きの境界線を組み合わせ、フォーカスの内と外を同時に画面に共存させています。" data-year="2024" data-role="Atmosphere study" data-media="Procreate + PS" data-gallery="https://picsum.photos/seed/171/800/500|https://picsum.photos/seed/172/800/500|https://picsum.photos/seed/173/800/500|https://picsum.photos/seed/174/800/500|https://picsum.photos/seed/175/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration4-2.jpeg" alt="illustration 07" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="遠くにあるものの持つ柔らかさ、大気の霞、届かない距離感をテーマにした一枚。ガウシアンぼかしと手描きの境界線を組み合わせ、フォーカスの内と外を同時に画面に共存させています。" data-year="2024" data-role="Atmosphere study" data-media="Procreate + PS" data-gallery="/assets/illustration/illustration4-2.jpeg|/assets/illustration/illustration4.jpeg">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration4-2.jpg" data-full-src="/assets/illustration/illustration4-2.jpeg" alt="illustration 07" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">SOFT DISTANCE</h2>
                 <p class="illus-sub">Atmosphere study / 2024</p>
               </div>
             </article>
 
-            <article class="illus-card" data-long="光が反射するとき、そこに残るわずかな「ずれ」をテーマにしたモノクロームシリーズの集大成。鏡面と粒子の間を行き来する視覚的な揺らぎを、グレースケールの階調だけで構成しました。" data-year="2023" data-role="Monochrome series" data-media="Procreate" data-gallery="https://picsum.photos/seed/181/800/500|https://picsum.photos/seed/182/800/500|https://picsum.photos/seed/183/800/500|https://picsum.photos/seed/184/800/500|https://picsum.photos/seed/185/800/500">
-              <div class="illus-thumb"><img src="/assets/illustration/illustration5-2.jpeg" alt="illustration 08" loading="lazy" decoding="async"></div>
+            <article class="illus-card" data-long="光が反射するとき、そこに残るわずかな「ずれ」をテーマにしたモノクロームシリーズの集大成。鏡面と粒子の間を行き来する視覚的な揺らぎを、グレースケールの階調だけで構成しました。" data-year="2023" data-role="Monochrome series" data-media="Procreate" data-gallery="/assets/optimized/illustration/illustration5-2.jpg?v=hires|/assets/optimized/illustration/illustration5.jpg?v=hires">
+              <div class="illus-thumb"><img src="/assets/optimized/illustration/illustration5-2.jpg" data-full-src="/assets/optimized/illustration/illustration5-2.jpg?v=hires" alt="illustration 08" loading="lazy" decoding="async"></div>
               <div class="illus-info">
                 <h2 class="illus-title">ECHO OF LIGHT</h2>
                 <p class="illus-sub">Monochrome work / 2023</p>
