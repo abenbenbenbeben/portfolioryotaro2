@@ -7755,7 +7755,7 @@ body.theme-view-design .design-desc{
   }
 }
 
-/* PROJECT / VISUAL FILM: replace dummy gallery with the 1/ JPEG sequence */
+/* 重なる KASANARU: replace dummy gallery with the 1/ JPEG sequence */
 body.theme-view-design .design-item.visual-film-project,
 body.theme-view-design .design-item.visual-film-project:nth-child(1){
   grid-column:1 / -1 !important;
@@ -8034,7 +8034,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   }
 }
 
-/* PROJECT / VISUAL FILM detail viewer visibility fix */
+/* 重なる KASANARU detail viewer visibility fix */
 #wv.is-visual-film,
 #wv.is-visual-film #wv-scroll,
 #wv.is-visual-film #wv-long-wrap,
@@ -8135,7 +8135,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   visibility:visible !important;
 }
 
-/* PROJECT / VISUAL FILM detail: tighter and sharper image layout */
+/* 重なる KASANARU detail: tighter and sharper image layout */
 #wv.is-visual-film #wv-gallery-wrap.is-visual-film-gallery{
   padding:12px clamp(12px, 5vw, 56px) 34px !important;
 }
@@ -8205,7 +8205,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   }
 }
 
-/* PROJECT / VISUAL FILM detail: YouTube preview near the top */
+/* 重なる KASANARU detail: YouTube preview near the top */
 #wv-video-wrap{
   display:none;
   padding:28px 44px 10px;
@@ -8403,7 +8403,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   }
 }
 
-/* PROJECT / VISUAL FILM detail: 1theme side slider next to the title block */
+/* 重なる KASANARU detail: 1theme side slider next to the title block */
 #wv-theme-wrap{
   display:none;
 }
@@ -10958,7 +10958,7 @@ body.theme-view-design .design-item:nth-child(8) .design-companion,
   opacity:1 !important;
 }
 
-/* PROJECT / VISUAL FILM: fit the long title without losing presence */
+/* 重なる KASANARU: fit the long title without losing presence */
 body.theme-view-design .design-item:nth-child(1) .design-title,
 #view-design .design-item:nth-child(1) .design-title,
 body.theme-view-design .visual-film-project .design-title,
