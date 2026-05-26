@@ -3368,23 +3368,27 @@ body.perf-stable::after{
 #wv-ttl{
   font:500 clamp(20px,2.2vw,34px)/1.26 "Shippori Mincho",serif;
   letter-spacing:.06em; color:#1D1D1F;
-  margin:0 0 24px; transition-delay:.16s;
+  margin:0 0 18px; transition-delay:.16s;
 }
 #wv-hr{
   width:30px; height:1px; background:rgba(29,29,31,0.15);
   margin-bottom:20px; transition-delay:.22s;
 }
+#wv-concept-label{
+  font:700 9px/1 "Zen Kaku Gothic New",sans-serif;
+  letter-spacing:.28em;
+  color:rgba(29,29,31,0.36);
+  margin:0 0 10px;
+  transition-delay:.24s;
+}
 #wv-dsc{
-  font:400 13.5px/2.1 "Zen Kaku Gothic New",sans-serif;
-  letter-spacing:.04em; color:rgba(29,29,31,0.62);
-  margin-bottom:22px; transition-delay:.26s;
+  font:500 14px/2.05 "Zen Kaku Gothic New",sans-serif;
+  letter-spacing:.035em; color:rgba(29,29,31,0.74);
+  margin-bottom:0; transition-delay:.28s;
 }
 /* meta table */
 #wv-meta{
-  margin-bottom:24px; padding:14px 16px;
-  background:rgba(29,29,31,0.035); border-radius:10px;
-  display:flex; flex-direction:column; gap:9px;
-  transition-delay:.30s;
+  display:none !important;
 }
 .wvmeta-row{
   display:grid; grid-template-columns:80px 1fr;
@@ -3448,7 +3452,7 @@ body.perf-stable::after{
 }
 
 #wv-long-wrap{
-  padding:28px 44px 8px;
+  padding:24px 44px 8px;
 }
 #wv-long-label{
   font:600 9.5px/1 "Zen Kaku Gothic New",sans-serif;
@@ -3456,8 +3460,9 @@ body.perf-stable::after{
   margin-bottom:18px;
 }
 #wv-long{
-  font:400 14px/2.15 "Zen Kaku Gothic New",sans-serif;
-  letter-spacing:.04em; color:rgba(29,29,31,0.74);
+  max-width:76ch;
+  font:400 15px/2.05 "Zen Kaku Gothic New",sans-serif;
+  letter-spacing:.035em; color:rgba(29,29,31,0.78);
   white-space:pre-line;
 }
 
@@ -8076,6 +8081,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
 #wv.is-visual-film #wv-breadcrumb span,
 #wv.is-visual-film #wv-num,
 #wv.is-visual-film #wv-cat,
+#wv.is-visual-film #wv-concept-label,
 #wv.is-visual-film #wv-dsc,
 #wv.is-visual-film #wv-long,
 #wv.is-visual-film #wv-process,
@@ -19694,6 +19700,7 @@ body.page-revealed .sidebar-toggle{
 #wv.is-illustration-work #wv-breadcrumb span,
 #wv.is-illustration-work #wv-num,
 #wv.is-illustration-work #wv-cat,
+#wv.is-illustration-work #wv-concept-label,
 #wv.is-illustration-work #wv-dsc,
 #wv.is-illustration-work #wv-long,
 #wv.is-illustration-work #wv-process,
@@ -20114,6 +20121,261 @@ body.page-revealed .sidebar-toggle{
   #wv:not(.is-visual-film):not(.is-illustration-work) .wv-story-img-wrap,
   #wv:not(.is-visual-film):not(.is-illustration-work) .wv-story-text{
     width:100% !important;
+  }
+}
+
+/* Final mobile lock: keep navigation visible and non-overlapping. */
+@media(max-width:720px){
+  .sidebar,
+  body.is-collapsed .sidebar,
+  body.is-intro-mode .sidebar,
+  body:not(.page-revealed) .sidebar,
+  body.page-revealed.is-intro-mode .sidebar,
+  body.page-revealed:not(.is-intro-mode) .sidebar{
+    position:fixed !important;
+    top:0 !important;
+    right:0 !important;
+    bottom:auto !important;
+    left:0 !important;
+    transform:translate3d(0, 0, 0) !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    animation:none !important;
+  }
+
+  body.is-view-transitioning .sidebar,
+  body.is-scrolling .sidebar{
+    transform:translate3d(0, 0, 0) !important;
+  }
+
+  #wv-concept-label{
+    margin-top:2px !important;
+  }
+
+  #wv-dsc{
+    font-size:13.5px !important;
+    line-height:1.95 !important;
+  }
+
+  #wv-long{
+    font-size:14px !important;
+    line-height:1.95 !important;
+  }
+}
+
+/* Mobile usability/performance pass: readable top UI and lighter rendering. */
+@media(max-width:720px){
+  :root{
+    --topbar-h:88px;
+    --topbar-safe-top:env(safe-area-inset-top, 0px);
+    --topbar-x:10px;
+    --topbar-gap:6px;
+    --topbar-brand:100%;
+    --sidebar-width:0px;
+  }
+
+  html{
+    scroll-padding-top:calc(var(--topbar-h) + var(--topbar-safe-top) + 12px);
+  }
+
+  .sidebar{
+    position:fixed !important;
+    inset:0 0 auto 0 !important;
+    z-index:1000 !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:26px 42px !important;
+    gap:7px !important;
+    width:100% !important;
+    height:calc(var(--topbar-h) + var(--topbar-safe-top)) !important;
+    min-height:calc(var(--topbar-h) + var(--topbar-safe-top)) !important;
+    padding:calc(8px + var(--topbar-safe-top)) 10px 8px !important;
+    background:rgba(11, 10, 12, 0.96) !important;
+    border-bottom:1px solid rgba(255,255,255,0.14) !important;
+    box-shadow:0 10px 24px rgba(0,0,0,0.24) !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    overflow:hidden !important;
+    transform:none !important;
+  }
+
+  .sidebar-bg-video,
+  .nowback-video,
+  .viewback-video,
+  .sidebar-meta,
+  .sidebar-toggle{
+    display:none !important;
+  }
+
+  body.is-collapsed .sidebar,
+  body.is-intro-mode .sidebar,
+  body:not(.page-revealed) .sidebar{
+    transform:none !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+
+  .sidebar .logo{
+    justify-self:center !important;
+    align-self:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+
+  .sidebar .logo .home-back{
+    display:flex !important;
+    justify-content:center !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .sidebar .logo .home-back::before{
+    content:"RYOTARO ABE" !important;
+    display:block !important;
+    max-width:100% !important;
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Zen Kaku Gothic New", sans-serif !important;
+    font-size:14px !important;
+    font-weight:760 !important;
+    line-height:1 !important;
+    letter-spacing:0.16em !important;
+    text-indent:0.16em !important;
+    white-space:nowrap !important;
+    color:#f7f4ee !important;
+    -webkit-text-fill-color:#f7f4ee !important;
+    background:none !important;
+    filter:none !important;
+  }
+
+  .sidebar .logo .home-back::after{
+    content:none !important;
+    display:none !important;
+  }
+
+  .menu{
+    align-self:stretch !important;
+    justify-self:stretch !important;
+    display:grid !important;
+    grid-template-columns:repeat(5, minmax(0, 1fr)) !important;
+    width:100% !important;
+    height:42px !important;
+    min-width:0 !important;
+    padding:3px !important;
+    gap:3px !important;
+    border:1px solid rgba(255,255,255,0.13) !important;
+    border-radius:7px !important;
+    background:rgba(255,255,255,0.055) !important;
+    box-shadow:none !important;
+    overflow:hidden !important;
+  }
+
+  .menu a{
+    min-width:0 !important;
+    width:100% !important;
+    height:100% !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:5px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    overflow:hidden !important;
+    color:rgba(247,244,238,0.64) !important;
+    background:transparent !important;
+    font-size:0 !important;
+    letter-spacing:0 !important;
+    line-height:1 !important;
+    text-indent:0 !important;
+    white-space:nowrap !important;
+    transition:none !important;
+  }
+
+  .menu a::before{
+    content:attr(data-short) !important;
+    display:block !important;
+    padding:0 !important;
+    border:0 !important;
+    background:none !important;
+    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Zen Kaku Gothic New", sans-serif !important;
+    font-size:9.5px !important;
+    font-weight:760 !important;
+    line-height:1 !important;
+    letter-spacing:0.04em !important;
+    text-indent:0.04em !important;
+    color:currentColor !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+  }
+
+  .menu a::after{
+    left:50% !important;
+    right:auto !important;
+    bottom:5px !important;
+    width:22px !important;
+    height:2px !important;
+    border-radius:999px !important;
+    background:#d7b46a !important;
+    transform:translateX(-50%) scaleX(0) !important;
+    transform-origin:center !important;
+    transition:none !important;
+  }
+
+  .menu a.active{
+    color:#fff !important;
+    background:rgba(255,255,255,0.14) !important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12) !important;
+  }
+
+  .menu a.active::after{
+    transform:translateX(-50%) scaleX(1) !important;
+  }
+
+  main{
+    margin-left:0 !important;
+    width:100% !important;
+    padding-top:calc(var(--topbar-h) + var(--topbar-safe-top)) !important;
+  }
+
+  .view:not(.is-active),
+  #nav-curtain:not(.is-transitioning){
+    content-visibility:hidden;
+  }
+
+  .view-card,
+  .design-item,
+  .illus-card,
+  .photo-item,
+  .illus-art-item,
+  .wv-story-block{
+    content-visibility:auto;
+    contain-intrinsic-size:1px 520px;
+  }
+
+  .opening-reveal,
+  #nav-curtain,
+  .work-open-transition{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+}
+
+@media(max-width:390px){
+  .sidebar{
+    padding-inline:8px !important;
+  }
+
+  .menu{
+    gap:2px !important;
+  }
+
+  .menu a::before{
+    font-size:8.8px !important;
+    letter-spacing:0 !important;
+    text-indent:0 !important;
   }
 }
 

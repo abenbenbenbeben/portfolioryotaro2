@@ -297,6 +297,34 @@
     document.documentElement.classList.add("is-light-mobile");
   }
 
+  function splitAssetSuffix(src){
+    var match = String(src || "").match(/^([^?#]+)([?#].*)?$/);
+    return {
+      path: match ? match[1] : String(src || ""),
+      suffix: match && match[2] ? match[2] : ""
+    };
+  }
+
+  function getMobileAssetSrc(src){
+    if(typeof src !== "string" || !src) return src || "";
+    var parts = splitAssetSuffix(src.trim());
+    var path = parts.path;
+    if(!/^\/assets\//.test(path)) return src;
+    if(/^\/assets\/mobile\//.test(path)) return src;
+    if(/^\/assets\/branding\//.test(path) || /^\/assets\/loader\//.test(path)) return src;
+    if(!/\.(jpe?g|png)$/i.test(path)) return src;
+    return "/assets/mobile/" + path.slice("/assets/".length).replace(/\.(jpe?g|png)$/i, ".jpg") + parts.suffix;
+  }
+
+  function getDisplayAssetSrc(src){
+    return isHeavyMediaConstrained() ? getMobileAssetSrc(src) : src;
+  }
+
+  function getImageDisplaySrc(img, preferredSrc){
+    var src = preferredSrc || (img ? (img.currentSrc || img.getAttribute("src") || img.src || "") : "");
+    return getDisplayAssetSrc(src);
+  }
+
   (function hydrateLoaderFloats(){
     var allowDecorativeImages = !isHeavyMediaConstrained();
     loaderFloatEls.forEach(function(img){
@@ -2514,23 +2542,24 @@
 
   // VIEWカード設定（ここだけ編集すれば画像・表示名・遷移URLを自由に変更できます）
   // 3D VIEWは初回カクつき防止のため、WebGL専用の軽量テクスチャを使う。
-  const VIEW_TEXTURE_BASE = "/assets/view-webgl/";
+  const VIEW_TEXTURE_BASE = isHeavyMediaConstrained() ? "/assets/mobile/view-webgl/" : "/assets/view-webgl/";
+  const VIEW_TEXTURE_EXT = isHeavyMediaConstrained() ? ".jpg" : ".jpeg";
   const viewCards = [
-    { image:VIEW_TEXTURE_BASE + "view1.jpeg",  title:"重なり", url:"https://1.com" },
-    { image:VIEW_TEXTURE_BASE + "view2.jpeg",  title:"リアルタイム色立体", url:"https://2.com" },
-    { image:VIEW_TEXTURE_BASE + "view3.jpeg",  title:"リミナルスペース", url:"https://3.com" },
-    { image:VIEW_TEXTURE_BASE + "view4.jpeg",  title:"ロゴ制作", url:"https://4.com" },
-    { image:VIEW_TEXTURE_BASE + "view5.jpeg",  title:"ゲームエンジンを用いた街制作", url:"https://5.com" },
-    { image:VIEW_TEXTURE_BASE + "view6.jpeg",  title:"ライブ背景映像", url:"https://6.com" },
-    { image:VIEW_TEXTURE_BASE + "view7.jpeg",  title:"07.com", url:"https://7.com" },
-    { image:VIEW_TEXTURE_BASE + "view8.jpeg",  title:"08.com", url:"https://8.com" },
-    { image:VIEW_TEXTURE_BASE + "view9.jpeg",  title:"09.com", url:"https://9.com" },
-    { image:VIEW_TEXTURE_BASE + "view13.jpeg", title:"10.com", url:"https://10.com" },
-    { image:VIEW_TEXTURE_BASE + "view11.jpeg", title:"11.com", url:"https://11.com" },
-    { image:VIEW_TEXTURE_BASE + "view12.jpeg", title:"12.com", url:"https://12.com" },
-    { image:VIEW_TEXTURE_BASE + "view12.jpeg", title:"13.com", url:"https://13.com" },
-    { image:VIEW_TEXTURE_BASE + "view14.jpeg", title:"14.com", url:"https://14.com" },
-    { image:VIEW_TEXTURE_BASE + "view15.jpeg", title:"15.com", url:"https://15.com" }
+    { image:VIEW_TEXTURE_BASE + "view1" + VIEW_TEXTURE_EXT,  title:"重なり", url:"https://1.com" },
+    { image:VIEW_TEXTURE_BASE + "view2" + VIEW_TEXTURE_EXT,  title:"リアルタイム色立体", url:"https://2.com" },
+    { image:VIEW_TEXTURE_BASE + "view3" + VIEW_TEXTURE_EXT,  title:"リミナルスペース", url:"https://3.com" },
+    { image:VIEW_TEXTURE_BASE + "view4" + VIEW_TEXTURE_EXT,  title:"ロゴ制作", url:"https://4.com" },
+    { image:VIEW_TEXTURE_BASE + "view5" + VIEW_TEXTURE_EXT,  title:"ゲームエンジンを用いた街制作", url:"https://5.com" },
+    { image:VIEW_TEXTURE_BASE + "view6" + VIEW_TEXTURE_EXT,  title:"ライブ背景映像", url:"https://6.com" },
+    { image:VIEW_TEXTURE_BASE + "view7" + VIEW_TEXTURE_EXT,  title:"07.com", url:"https://7.com" },
+    { image:VIEW_TEXTURE_BASE + "view8" + VIEW_TEXTURE_EXT,  title:"08.com", url:"https://8.com" },
+    { image:VIEW_TEXTURE_BASE + "view9" + VIEW_TEXTURE_EXT,  title:"09.com", url:"https://9.com" },
+    { image:VIEW_TEXTURE_BASE + "view13" + VIEW_TEXTURE_EXT, title:"10.com", url:"https://10.com" },
+    { image:VIEW_TEXTURE_BASE + "view11" + VIEW_TEXTURE_EXT, title:"11.com", url:"https://11.com" },
+    { image:VIEW_TEXTURE_BASE + "view12" + VIEW_TEXTURE_EXT, title:"12.com", url:"https://12.com" },
+    { image:VIEW_TEXTURE_BASE + "view12" + VIEW_TEXTURE_EXT, title:"13.com", url:"https://13.com" },
+    { image:VIEW_TEXTURE_BASE + "view14" + VIEW_TEXTURE_EXT, title:"14.com", url:"https://14.com" },
+    { image:VIEW_TEXTURE_BASE + "view15" + VIEW_TEXTURE_EXT, title:"15.com", url:"https://15.com" }
   ];
   const COUNT = viewCards.length;
   const viewImages = viewCards.map((card)=>card.image);
@@ -3431,7 +3460,7 @@
     var no = caption ? caption.querySelector("span") : null;
     var title = caption ? caption.querySelector("strong") : null;
     return {
-      src: img ? (img.getAttribute("data-full-src") || img.currentSrc || img.src || "") : "",
+      src: img ? getImageDisplaySrc(img, img.getAttribute("data-full-src") || img.currentSrc || img.src || "") : "",
       alt: img ? (img.alt || "") : "",
       label: [no ? no.textContent : "", title ? title.textContent : ""].filter(Boolean).join(" / ")
     };
@@ -3583,7 +3612,7 @@
     var img = frame ? frame.querySelector("img") : null;
     if(!img) return null;
     return {
-      src: img.getAttribute("data-full-src") || img.currentSrc || img.src || "",
+      src: getImageDisplaySrc(img, img.getAttribute("data-full-src") || img.currentSrc || img.src || ""),
       alt: img.alt || "",
       no: getNoFromFrame(frame)
     };
@@ -4001,6 +4030,7 @@
               '<p  id="wv-cat" class="wvi"></p>' +
               '<h2 id="wv-ttl" class="wvi"></h2>' +
               '<div id="wv-hr" class="wvi"></div>' +
+              '<p  id="wv-concept-label" class="wvi">CONCEPT</p>' +
               '<p  id="wv-dsc" class="wvi"></p>' +
               '<div id="wv-meta" class="wvi"></div>' +
               '<a  id="wv-lnk" class="wvi" target="_blank" rel="noopener">VIEW PROJECT &#8594;</a>' +
@@ -4014,10 +4044,9 @@
           '</div>' +
           '<div class="wv-section-divider"></div>' +
           '<div id="wv-long-wrap">' +
-            '<p id="wv-long-label">ABOUT THIS WORK</p>' +
+            '<p id="wv-long-label">DESCRIPTION</p>' +
             '<div id="wv-long"></div>' +
           '</div>' +
-          '<div class="wv-section-divider"></div>' +
           '<div id="wv-process-wrap">' +
             '<p id="wv-process-label">PROCESS &amp; TOOLS</p>' +
             '<div id="wv-tools"></div>' +
@@ -4222,7 +4251,8 @@
   function getData(el){
     var imgEl = el.querySelector("img.swap-base") || el.querySelector("img:not(.swap-hover)");
     var fallbackSrc = imgEl ? (imgEl.getAttribute("src") || "") : "";
-    var src   = imgEl ? (imgEl.getAttribute("data-full-src") || fallbackSrc) : "";
+    var rawSrc = imgEl ? (imgEl.getAttribute("data-full-src") || fallbackSrc) : "";
+    var src   = imgEl ? getImageDisplaySrc(imgEl, rawSrc) : "";
     var title = tx(el, ".design-title,.illus-title,.view-title") || tx(el,"h2,h3") || "";
     var catTx = tx(el, ".design-meta,.illus-sub,.view-meta,.design-index,.view-no") || "";
     var desc  = tx(el, ".design-desc,.illus-desc,.view-desc") || "";
@@ -4232,7 +4262,7 @@
     var role  = ds.role  || "";
     var media = ds.media || "";
     var gRaw  = ds.gallery || "";
-    var gallery = gRaw ? gRaw.split("|").map(function(s){ return s.trim(); }).filter(Boolean) : [];
+    var gallery = gRaw ? gRaw.split("|").map(function(s){ return getDisplayAssetSrc(s.trim()); }).filter(Boolean) : [];
     var galleryLayout = ds.galleryLayout || "";
     var youtubeRaw = ds.youtube || "";
     var youtubeListRaw = ds.youtubeList || "";
@@ -4241,7 +4271,7 @@
       : (youtubeRaw ? youtubeRaw.split("|").map(getYoutubeId).filter(Boolean) : []);
     var youtube = youtubeList[0] || "";
     var themeRaw = ds.themeGallery || "";
-    var themeGallery = themeRaw ? themeRaw.split("|").map(function(s){ return s.trim(); }).filter(Boolean) : [];
+    var themeGallery = themeRaw ? themeRaw.split("|").map(function(s){ return getDisplayAssetSrc(s.trim()); }).filter(Boolean) : [];
     var href  = ds.url || ds.href ||
                 (el.querySelector("a[href]") ? el.querySelector("a[href]").href : "") || "";
     var process = ds.process || "";
@@ -4319,20 +4349,9 @@
     return videoId ? "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId) : "";
   }
 
-  function renderMeta(d){
+  function renderMeta(){
     metaEl.innerHTML = "";
-    var rows = [];
-    if(d.year)  rows.push(["YEAR", d.year]);
-    if(d.role)  rows.push(["ROLE", d.role]);
-    if(d.media) rows.push(["MEDIA", d.media]);
-    if(!rows.length){ metaEl.style.display="none"; return; }
-    metaEl.style.display = "";
-    rows.forEach(function(r){
-      var row = document.createElement("div");
-      row.className = "wvmeta-row";
-      row.innerHTML = '<span class="wvmeta-k">'+esc(r[0])+'</span><span class="wvmeta-v">'+esc(r[1])+'</span>';
-      metaEl.appendChild(row);
-    });
+    metaEl.style.display = "none";
   }
 
   /* ── story captions – one per gallery image ── */
@@ -4425,7 +4444,7 @@
         var host = im.closest(".wv-story-img-wrap");
         if(host) host.classList.add("is-error");
       };
-      if(gi < 2){
+      if(gi < 2 && !isHeavyMediaConstrained()){
         im.src = src;
       }else{
         im.setAttribute("data-src", src);
@@ -4472,8 +4491,7 @@
     /* process text */
     if(processEl) processEl.textContent = d.process || "";
     /* show/hide whole section */
-    var hasContent = !!(d.process || (d.tools) ||
-      (d.media && d.media.length > 0));
+    var hasContent = !!(d.process || d.tools);
     processWrap.style.display = hasContent ? "" : "none";
   }
 
@@ -4498,7 +4516,7 @@
     iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     iframe.allowFullscreen = true;
     iframe.setAttribute("allowfullscreen", "");
-    iframe.loading = "eager";
+    iframe.loading = isHeavyMediaConstrained() ? "lazy" : "eager";
     iframe.referrerPolicy = "strict-origin-when-cross-origin";
     videoFrame.appendChild(iframe);
 
@@ -4568,7 +4586,7 @@
       var im = document.createElement("img");
       im.src = src;
       im.alt = "theme image " + String(i + 1).padStart(2, "0");
-      im.loading = i === 0 ? "eager" : "lazy";
+      im.loading = (i === 0 && !isHeavyMediaConstrained()) ? "eager" : "lazy";
       im.decoding = "async";
       figure.appendChild(im);
       themeTrack.appendChild(figure);
@@ -4618,7 +4636,7 @@
     num.textContent = pad(idx+1) + " / " + pad(items.length);
     cat.textContent = d.cat;
     ttl.textContent = d.title;
-    dsc.textContent = d.desc || "";
+    dsc.textContent = d.desc || d.long || "";
 
     renderMeta(d);
 
@@ -6437,6 +6455,7 @@
         var raw = img.getAttribute("src") || img.currentSrc || img.src || "";
         src = raw.replace(/\/assets\/optimized\/photo\/([^/?#]+)\.jpg([?#].*)?$/i, "/assets/photo/$1.JPG$2");
       }
+      src = getImageDisplaySrc(img, src);
     }
     return {
       src: src,
