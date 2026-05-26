@@ -228,6 +228,47 @@
         }, CATASTROPHIC_TIMEOUT_MS);
       })();
 
+  function isHeavyMediaConstrained(){
+    try{
+      var mobileLike = window.matchMedia &&
+        window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
+      var reduced = window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var saveData = navigator.connection && navigator.connection.saveData;
+      return !!(mobileLike || reduced || saveData);
+    }catch(_){
+      return false;
+    }
+  }
+
+  function splitAssetSuffix(src){
+    var match = String(src || "").match(/^([^?#]+)([?#].*)?$/);
+    return {
+      path: match ? match[1] : String(src || ""),
+      suffix: match && match[2] ? match[2] : ""
+    };
+  }
+
+  function getMobileAssetSrc(src){
+    if(typeof src !== "string" || !src) return src || "";
+    var parts = splitAssetSuffix(src.trim());
+    var path = parts.path;
+    if(!/^\/assets\//.test(path)) return src;
+    if(/^\/assets\/mobile\//.test(path)) return src;
+    if(/^\/assets\/branding\//.test(path) || /^\/assets\/loader\//.test(path)) return src;
+    if(!/\.(jpe?g|png)$/i.test(path)) return src;
+    return "/assets/mobile/" + path.slice("/assets/".length).replace(/\.(jpe?g|png)$/i, ".jpg") + parts.suffix;
+  }
+
+  function getDisplayAssetSrc(src){
+    return isHeavyMediaConstrained() ? getMobileAssetSrc(src) : src;
+  }
+
+  function getImageDisplaySrc(img, preferredSrc){
+    var src = preferredSrc || (img ? (img.currentSrc || img.getAttribute("src") || img.src || "") : "");
+    return getDisplayAssetSrc(src);
+  }
+
   (async () => {
   const useScrollViewSystem = !!document.querySelector(".view-scroll-system, .view-legacy-3d");
   async function ensureThreeLib(){
@@ -281,48 +322,8 @@
   const loaderFloatEls = Array.from(document.querySelectorAll(".loader-float"));
   const STABLE_PERFORMANCE_MODE = true;
 
-  function isHeavyMediaConstrained(){
-    try{
-      var mobileLike = window.matchMedia &&
-        window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
-      var reduced = window.matchMedia &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      var saveData = navigator.connection && navigator.connection.saveData;
-      return !!(mobileLike || reduced || saveData);
-    }catch(_){
-      return false;
-    }
-  }
   if(isHeavyMediaConstrained()){
     document.documentElement.classList.add("is-light-mobile");
-  }
-
-  function splitAssetSuffix(src){
-    var match = String(src || "").match(/^([^?#]+)([?#].*)?$/);
-    return {
-      path: match ? match[1] : String(src || ""),
-      suffix: match && match[2] ? match[2] : ""
-    };
-  }
-
-  function getMobileAssetSrc(src){
-    if(typeof src !== "string" || !src) return src || "";
-    var parts = splitAssetSuffix(src.trim());
-    var path = parts.path;
-    if(!/^\/assets\//.test(path)) return src;
-    if(/^\/assets\/mobile\//.test(path)) return src;
-    if(/^\/assets\/branding\//.test(path) || /^\/assets\/loader\//.test(path)) return src;
-    if(!/\.(jpe?g|png)$/i.test(path)) return src;
-    return "/assets/mobile/" + path.slice("/assets/".length).replace(/\.(jpe?g|png)$/i, ".jpg") + parts.suffix;
-  }
-
-  function getDisplayAssetSrc(src){
-    return isHeavyMediaConstrained() ? getMobileAssetSrc(src) : src;
-  }
-
-  function getImageDisplaySrc(img, preferredSrc){
-    var src = preferredSrc || (img ? (img.currentSrc || img.getAttribute("src") || img.src || "") : "");
-    return getDisplayAssetSrc(src);
   }
 
   (function hydrateLoaderFloats(){
