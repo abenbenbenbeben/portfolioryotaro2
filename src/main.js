@@ -6207,13 +6207,23 @@
   function ensure(){
     /* now-viewing と view-section の両方を一括再生 */
     document.querySelectorAll(".sidebar-bg-video, .nowback-video, .viewback-video").forEach(function(v){
+      var lazySrc = v.getAttribute("data-src");
+      if(lazySrc && !v.getAttribute("src") && !v.currentSrc){
+        v.src = lazySrc;
+        try{ v.load(); }catch(_){}
+      }
       if(v.currentSrc || v.getAttribute("src")){
         tryPlay(v);
       }
     });
   }
   function bind(){
-    ensure();
+    var start = function(){ ensure(); };
+    if("requestIdleCallback" in window){
+      window.requestIdleCallback(start, { timeout: 2200 });
+    } else {
+      window.setTimeout(start, 1600);
+    }
     document.addEventListener("visibilitychange", function(){
       if(!document.hidden) ensure();
     });
