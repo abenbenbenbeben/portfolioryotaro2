@@ -16,11 +16,11 @@
   <div id="ux-progress" aria-hidden="true"></div>
   <div class="loader" id="loader" aria-hidden="true">
     <div class="loader-floats" id="loaderFloats">
-      <img class="loader-float f1" src="/assets/loader/loader-image.png" alt="">
-      <img class="loader-float f2" src="/assets/loader/loader-image2.png" alt="">
-      <img class="loader-float f3" src="/assets/loader/loader-image3.png" alt="">
-      <img class="loader-float f4" src="/assets/loader/loader-image4.png" alt="">
-      <img class="loader-float f5" src="/assets/loader/loader-image5.png" alt="">
+      <img class="loader-float f1" data-src="/assets/loader/loader-image.png" alt="">
+      <img class="loader-float f2" data-src="/assets/loader/loader-image2.png" alt="">
+      <img class="loader-float f3" data-src="/assets/loader/loader-image3.png" alt="">
+      <img class="loader-float f4" data-src="/assets/loader/loader-image4.png" alt="">
+      <img class="loader-float f5" data-src="/assets/loader/loader-image5.png" alt="">
     </div>
     <div class="loader-ui">
       <div class="loader-ring">
@@ -159,12 +159,13 @@
           <video
             id="introFilmVideo"
             class="intro-film-video"
-            src="/media/sasisho.mp4"
+            data-src="/media/sasisho.mp4"
+            poster="/assets/optimized/video/sasisho-poster.jpg"
             autoplay
             muted
             loop
             playsinline
-            preload="auto"
+            preload="none"
           ></video>
           <div class="intro-film-veil" aria-hidden="true"></div>
           <div class="intro-film-ui">

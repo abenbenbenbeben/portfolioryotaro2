@@ -381,6 +381,28 @@ body.is-intro-mode .intro-film-stage{
 .intro-film-stage.is-missing .intro-film-veil{
   display:none;
 }
+.intro-film-stage.is-poster-mode{
+  background:#050505 url("/assets/optimized/video/sasisho-poster.jpg") center center / cover no-repeat;
+}
+.intro-film-stage.is-poster-mode .intro-film-video{
+  display:none;
+}
+html.is-light-mobile .loader-floats,
+html.is-light-mobile .opening-reveal-cards,
+html.is-light-mobile .noise-squares,
+html.is-light-mobile #trail,
+html.is-light-mobile .cursor,
+html.is-light-mobile .cursor-echo-wrap,
+html.is-light-mobile .cursor-ripple{
+  display:none !important;
+}
+html.is-light-mobile .opening-reveal,
+html.is-light-mobile .intro-film-stage,
+html.is-light-mobile .intro-film-copy,
+html.is-light-mobile .intro-film-scroll{
+  animation:none !important;
+  transition:none !important;
+}
 .intro-film-video{
   position:absolute;
   inset:0;

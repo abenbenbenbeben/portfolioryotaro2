@@ -281,6 +281,37 @@
   const loaderFloatEls = Array.from(document.querySelectorAll(".loader-float"));
   const STABLE_PERFORMANCE_MODE = true;
 
+  function isHeavyMediaConstrained(){
+    try{
+      var mobileLike = window.matchMedia &&
+        window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
+      var reduced = window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var saveData = navigator.connection && navigator.connection.saveData;
+      return !!(mobileLike || reduced || saveData);
+    }catch(_){
+      return false;
+    }
+  }
+  if(isHeavyMediaConstrained()){
+    document.documentElement.classList.add("is-light-mobile");
+  }
+
+  (function hydrateLoaderFloats(){
+    var allowDecorativeImages = !isHeavyMediaConstrained();
+    loaderFloatEls.forEach(function(img){
+      var src = img.getAttribute("data-src");
+      if(allowDecorativeImages && src && !img.getAttribute("src")){
+        img.src = src;
+        return;
+      }
+      if(!allowDecorativeImages){
+        img.removeAttribute("src");
+        img.style.display = "none";
+      }
+    });
+  })();
+
   /* ── Loader float image drift animation ── */
   (function animateLoaderFloats(){
     var els = loaderFloatEls.filter(function(el){ return el.offsetParent !== null || el.style.display !== 'none'; });
@@ -1156,6 +1187,7 @@
 
   async function playIntroFilm(){
     if(!introFilmVideoEl || !viewSectionActive) return;
+    if(isHeavyMediaConstrained()) return;
     if(introFilmStageEl && introFilmStageEl.classList.contains("is-missing")) return;
     const played = await playVideo(introFilmVideoEl);
     if(!played){
@@ -1176,27 +1208,28 @@
     introFilmVideoEl.loop = true;
     introFilmVideoEl.autoplay = true;
     introFilmVideoEl.playsInline = true;
-    introFilmVideoEl.preload = "auto";
     introFilmVideoEl.setAttribute("muted", "");
     introFilmVideoEl.setAttribute("playsinline", "");
     introFilmVideoEl.setAttribute("webkit-playsinline", "");
     introFilmVideoEl.setAttribute("autoplay", "");
     introFilmVideoEl.setAttribute("loop", "");
-    introFilmVideoEl.setAttribute("preload", "auto");
+    if(isHeavyMediaConstrained()){
+      introFilmVideoEl.preload = "none";
+      introFilmVideoEl.setAttribute("preload", "none");
+      introFilmVideoEl.pause();
+      introFilmVideoEl.removeAttribute("src");
+      if(introFilmStageEl) introFilmStageEl.classList.add("is-poster-mode");
+      try{ introFilmVideoEl.load(); }catch(_){}
+      return;
+    }
+
+    if(introFilmStageEl) introFilmStageEl.classList.remove("is-poster-mode");
+    introFilmVideoEl.preload = "metadata";
+    introFilmVideoEl.setAttribute("preload", "metadata");
+    const introSrc = introFilmVideoEl.getAttribute("data-src") || introFilmVideoEl.getAttribute("src");
     const rawCandidates = [
-      introFilmVideoEl.getAttribute("src"),
-      "/media/sasisho.mp4",
-      "/media/sasisho.mov",
-      "/media/saisho.mov",
-      "/media/saisho.mp4",
-      "/media/sasisho.MOV",
-      "/media/sasisho.MP4",
-      "/media/saisho.MOV",
-      "/media/saisho.MP4",
-      "/media/SASISHO.mp4",
-      "/media/SASISHO.mov",
-      "/media/SASISHO.MOV",
-      "/media/SASISHO.MP4"
+      introSrc,
+      "/media/sasisho.mp4"
     ];
     const candidates = [...new Set(rawCandidates.filter(Boolean))];
 
@@ -5894,6 +5927,10 @@
         resolve();
         return;
       }
+      if(!video.currentSrc && !video.getAttribute("src")){
+        resolve();
+        return;
+      }
       if(video.readyState >= 1){
         resolve();
         return;
@@ -6022,10 +6059,10 @@
                     && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
   /* スクエア基本数を半減以下に。少なくしても密度感が保てるよう
      サイズ分布を維持しているので、見た目はほぼ同じ。 */
-  var COUNT_PROFILE = IS_MOBILE ? 14 : 26;
-  var COUNT_VIEW    = IS_MOBILE ? 14 : 28;
-  var COUNT_DESIGN  = IS_MOBILE ? 6 : 10;
-  var COUNT_ILLUS   = IS_MOBILE ? 6 : 10;
+  var COUNT_PROFILE = IS_MOBILE ? 0 : 26;
+  var COUNT_VIEW    = IS_MOBILE ? 0 : 28;
+  var COUNT_DESIGN  = IS_MOBILE ? 0 : 10;
+  var COUNT_ILLUS   = IS_MOBILE ? 0 : 10;
 
   /* ── タブが裏に回ったら body にクラスを立て、CSS でアニメ全停止 ── */
   function bindVisibility(){
@@ -6207,6 +6244,12 @@
   function ensure(){
     /* now-viewing と view-section の両方を一括再生 */
     document.querySelectorAll(".sidebar-bg-video, .nowback-video, .viewback-video").forEach(function(v){
+      if(isHeavyMediaConstrained()){
+        try{ v.pause(); }catch(_){}
+        v.removeAttribute("src");
+        try{ v.load(); }catch(_){}
+        return;
+      }
       var lazySrc = v.getAttribute("data-src");
       if(lazySrc && !v.getAttribute("src") && !v.currentSrc){
         v.src = lazySrc;
