@@ -7782,7 +7782,7 @@ body.theme-view-design .design-desc{
   }
 }
 
-/* 重なる KASANARU: replace dummy gallery with the 1/ JPEG sequence */
+/* 重なる: replace dummy gallery with the 1/ JPEG sequence */
 body.theme-view-design .design-item.visual-film-project,
 body.theme-view-design .design-item.visual-film-project:nth-child(1){
   grid-column:1 / -1 !important;
@@ -8061,7 +8061,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   }
 }
 
-/* 重なる KASANARU detail viewer visibility fix */
+/* 重なる detail viewer visibility fix */
 #wv.is-visual-film,
 #wv.is-visual-film #wv-scroll,
 #wv.is-visual-film #wv-long-wrap,
@@ -8163,7 +8163,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   visibility:visible !important;
 }
 
-/* 重なる KASANARU detail: tighter and sharper image layout */
+/* 重なる detail: tighter and sharper image layout */
 #wv.is-visual-film #wv-gallery-wrap.is-visual-film-gallery{
   padding:12px clamp(12px, 5vw, 56px) 34px !important;
 }
@@ -8233,7 +8233,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   }
 }
 
-/* 重なる KASANARU detail: YouTube preview near the top */
+/* 重なる detail: YouTube preview near the top */
 #wv-video-wrap{
   display:none;
   padding:28px 44px 10px;
@@ -8431,7 +8431,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   }
 }
 
-/* 重なる KASANARU detail: 1theme side slider next to the title block */
+/* 重なる detail: 1theme side slider next to the title block */
 #wv-theme-wrap{
   display:none;
 }
@@ -10986,7 +10986,7 @@ body.theme-view-design .design-item:nth-child(8) .design-companion,
   opacity:1 !important;
 }
 
-/* 重なる KASANARU: fit the long title without losing presence */
+/* 重なる: fit the title without losing presence */
 body.theme-view-design .design-item:nth-child(1) .design-title,
 #view-design .design-item:nth-child(1) .design-title,
 body.theme-view-design .visual-film-project .design-title,
@@ -10999,12 +10999,51 @@ body.theme-view-design .visual-film-project .design-title,
   text-wrap:balance;
 }
 
+/* Work detail readability: make the concept block easier to scan. */
+#wv-concept-label{
+  font-size:12px !important;
+  line-height:1 !important;
+  letter-spacing:0.34em !important;
+  color:rgba(29,29,31,0.52) !important;
+  margin:0 0 14px !important;
+}
+
+#wv-dsc{
+  max-width:48ch !important;
+  font-size:clamp(17px, 1.55vw, 22px) !important;
+  line-height:1.82 !important;
+  letter-spacing:0.025em !important;
+  color:rgba(29,29,31,0.86) !important;
+}
+
+#wv.is-visual-film #wv-concept-label{
+  color:rgba(246,243,236,0.62) !important;
+}
+
+#wv.is-visual-film #wv-dsc{
+  color:rgba(246,243,236,0.9) !important;
+}
+
 @media(max-width:1180px){
   body.theme-view-design .design-item:nth-child(1) .design-title,
   #view-design .design-item:nth-child(1) .design-title,
   body.theme-view-design .visual-film-project .design-title,
   #view-design .visual-film-project .design-title{
     font-size:38px !important;
+  }
+}
+
+@media(max-width:720px){
+  #wv-concept-label{
+    font-size:11px !important;
+    letter-spacing:0.3em !important;
+    margin-bottom:12px !important;
+  }
+
+  #wv-dsc{
+    max-width:100% !important;
+    font-size:17px !important;
+    line-height:1.78 !important;
   }
 }
 
@@ -20121,6 +20160,34 @@ body.page-revealed .sidebar-toggle{
   #wv:not(.is-visual-film):not(.is-illustration-work) .wv-story-img-wrap,
   #wv:not(.is-visual-film):not(.is-illustration-work) .wv-story-text{
     width:100% !important;
+  }
+}
+
+/* EOF readability lock: concept text stays large on desktop and mobile. */
+#wv-concept-label{
+  font-size:12px !important;
+  line-height:1 !important;
+  letter-spacing:0.34em !important;
+  margin:0 0 14px !important;
+}
+
+#wv-dsc{
+  max-width:48ch !important;
+  font-size:clamp(17px, 1.55vw, 22px) !important;
+  line-height:1.82 !important;
+  letter-spacing:0.025em !important;
+}
+
+@media(max-width:720px){
+  #wv-concept-label{
+    font-size:11px !important;
+    letter-spacing:0.3em !important;
+  }
+
+  #wv-dsc{
+    max-width:100% !important;
+    font-size:17px !important;
+    line-height:1.78 !important;
   }
 }
 
