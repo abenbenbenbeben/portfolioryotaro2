@@ -20191,7 +20191,7 @@ body.page-revealed .sidebar-toggle{
   }
 }
 
-/* EOF description width lock: let DESCRIPTION breathe with the screen. */
+/* EOF description width lock: let detailed text breathe with the screen. */
 #wv-long-wrap{
   padding-inline:clamp(24px, 6vw, 84px) !important;
 }

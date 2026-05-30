@@ -4065,7 +4065,7 @@
           '</div>' +
           '<div class="wv-section-divider"></div>' +
           '<div id="wv-long-wrap">' +
-            '<p id="wv-long-label">DESCRIPTION</p>' +
+            '<p id="wv-long-label">DETAILED DESCRIPTION</p>' +
             '<div id="wv-long"></div>' +
           '</div>' +
           '<div id="wv-process-wrap">' +
