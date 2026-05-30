@@ -20497,7 +20497,33 @@ body.page-revealed .sidebar-toggle{
 
 /* EOF intro title lock: keep the Japanese portfolio title on one line. */
 .intro-film-copy{
+  position:relative !important;
+  isolation:isolate !important;
   max-width:min(1180px, calc(100vw - 56px)) !important;
+  padding:clamp(18px, 2.4vw, 30px) clamp(20px, 3vw, 42px) clamp(18px, 2.5vw, 32px) clamp(18px, 2.8vw, 38px) !important;
+}
+
+.intro-film-copy::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:-1 !important;
+  inset:-8px -22vw -8px -18px !important;
+  background:
+    linear-gradient(90deg,
+      rgba(3,3,4,0.78) 0%,
+      rgba(3,3,4,0.56) 42%,
+      rgba(3,3,4,0.22) 72%,
+      rgba(3,3,4,0) 100%) !important;
+  border-left:2px solid rgba(215,186,115,0.72) !important;
+  box-shadow:0 28px 80px rgba(0,0,0,0.46) !important;
+  pointer-events:none !important;
+}
+
+.intro-film-kicker,
+.intro-film-title,
+.intro-film-note{
+  position:relative !important;
+  z-index:1 !important;
 }
 
 .intro-film-title{
@@ -20507,15 +20533,31 @@ body.page-revealed .sidebar-toggle{
   font-size:clamp(31px, 6.3vw, 88px) !important;
   line-height:1.02 !important;
   letter-spacing:0.01em !important;
+  text-shadow:
+    0 2px 0 rgba(0,0,0,0.22),
+    0 18px 44px rgba(0,0,0,0.82),
+    0 0 30px rgba(215,186,115,0.1) !important;
 }
 
 .intro-film-note{
   max-width:42em !important;
+  color:rgba(246,241,231,0.82) !important;
+  text-shadow:0 12px 32px rgba(0,0,0,0.74) !important;
 }
 
 @media(max-width:720px){
   .intro-film-copy{
     max-width:calc(100vw - 32px) !important;
+    padding:16px 18px 17px 18px !important;
+  }
+
+  .intro-film-copy::before{
+    inset:-8px -28px -8px -12px !important;
+    background:
+      linear-gradient(90deg,
+        rgba(3,3,4,0.82) 0%,
+        rgba(3,3,4,0.58) 62%,
+        rgba(3,3,4,0.12) 100%) !important;
   }
 
   .intro-film-title{
