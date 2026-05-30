@@ -20495,6 +20495,38 @@ body.page-revealed .sidebar-toggle{
   }
 }
 
+/* EOF intro title lock: keep the Japanese portfolio title on one line. */
+.intro-film-copy{
+  max-width:min(1180px, calc(100vw - 56px)) !important;
+}
+
+.intro-film-title{
+  white-space:nowrap !important;
+  width:max-content !important;
+  max-width:100% !important;
+  font-size:clamp(31px, 6.3vw, 88px) !important;
+  line-height:1.02 !important;
+  letter-spacing:0.01em !important;
+}
+
+.intro-film-note{
+  max-width:42em !important;
+}
+
+@media(max-width:720px){
+  .intro-film-copy{
+    max-width:calc(100vw - 32px) !important;
+  }
+
+  .intro-film-title{
+    font-size:clamp(24px, 8.1vw, 38px) !important;
+  }
+
+  .intro-film-note{
+    max-width:28em !important;
+  }
+}
+
 /* Latest polish: GALLERY at 75%, solid illustration folder, clickable zoom. */
 #wv.is-visual-film #wv-gallery.is-visual-film-gallery,
 #wv.is-visual-film #wv-gallery-label{
