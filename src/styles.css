@@ -15322,7 +15322,7 @@ body.is-opening-reveal #view-profile .intro-film-scroll{
   }
 }
 
-/* SAISHO -> ORBIT VIEW: remove the dead scroll pocket between the film and ring view. */
+/* Intro film -> orbit view: remove the dead scroll pocket between the film and ring view. */
 .intro-film{
   margin-bottom:clamp(-380px, -46svh, -260px) !important;
 }
