@@ -4678,9 +4678,10 @@
     if(!videoWrap || !videoFrame) return;
     clearTimeout(videoTimer);
     videoFrame.innerHTML = "";
-    videoFrame.classList.remove("is-playing");
-    var previousExternal = videoWrap.querySelector(".wv-video-external");
-    if(previousExternal) previousExternal.remove();
+    videoFrame.classList.remove("is-playing", "is-multi");
+    videoWrap.querySelectorAll(".wv-video-external").forEach(function(link){
+      link.remove();
+    });
     var videos = d.youtubeList && d.youtubeList.length
       ? d.youtubeList
       : (d.youtube ? [d.youtube] : []);
@@ -4690,65 +4691,75 @@
       return;
     }
     videoWrap.style.display = "block";
-    var iframe = document.createElement("iframe");
-    iframe.title = d.title ? d.title + " film preview" : "Film preview";
-    iframe.src = getYoutubeEmbedSrc(videos[0], { autoplay:false, muted:true, loop:false, controls:false });
-    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    iframe.allowFullscreen = true;
-    iframe.setAttribute("allowfullscreen", "");
-    iframe.loading = isHeavyMediaConstrained() ? "lazy" : "eager";
-    iframe.referrerPolicy = "strict-origin-when-cross-origin";
-    videoFrame.appendChild(iframe);
+    videoFrame.classList.toggle("is-multi", videos.length > 1);
 
-    var playButton = document.createElement("button");
-    playButton.className = "wv-video-play";
-    playButton.type = "button";
-    playButton.setAttribute("aria-label", "Play film");
-    playButton.innerHTML = "<span>PLAY FILM</span>";
-    playButton.addEventListener("click", function(){
-      function postPlay(){
-        if(!iframe.contentWindow) return;
-        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":[]}', "*");
-        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":[]}', "*");
+    videos.forEach(function(videoId, index){
+      var slot = document.createElement("div");
+      slot.className = "wv-video-slot";
+      slot.setAttribute("data-video-index", String(index + 1).padStart(2, "0"));
+
+      var iframe = document.createElement("iframe");
+      iframe.title = (d.title ? d.title : "Film") + " preview " + String(index + 1);
+      iframe.src = getYoutubeEmbedSrc(videoId, { autoplay:false, muted:true, loop:false, controls:false });
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.loading = isHeavyMediaConstrained() ? "lazy" : (index === 0 ? "eager" : "lazy");
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      slot.appendChild(iframe);
+
+      var playButton = document.createElement("button");
+      playButton.className = "wv-video-play";
+      playButton.type = "button";
+      playButton.setAttribute("aria-label", "Play film " + String(index + 1));
+      playButton.innerHTML = "<span>PLAY FILM " + String(index + 1).padStart(2, "0") + "</span>";
+      playButton.addEventListener("click", function(){
+        function postPlay(){
+          if(!iframe.contentWindow) return;
+          iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":[]}', "*");
+          iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":[]}', "*");
+        }
+        slot.classList.add("is-playing");
+        videoFrame.classList.add("is-playing");
+        iframe.src = getYoutubeEmbedSrc(videoId, { autoplay:true, muted:false, loop:false, controls:true });
+        iframe.addEventListener("load", postPlay, { once:true });
+        setTimeout(postPlay, 120);
+        setTimeout(postPlay, 520);
+      });
+      slot.appendChild(playButton);
+      videoFrame.appendChild(slot);
+
+      var watchUrl = getYoutubeWatchUrl(videoId);
+      if(watchUrl){
+        var externalLink = document.createElement("a");
+        externalLink.className = "wv-video-external";
+        externalLink.href = watchUrl;
+        externalLink.target = "_blank";
+        externalLink.rel = "noopener noreferrer";
+        externalLink.textContent = "OPEN YOUTUBE " + String(index + 1).padStart(2, "0");
+        externalLink.setAttribute("aria-label", "Open film " + String(index + 1) + " on YouTube");
+        externalLink.addEventListener("pointerdown", function(event){
+          event.stopPropagation();
+        });
+        externalLink.addEventListener("click", function(event){
+          event.stopPropagation();
+          if(event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey){
+            return;
+          }
+          event.preventDefault();
+          var opened = null;
+          try{
+            opened = window.open(watchUrl, "_blank", "noopener,noreferrer");
+          }catch(_){}
+          if(opened){
+            try{ opened.opener = null; opened.focus(); }catch(_){}
+            return;
+          }
+          window.location.href = watchUrl;
+        });
+        videoWrap.appendChild(externalLink);
       }
-      videoFrame.classList.add("is-playing");
-      iframe.src = getYoutubeEmbedSrc(videos[0], { autoplay:true, muted:false, loop:false, controls:true });
-      iframe.addEventListener("load", postPlay, { once:true });
-      setTimeout(postPlay, 120);
-      setTimeout(postPlay, 520);
     });
-    videoFrame.appendChild(playButton);
-
-    var watchUrl = getYoutubeWatchUrl(videos[0]);
-    if(watchUrl){
-      var externalLink = document.createElement("a");
-      externalLink.className = "wv-video-external";
-      externalLink.href = watchUrl;
-      externalLink.target = "_blank";
-      externalLink.rel = "noopener noreferrer";
-      externalLink.textContent = "OPEN YOUTUBE";
-      externalLink.setAttribute("aria-label", "Open this film on YouTube");
-      externalLink.addEventListener("pointerdown", function(event){
-        event.stopPropagation();
-      });
-      externalLink.addEventListener("click", function(event){
-        event.stopPropagation();
-        if(event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey){
-          return;
-        }
-        event.preventDefault();
-        var opened = null;
-        try{
-          opened = window.open(watchUrl, "_blank", "noopener,noreferrer");
-        }catch(_){}
-        if(opened){
-          try{ opened.opener = null; opened.focus(); }catch(_){}
-          return;
-        }
-        window.location.href = watchUrl;
-      });
-      videoWrap.appendChild(externalLink);
-    }
   }
 
   function renderThemeGallery(d){
