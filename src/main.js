@@ -4597,6 +4597,7 @@
     var videos = d.youtubeList && d.youtubeList.length
       ? d.youtubeList
       : (d.youtube ? [d.youtube] : []);
+    if(ov) ov.classList.toggle("has-video-preview", videos.length > 0);
     if(!videos.length){
       videoWrap.style.display = "none";
       return;

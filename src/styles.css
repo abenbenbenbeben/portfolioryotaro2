@@ -8386,7 +8386,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   clip-path:polygon(0 0, 100% 50%, 0 100%);
 }
 
-#wv.is-visual-film #wv-video-wrap{
+#wv.is-visual-film.has-video-preview #wv-video-wrap{
   display:block !important;
   padding:22px clamp(14px, 6vw, 72px) 8px !important;
   background:#050505 !important;
@@ -8426,7 +8426,7 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
 
 @media(max-width:920px){
   #wv-video-wrap,
-  #wv.is-visual-film #wv-video-wrap{
+  #wv.is-visual-film.has-video-preview #wv-video-wrap{
     padding:16px 14px 6px !important;
   }
 }
