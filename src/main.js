@@ -4017,33 +4017,23 @@
   var workTransitionEndTimer = 0;
 
   var DESSIN_GALLERY = [
-    "/assets/illustration-art/dessin/15-1.jpg",
-    "/assets/illustration-art/dessin/16-148bb317-221c-44c6-9677-a813199f2828-rw-600.jpg",
-    "/assets/illustration-art/dessin/17-27b737c9-14db-45e1-8f83-ede676fdd9ba-rw-600.jpg",
-    "/assets/illustration-art/dessin/18-2e16a966-9f73-4fc7-a8eb-54c52b30d6f1-rw-600.jpg",
-    "/assets/illustration-art/dessin/19-55b10221-4e42-45c3-aa3f-6a9f7ab2b788-rw-600.jpg",
-    "/assets/illustration-art/dessin/20-6090bc12-3beb-4bb8-a0f2-9c73755a0206-rw-600.jpg",
-    "/assets/illustration-art/dessin/21-638eb497-6d72-49ef-a147-98ccc24fdfca-rw-600.jpg",
-    "/assets/illustration-art/dessin/22-67bb1924-7afd-4c68-852a-4fba40ee3ae5-rw-1200.jpg",
-    "/assets/illustration-art/dessin/23-681ba677-78d3-46fa-8922-5e4dab930c18-rw-1200.jpg",
-    "/assets/illustration-art/dessin/24-7f7149ed-d6f9-4796-b61c-cac14689ff2d-rw-600.jpg",
-    "/assets/illustration-art/dessin/25-8de3efe7-1d2d-4a75-997f-2a2251c74935-rw-600.jpg",
-    "/assets/illustration-art/dessin/26-8e306f86-d6bc-4c31-9db6-a80010fb6290-rw-600.jpg",
-    "/assets/illustration-art/dessin/27-9da7d944-db81-4f58-89fe-bca45c6ed558-rw-600.jpg",
-    "/assets/illustration-art/dessin/28-a8545dca-246b-4194-b652-56872e259283-rw-600.jpg",
-    "/assets/illustration-art/dessin/29-a90727ee-4d05-411e-a5a7-ef19763e6c03-rw-600.jpg",
-    "/assets/illustration-art/dessin/30-a9406c3e-5862-46ca-b8f9-17398ea46549-rw-600.jpg",
-    "/assets/illustration-art/dessin/31-aad8a899-e577-4639-b816-e481a589a4dc-rw-600.jpg",
-    "/assets/illustration-art/dessin/32-b564f9b3-2614-4ba9-8867-b5610e601df3-rw-600.jpg",
-    "/assets/illustration-art/dessin/33-c6d151a8-a8d1-4cf2-931d-1b6a8d257c6a-rw-600.jpg",
-    "/assets/illustration-art/dessin/34-d142ed24-5f2b-4080-92e1-0ae0a39acc8e-rw-1200.jpg",
-    "/assets/illustration-art/dessin/35-d4687d6a-25e0-4d09-9d9c-f74143b4ae92-rw-1200.jpg",
-    "/assets/illustration-art/dessin/36-d6a29c0f-24c9-4b73-83a6-f8e9364f8b14-rw-1200.jpg",
-    "/assets/illustration-art/dessin/37-d851c9e8-05a0-4446-ad82-33ea0c0d2571-rw-600.jpg",
-    "/assets/illustration-art/dessin/38-d8b7c4f7-5d10-47e0-a8d4-04351e77cfef-rw-600.jpg",
-    "/assets/illustration-art/dessin/39-illustration5-2.jpeg",
-    "/assets/illustration-art/dessin/40-sikisaiii.jpg",
-    "/assets/illustration-art/dessin/41-s.jpeg"
+    "/assets/illustration-art/dessin-updated/1.jpg",
+    "/assets/illustration-art/dessin-updated/2.jpg",
+    "/assets/illustration-art/dessin-updated/2-1.jpg",
+    "/assets/illustration-art/dessin-updated/2-2.jpg",
+    "/assets/illustration-art/dessin-updated/2-3.jpg",
+    "/assets/illustration-art/dessin-updated/2-4.jpg",
+    "/assets/illustration-art/dessin-updated/2-5.jpg",
+    "/assets/illustration-art/dessin-updated/2-6.jpg",
+    "/assets/illustration-art/dessin-updated/2-7.jpg",
+    "/assets/illustration-art/dessin-updated/3.jpg",
+    "/assets/illustration-art/dessin-updated/4.jpg",
+    "/assets/illustration-art/dessin-updated/5.jpg",
+    "/assets/illustration-art/dessin-updated/6.jpg",
+    "/assets/illustration-art/dessin-updated/7.jpg",
+    "/assets/illustration-art/dessin-updated/8.jpg",
+    "/assets/illustration-art/dessin-updated/9.jpg",
+    "/assets/illustration-art/dessin-updated/10.jpg"
   ];
 
   var ILLUSTRATION_FOLDER_GALLERIES = {
@@ -4069,7 +4059,7 @@
     "animal": [
       "/assets/illustration-art/quiet-surface/14-view8.jpeg"
     ],
-    "デッサン、色彩構成": DESSIN_GALLERY.slice(0, 7),
+    "デッサン、色彩構成": DESSIN_GALLERY,
     "AFTER IMAGE": DESSIN_GALLERY.slice(7, 14)
   };
 
