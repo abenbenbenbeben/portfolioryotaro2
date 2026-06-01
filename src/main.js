@@ -2137,7 +2137,7 @@
   const viewLegacy3dEl = document.getElementById("viewLegacy3d");
   const legacy3dStageEl = document.getElementById("legacy3dStage");
   const legacy3dRingEl = document.getElementById("legacy3dRing");
-  const legacy3dCards = viewLegacy3dEl ? Array.from(viewLegacy3dEl.querySelectorAll(".view-legacy-card")) : [];
+  let legacy3dCards = viewLegacy3dEl ? Array.from(viewLegacy3dEl.querySelectorAll(".view-legacy-card")) : [];
   const legacy3dCounterEl = document.getElementById("legacy3dCounter");
   const legacy3dTitleEl = document.getElementById("legacy3dTitle");
   const legacy3dPrevEl = document.getElementById("legacy3dPrev");
@@ -2157,6 +2157,7 @@
   let legacy3dFrame = 0;
   let legacy3dActive = -1;
   let legacy3dWheelSnapTimer = 0;
+  let legacy3dSuppressClickUntil = 0;
 
   function resize3D(){
     requestViewRenderLoop();
@@ -2218,6 +2219,81 @@
     if(!viewScrollEl || !viewLegacy3dEl || !viewScrollEl.parentNode) return;
     if(viewScrollEl.nextElementSibling === viewLegacy3dEl) return;
     viewScrollEl.insertAdjacentElement("afterend", viewLegacy3dEl);
+  }
+
+  function getLegacyWorkTitle(card){
+    if(!card) return "";
+    var titleEl = card.querySelector(".design-title, .illus-title");
+    return titleEl ? titleEl.textContent.trim() : "";
+  }
+
+  function getLegacyWorkImage(card){
+    if(!card) return null;
+    var img = card.querySelector(".design-thumb img:not(.swap-hover), .illus-thumb img:not(.swap-hover)");
+    if(!img) return null;
+    var src = img.getAttribute("src") || img.currentSrc || img.src || "";
+    if(!src) return null;
+    return {
+      src:src,
+      srcset:img.getAttribute("srcset") || "",
+      sizes:img.getAttribute("sizes") || "(max-width: 720px) 86vw, 34vw",
+      alt:img.getAttribute("alt") || getLegacyWorkTitle(card) || "Portfolio work"
+    };
+  }
+
+  function buildLegacy3dFromWorkCards(){
+    if(!viewLegacy3dEl || !legacy3dRingEl) return;
+    var sources = [];
+    document.querySelectorAll("#view-design .design-item").forEach(function(card, i){
+      sources.push({ card:card, label:"DESIGN", index:i + 1 });
+    });
+    document.querySelectorAll("#illusGrid .illus-card").forEach(function(card, i){
+      sources.push({ card:card, label:"ART", index:i + 1 });
+    });
+    var works = sources.map(function(item){
+      return {
+        card:item.card,
+        title:getLegacyWorkTitle(item.card),
+        image:getLegacyWorkImage(item.card),
+        meta:item.label + " " + String(item.index).padStart(2, "0")
+      };
+    }).filter(function(item){
+      return item.title && item.image;
+    });
+    if(!works.length) return;
+    var count = works.length;
+    legacy3dRingEl.innerHTML = "";
+    legacy3dCards = works.map(function(item, i){
+      var fig = document.createElement("figure");
+      fig.className = "view-legacy-card" + (i === 0 ? " is-active" : "");
+      fig.style.setProperty("--a", ((360 / count) * i).toFixed(3) + "deg");
+      fig.dataset.title = item.title;
+      fig.dataset.meta = item.meta;
+      fig.setAttribute("role", "button");
+      fig.setAttribute("tabindex", "0");
+      fig.setAttribute("aria-label", "Open " + item.title);
+      fig.__legacyTargetCard = item.card;
+
+      var img = document.createElement("img");
+      img.src = item.image.src;
+      if(item.image.srcset) img.setAttribute("srcset", item.image.srcset);
+      img.setAttribute("sizes", item.image.sizes);
+      img.alt = item.image.alt;
+      img.loading = "lazy";
+      img.decoding = "async";
+      fig.appendChild(img);
+      legacy3dRingEl.appendChild(fig);
+      return fig;
+    });
+    legacy3dTarget = 0;
+    legacy3dCurrent = 0;
+    legacy3dActive = -1;
+    if(legacy3dCounterEl){
+      legacy3dCounterEl.textContent = "01 / " + String(count).padStart(2, "0");
+    }
+    if(legacy3dTitleEl){
+      legacy3dTitleEl.textContent = legacy3dCards[0].dataset.title || "";
+    }
   }
 
   function normalizeLegacyIndex(value){
@@ -2321,9 +2397,30 @@
   }
 
   function initLegacy3dView(){
+    buildLegacy3dFromWorkCards();
     if(!viewLegacy3dEl || !legacy3dRingEl || !legacy3dCards.length) return;
     legacy3dCards.forEach((card, i)=>{
       card.setAttribute("aria-hidden", i === 0 ? "false" : "true");
+      card.addEventListener("click", ()=>{
+        if(Date.now() < legacy3dSuppressClickUntil) return;
+        if(i !== normalizeLegacyIndex(Math.round(legacy3dCurrent))){
+          setLegacy3dTarget(i);
+          return;
+        }
+        if(card.__legacyTargetCard){
+          if(typeof window.__openWorkFromElement === "function" && window.__openWorkFromElement(card.__legacyTargetCard)){
+            return;
+          }
+          if(typeof card.__legacyTargetCard.click === "function"){
+            card.__legacyTargetCard.click();
+          }
+        }
+      });
+      card.addEventListener("keydown", (event)=>{
+        if(event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        card.click();
+      });
     });
     syncLegacy3dActive();
     requestLegacy3dRender();
@@ -2356,6 +2453,9 @@
       try{ viewLegacy3dEl.setPointerCapture(event.pointerId); }catch(_){}
       const move = (moveEvent)=>{
         if(moveEvent.pointerId !== event.pointerId) return;
+        if(Math.abs(moveEvent.clientX - startX) > 6){
+          legacy3dSuppressClickUntil = Date.now() + 260;
+        }
         setLegacy3dTarget(startTarget + ((startX - moveEvent.clientX) * 0.018));
       };
       const up = (upEvent)=>{
@@ -3708,7 +3808,7 @@
   function getGroupFrames(title){
     if(!title) return [];
     var folderTitle = title;
-    if(title === "デッサン、色彩構成" || title === "AFTER IMAGE"){
+    if(title === "デッサン、色彩構成"){
       folderTitle = "DESSIN";
     }
     return getAllFrames().filter(function(frame){
@@ -4059,8 +4159,7 @@
     "animal": [
       "/assets/illustration-art/quiet-surface/14-view8.jpeg"
     ],
-    "デッサン、色彩構成": DESSIN_GALLERY,
-    "AFTER IMAGE": DESSIN_GALLERY.slice(7, 14)
+    "デッサン、色彩構成": DESSIN_GALLERY
   };
 
   function applyIllustrationFolderGalleries(){

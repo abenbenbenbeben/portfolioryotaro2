@@ -15845,6 +15845,7 @@ body.page-revealed #view-profile .intro-film-copy{
   opacity:0.08 !important;
   filter:saturate(0.72) brightness(0.48) !important;
   box-shadow:none !important;
+  cursor:pointer !important;
 }
 
 .view-legacy-card.is-neighbor{
@@ -15856,6 +15857,11 @@ body.page-revealed #view-profile .intro-film-copy{
   opacity:1 !important;
   filter:saturate(0.94) brightness(0.94) !important;
   box-shadow:0 28px 82px rgba(0,0,0,0.46) !important;
+}
+
+.view-legacy-card:focus-visible{
+  outline:2px solid rgba(215,186,115,0.9) !important;
+  outline-offset:8px !important;
 }
 
 .view-legacy-card::before,
