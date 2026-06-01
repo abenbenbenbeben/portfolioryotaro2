@@ -18163,34 +18163,39 @@ body.theme-view-photo .scrollbar-track{
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:8px;
-  margin:0 0 clamp(28px, 4vw, 58px);
+  gap:12px;
+  margin:0 0 clamp(34px, 4.4vw, 64px);
 }
 
 #view-photo .photo-filter-btn{
   appearance:none;
-  min-width:118px;
-  height:38px;
-  border:1px solid rgba(24,22,19,0.22);
+  min-width:168px;
+  height:54px;
+  padding:0 26px;
+  border:1.5px solid rgba(24,22,19,0.34);
   border-radius:999px;
-  background:rgba(255,255,255,0.28);
-  color:rgba(24,22,19,0.62);
+  background:rgba(255,255,255,0.54);
+  color:rgba(24,22,19,0.78);
   font-family:"JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  font-size:11px;
+  font-size:13px;
+  font-weight:600;
   line-height:1;
   letter-spacing:0;
   cursor:pointer;
+  box-shadow:0 10px 26px rgba(24,22,19,0.08);
   transition:
     background 220ms ease,
     border-color 220ms ease,
     color 220ms ease,
+    box-shadow 220ms ease,
     transform 220ms ease;
 }
 
 #view-photo .photo-filter-btn:hover,
 #view-photo .photo-filter-btn:focus-visible{
-  border-color:rgba(24,22,19,0.42);
+  border-color:rgba(24,22,19,0.58);
   color:#181613;
+  box-shadow:0 14px 34px rgba(24,22,19,0.12);
   transform:translate3d(0, -1px, 0);
 }
 
@@ -18198,6 +18203,7 @@ body.theme-view-photo .scrollbar-track{
   border-color:#181613;
   background:#181613;
   color:#f6f1e7;
+  box-shadow:0 16px 38px rgba(24,22,19,0.18);
 }
 
 #view-photo .photo-index{
@@ -18520,20 +18526,23 @@ body.photo-lightbox-open{
     z-index:3;
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:6px;
-    margin-bottom:28px;
-    padding:6px;
-    border:1px solid rgba(24,22,19,0.14);
-    border-radius:999px;
-    background:rgba(244,241,235,0.86);
-    backdrop-filter:blur(14px);
+    gap:8px;
+    margin-bottom:32px;
+    padding:8px;
+    border:1.5px solid rgba(24,22,19,0.18);
+    border-radius:24px;
+    background:rgba(244,241,235,0.92);
+    box-shadow:0 14px 36px rgba(24,22,19,0.10);
+    backdrop-filter:blur(16px);
   }
 
   #view-photo .photo-filter-btn{
     width:100%;
     min-width:0;
-    height:36px;
-    font-size:10px;
+    height:48px;
+    padding:0 12px;
+    border-radius:18px;
+    font-size:12px;
   }
 
   #view-photo .photo-index{
