@@ -18159,11 +18159,57 @@ body.theme-view-photo .scrollbar-track{
   letter-spacing:0.02em;
 }
 
+#view-photo .photo-filter{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  margin:0 0 clamp(28px, 4vw, 58px);
+}
+
+#view-photo .photo-filter-btn{
+  appearance:none;
+  min-width:118px;
+  height:38px;
+  border:1px solid rgba(24,22,19,0.22);
+  border-radius:999px;
+  background:rgba(255,255,255,0.28);
+  color:rgba(24,22,19,0.62);
+  font-family:"JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size:11px;
+  line-height:1;
+  letter-spacing:0;
+  cursor:pointer;
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+#view-photo .photo-filter-btn:hover,
+#view-photo .photo-filter-btn:focus-visible{
+  border-color:rgba(24,22,19,0.42);
+  color:#181613;
+  transform:translate3d(0, -1px, 0);
+}
+
+#view-photo .photo-filter-btn.is-active{
+  border-color:#181613;
+  background:#181613;
+  color:#f6f1e7;
+}
+
 #view-photo .photo-index{
   display:grid;
   grid-template-columns:repeat(3, minmax(0, 1fr));
   gap:clamp(22px, 2.5vw, 38px);
   align-items:start;
+  transition:opacity 180ms ease;
+}
+
+#view-photo .photo-index.is-switching{
+  opacity:0;
 }
 
 #view-photo .photo-column{
@@ -18184,6 +18230,7 @@ body.theme-view-photo .scrollbar-track{
 #view-photo .photo-item{
   margin:0;
   min-width:0;
+  order:var(--photo-order, 0);
 }
 
 #view-photo .photo-frame{
@@ -18432,6 +18479,10 @@ body.photo-lightbox-open{
     margin:0;
   }
 
+  #view-photo .photo-filter{
+    justify-content:flex-start;
+  }
+
   #view-photo .photo-index{
     grid-template-columns:repeat(2, minmax(0, 1fr));
   }
@@ -18461,6 +18512,28 @@ body.photo-lightbox-open{
 
   #view-photo .photo-hero h1{
     font-size:clamp(58px, 22vw, 112px);
+  }
+
+  #view-photo .photo-filter{
+    position:sticky;
+    top:12px;
+    z-index:3;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    margin-bottom:28px;
+    padding:6px;
+    border:1px solid rgba(24,22,19,0.14);
+    border-radius:999px;
+    background:rgba(244,241,235,0.86);
+    backdrop-filter:blur(14px);
+  }
+
+  #view-photo .photo-filter-btn{
+    width:100%;
+    min-width:0;
+    height:36px;
+    font-size:10px;
   }
 
   #view-photo .photo-index{

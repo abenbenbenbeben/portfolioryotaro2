@@ -6507,6 +6507,127 @@
 })();
 
 
+/* ── PHOTO gallery: render the new product / outdoor sets on demand ── */
+(function(){
+  "use strict";
+
+  var root = document.getElementById("view-photo");
+  if(!root) return;
+
+  var index = root.querySelector("#photoIndex");
+  var buttons = Array.from(root.querySelectorAll("[data-photo-category-button]"));
+  if(!index || !buttons.length) return;
+
+  var categories = {
+    product: {
+      label: "PRODUCT",
+      key: "product",
+      count: 88,
+      alt: "Product photo"
+    },
+    outside: {
+      label: "OUTDOOR",
+      key: "outside",
+      count: 51,
+      alt: "Outdoor photo"
+    }
+  };
+
+  var activeKey = "product";
+  var switchingTimer = 0;
+
+  function pad(number){
+    return String(number).padStart(3, "0");
+  }
+
+  function buildPhoto(category, number){
+    var file = category.key + "-" + pad(number) + ".jpg";
+    var desktop = "/assets/newphoto/" + category.key + "/" + file;
+    var mobile = "/assets/mobile/newphoto/" + category.key + "/" + file;
+
+    var figure = document.createElement("figure");
+    figure.className = "photo-item";
+    figure.style.setProperty("--photo-order", String(number));
+
+    var frame = document.createElement("div");
+    frame.className = "photo-frame";
+
+    var img = document.createElement("img");
+    img.src = desktop;
+    img.srcset = mobile + " 1000w, " + desktop + " 1800w";
+    img.sizes = "(max-width: 720px) 92vw, (max-width: 980px) 46vw, 31vw";
+    img.alt = category.alt + " " + pad(number);
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.setAttribute("data-full-src", desktop);
+
+    var caption = document.createElement("figcaption");
+    var no = document.createElement("span");
+    var title = document.createElement("strong");
+    no.textContent = pad(number);
+    title.textContent = category.label;
+
+    frame.appendChild(img);
+    caption.appendChild(no);
+    caption.appendChild(title);
+    figure.appendChild(frame);
+    figure.appendChild(caption);
+    return figure;
+  }
+
+  function render(key){
+    var category = categories[key] || categories.product;
+    var columns = [0, 1, 2].map(function(){
+      var column = document.createElement("div");
+      column.className = "photo-column";
+      return column;
+    });
+
+    for(var i = 1; i <= category.count; i++){
+      columns[(i - 1) % columns.length].appendChild(buildPhoto(category, i));
+    }
+
+    index.replaceChildren.apply(index, columns);
+    index.setAttribute("data-photo-current", key);
+    index.setAttribute("aria-label", category.label + " photo works");
+    root.dispatchEvent(new CustomEvent("photo-gallery-updated"));
+  }
+
+  function setActiveButton(key){
+    buttons.forEach(function(button){
+      var isActive = button.getAttribute("data-photo-category-button") === key;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+  }
+
+  function setCategory(key){
+    if(!categories[key]) key = "product";
+    activeKey = key;
+    setActiveButton(key);
+    index.classList.add("is-switching");
+    window.clearTimeout(switchingTimer);
+    switchingTimer = window.setTimeout(function(){
+      render(activeKey);
+      requestAnimationFrame(function(){
+        index.classList.remove("is-switching");
+      });
+    }, 110);
+  }
+
+  buttons.forEach(function(button){
+    button.addEventListener("click", function(){
+      var key = button.getAttribute("data-photo-category-button") || "product";
+      if(key === activeKey) return;
+      setCategory(key);
+    });
+  });
+
+  render(activeKey);
+  setActiveButton(activeKey);
+})();
+
+
 
 /* ── PHOTO lightbox: large view without preloading original files ── */
 (function(){
@@ -6646,15 +6767,22 @@
       var frame = event.target.closest ? event.target.closest(".photo-frame") : null;
       if(!frame || !root.contains(frame)) return;
       event.preventDefault();
-      open(frames.indexOf(frame));
+      refreshFrames();
+      var index = frames.indexOf(frame);
+      if(index < 0) return;
+      open(index);
     });
     root.addEventListener("keydown", function(event){
       if(event.key !== "Enter" && event.key !== " ") return;
       var frame = event.target.closest ? event.target.closest(".photo-frame") : null;
       if(!frame || !root.contains(frame)) return;
       event.preventDefault();
-      open(frames.indexOf(frame));
+      refreshFrames();
+      var index = frames.indexOf(frame);
+      if(index < 0) return;
+      open(index);
     });
+    root.addEventListener("photo-gallery-updated", refreshFrames);
   }
 
   if(document.readyState === "loading"){
