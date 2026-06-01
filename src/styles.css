@@ -19923,7 +19923,7 @@ body.page-revealed .sidebar-toggle{
   background:#f6f1e7 !important;
 }
 
-/* MONOCHROME FLOW: keep the artwork's native ratio visible in the grid. */
+/* メカ軍団: keep the artwork's native ratio visible in the grid. */
 #view-illustration .illus-card:first-child .illus-thumb{
   aspect-ratio:7694 / 6344 !important;
   background:#070707 !important;

@@ -3708,7 +3708,7 @@
   function getGroupFrames(title){
     if(!title) return [];
     var folderTitle = title;
-    if(title === "SILENT FRAME" || title === "AFTER IMAGE" || title === "SOFT DISTANCE" || title === "ECHO OF LIGHT"){
+    if(title === "デッサン、色彩構成" || title === "AFTER IMAGE"){
       folderTitle = "DESSIN";
     }
     return getAllFrames().filter(function(frame){
@@ -4047,16 +4047,16 @@
   ];
 
   var ILLUSTRATION_FOLDER_GALLERIES = {
-    "MONOCHROME FLOW": [
+    "メカ軍団": [
       "/assets/illustration-art/monochrome-flow/01-view7.jpeg",
       "/assets/illustration-art/monochrome-flow/02-view8.jpeg"
     ],
-    "CITY NOISE": [
+    "ペン画": [
       "/assets/illustration-art/city-noise/03-bill.jpg",
       "/assets/illustration-art/city-noise/04-meka.jpg",
       "/assets/illustration-art/city-noise/05-meka2.jpg"
     ],
-    "DUST & LIGHT": [
+    "絵画": [
       "/assets/illustration-art/dust-and-light/06-img-9457-2.jpg",
       "/assets/illustration-art/dust-and-light/07-img-9458-3.jpg",
       "/assets/illustration-art/dust-and-light/08-img-9459.jpg",
@@ -4066,18 +4066,16 @@
       "/assets/illustration-art/dust-and-light/12-img-9465-2.jpg",
       "/assets/illustration-art/dust-and-light/13-img-9508.jpg"
     ],
-    "QUIET SURFACE": [
+    "animal": [
       "/assets/illustration-art/quiet-surface/14-view8.jpeg"
     ],
-    "SILENT FRAME": DESSIN_GALLERY.slice(0, 7),
-    "AFTER IMAGE": DESSIN_GALLERY.slice(7, 14),
-    "SOFT DISTANCE": DESSIN_GALLERY.slice(14, 21),
-    "ECHO OF LIGHT": DESSIN_GALLERY.slice(21)
+    "デッサン、色彩構成": DESSIN_GALLERY.slice(0, 7),
+    "AFTER IMAGE": DESSIN_GALLERY.slice(7, 14)
   };
 
   function applyIllustrationFolderGalleries(){
     document.querySelectorAll("#illusGrid .illus-card").forEach(function(card){
-      var title = tx(card, ".illus-title").toUpperCase();
+      var title = tx(card, ".illus-title");
       var gallery = ILLUSTRATION_FOLDER_GALLERIES[title];
       if(!gallery || !gallery.length) return;
       card.dataset.gallery = gallery.join("|");
