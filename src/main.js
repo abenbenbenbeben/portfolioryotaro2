@@ -274,6 +274,15 @@
     return isHeavyMediaConstrained() ? getMobileAssetSrc(src) : src;
   }
 
+  function getDesktopAssetSrc(src){
+    if(typeof src !== "string" || !src) return src || "";
+    var parts = splitAssetSuffix(src.trim());
+    var path = parts.path;
+    if(!/^\/assets\/mobile\//.test(path)) return src;
+    var desktopPath = "/assets/" + path.slice("/assets/mobile/".length);
+    return desktopPath + parts.suffix;
+  }
+
   function getImageDisplaySrc(img, preferredSrc){
     var src = preferredSrc || (img ? (img.currentSrc || img.getAttribute("src") || img.src || "") : "");
     return getDisplayAssetSrc(src);
@@ -4461,11 +4470,20 @@
         im.classList.add("lo");
       };
       im.onerror = function(){
+        var desktopSrc = getDesktopAssetSrc(im.getAttribute("src") || im.getAttribute("data-src") || "");
+        if(desktopSrc && desktopSrc !== im.getAttribute("src") && !im.dataset.desktopFallbackTried){
+          im.dataset.desktopFallbackTried = "1";
+          im.classList.remove("is-error");
+          var hostBefore = im.closest(".wv-story-img-wrap");
+          if(hostBefore) hostBefore.classList.remove("is-error");
+          im.src = desktopSrc;
+          return;
+        }
         im.classList.add("lo", "is-error");
         var host = im.closest(".wv-story-img-wrap");
         if(host) host.classList.add("is-error");
       };
-      if(gi < 2 && !isHeavyMediaConstrained()){
+      if(gi < 2){
         im.src = src;
       }else{
         im.setAttribute("data-src", src);
