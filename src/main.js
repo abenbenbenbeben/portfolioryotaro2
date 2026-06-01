@@ -2625,7 +2625,7 @@
 
   // VIEWカード設定（ここだけ編集すれば画像・表示名・遷移URLを自由に変更できます）
   // 3D VIEWは初回カクつき防止のため、WebGL専用の軽量テクスチャを使う。
-  const VIEW_TEXTURE_BASE = isHeavyMediaConstrained() ? "/assets/mobile/view-webgl/" : "/assets/view-webgl/";
+  const VIEW_TEXTURE_BASE = isHeavyMediaConstrained() ? "/assets/mobile/view-webgl/" : "/assets/view-webgl-lite/";
   const VIEW_TEXTURE_EXT = isHeavyMediaConstrained() ? ".jpg" : ".jpeg";
   const viewCards = [
     { image:VIEW_TEXTURE_BASE + "view1" + VIEW_TEXTURE_EXT,  title:"重なり", url:"https://1.com" },
