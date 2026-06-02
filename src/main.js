@@ -6171,7 +6171,7 @@
     Promise.all([
       Promise.all(criticalImages.map(waitForImage)),
       Promise.all(criticalViewTextures.map(waitForSrc)),
-      waitForVideo(introVideo),
+      Promise.resolve(),
       (document.fonts && document.fonts.ready)
         ? document.fonts.ready.catch(function(){})
         : Promise.resolve()
