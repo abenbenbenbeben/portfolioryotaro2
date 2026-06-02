@@ -45,9 +45,8 @@
       }
       window.__startOpeningReveal = __startOpeningReveal;
 
-      /* Final safety net: if anything stalls, dismiss the loader
-         as soon as window load fires, or after 2.5s — whichever
-         comes first — so the page is always usable. */
+      /* Drop helper. The actual timing is controlled by the asset-ready
+         signal below so the intro does not appear before its media exists. */
       function __dropLoader(){
         try{
           var ld = document.getElementById("loader");
@@ -59,17 +58,12 @@
         }catch(_){}
       }
       var _loaderStart = Date.now();
-      /* ── ALL-IN-ONE LOADER ──
-         全ページの画像（profile / view / design / illustration / hover swap /
-         data-gallery）をローダー表示中にすべてダウンロード＆デコードする。
-         ローダーが下がった瞬間、どのビューへ行ってもキャッシュ済みなので
-         動きが詰まらない。ready シグナルは window._viewAssetsReady。
-         ・MIN: ローダーが一瞬で消えるとチラつくので最低 600ms 出す
-         ・MAX: ネットワークが死んでも 12s で必ず下げる（ハードキャップ）  */
-      /* ローダーは十分見せつつ、失敗時はすぐ触れる長さに抑える。 */
+      /* ── INITIAL LOADER ──
+         Keep the first screen covered until the critical intro assets report
+         ready. Broken assets resolve through their error handlers, but there
+         is no timer that hides the loader before the ready signal arrives. */
       var MIN_LOADER_MS = 850;
-      var MAX_LOADER_MS = 4500;
-      try{ console.log("[loader] MAX-OUT+++ MODE  MIN=", MIN_LOADER_MS, "ms  MAX=", MAX_LOADER_MS, "ms"); }catch(_){}
+      try{ console.log("[loader] FULL-WAIT MODE  MIN=", MIN_LOADER_MS, "ms"); }catch(_){}
 
       function _ready(){
         return window._viewAssetsReady === true;
@@ -81,11 +75,6 @@
           __dropLoader();
           return;
         }
-        if(elapsed >= MAX_LOADER_MS){
-          try{ window._viewAssetsReady = true; window._viewImagesReady = true; }catch(_){}
-          __dropLoader();
-          return;
-        }
         setTimeout(_dropWhenReady, 100);
       }
       if(document.readyState === "loading"){
@@ -94,8 +83,6 @@
         _dropWhenReady();
       }
       window.addEventListener("load", _dropWhenReady);
-      /* 絶対安全網 */
-      setTimeout(__dropLoader, MAX_LOADER_MS + 800);
     }catch(_){}
   })();
 
@@ -254,9 +241,7 @@
 
   function shouldUseIntroPosterOnly(){
     try{
-      var mobileLike = window.matchMedia &&
-        window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
-      return !!(shouldSkipIntroVideo() || mobileLike);
+      return !!shouldSkipIntroVideo();
     }catch(_){
       return shouldSkipIntroVideo();
     }
@@ -1293,8 +1278,8 @@
     introFilmVideoEl.setAttribute("webkit-playsinline", "");
     introFilmVideoEl.setAttribute("autoplay", "");
     introFilmVideoEl.setAttribute("loop", "");
-    introFilmVideoEl.preload = "none";
-    introFilmVideoEl.setAttribute("preload", "none");
+    introFilmVideoEl.preload = "auto";
+    introFilmVideoEl.setAttribute("preload", "auto");
     introFilmVideoEl.removeAttribute("src");
 
     if(shouldUseIntroPosterOnly()){
@@ -1307,8 +1292,8 @@
       return;
     }
 
-    introFilmVideoEl.preload = "metadata";
-    introFilmVideoEl.setAttribute("preload", "metadata");
+    introFilmVideoEl.preload = "auto";
+    introFilmVideoEl.setAttribute("preload", "auto");
     const introSrc = introFilmVideoEl.getAttribute("data-src");
     const rawCandidates = [
       introSrc,
@@ -1359,11 +1344,7 @@
       window.setTimeout(()=>playIntroFilm(), 2400);
     };
 
-    if("requestIdleCallback" in window){
-      window.requestIdleCallback(startIntroLoad, { timeout: 1800 });
-    }else{
-      window.setTimeout(startIntroLoad, 900);
-    }
+    startIntroLoad();
     document.addEventListener("visibilitychange", ()=>{
       if(!document.hidden) startIntroLoad();
     }, { passive:true });
@@ -6136,18 +6117,50 @@
         resolve();
         return;
       }
-      if(!video.currentSrc && !video.getAttribute("src")){
+      var src = video.currentSrc || video.getAttribute("src") || video.getAttribute("data-src") || "";
+      if(!src){
         resolve();
         return;
       }
-      if(video.readyState >= 1){
+
+      function hasPlayableBuffer(){
+        try{
+          return video.readyState >= 4;
+        }catch(_){
+          return false;
+        }
+      }
+
+      if(hasPlayableBuffer()){
         resolve();
         return;
       }
-      video.addEventListener("loadedmetadata", resolve, { once:true });
-      video.addEventListener("error", resolve, { once:true });
+
+      var settled = false;
+      function settle(){
+        if(settled) return;
+        settled = true;
+        resolve();
+      }
+      function settleWhenReady(){
+        if(hasPlayableBuffer()){
+          settle();
+        }
+      }
+
+      video.addEventListener("canplaythrough", settle, { once:true });
+      video.addEventListener("canplay", settleWhenReady, { once:true });
+      video.addEventListener("loadeddata", settleWhenReady, { once:true });
+      video.addEventListener("progress", settleWhenReady);
+      video.addEventListener("error", settle, { once:true });
       try{
-        video.preload = "metadata";
+        video.muted = true;
+        video.defaultMuted = true;
+        video.preload = "auto";
+        video.setAttribute("preload", "auto");
+        if(!video.getAttribute("src")){
+          video.src = src;
+        }
         video.load();
       }catch(_){}
     });
@@ -6163,15 +6176,17 @@
   function start(){
     var startedAt = Date.now();
     var criticalImages = Array.from(document.querySelectorAll(
-      ".sidebar .logo img"
+      ".sidebar .logo img, .loader-float[src]"
     ));
-    var criticalViewTextures = [];
+    var criticalViewTextures = [
+      "/assets/optimized/video/sasisho-poster.jpg"
+    ];
     var introVideo = document.getElementById("introFilmVideo");
 
     Promise.all([
       Promise.all(criticalImages.map(waitForImage)),
       Promise.all(criticalViewTextures.map(waitForSrc)),
-      Promise.resolve(),
+      waitForVideo(introVideo),
       (document.fonts && document.fonts.ready)
         ? document.fonts.ready.catch(function(){})
         : Promise.resolve()
@@ -6183,9 +6198,6 @@
       markReady(startedAt);
     });
 
-    setTimeout(function(){
-      markReady(startedAt);
-    }, 3200);
   }
 
   if(document.readyState === "loading"){
