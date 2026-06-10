@@ -6547,9 +6547,11 @@
   function bind(){
     var start = function(){ ensure(); };
     if("requestIdleCallback" in window){
-      window.requestIdleCallback(start, { timeout: 2200 });
+      window.requestIdleCallback(function(){
+        window.setTimeout(start, 6200);
+      }, { timeout: 5200 });
     } else {
-      window.setTimeout(start, 1600);
+      window.setTimeout(start, 7200);
     }
     document.addEventListener("visibilitychange", function(){
       if(!document.hidden) ensure();
@@ -6708,6 +6710,7 @@
   };
 
   var activeKey = "product";
+  var renderedKey = "";
   var switchingTimer = 0;
 
   function pad(number){
@@ -6762,9 +6765,20 @@
     }
 
     index.replaceChildren.apply(index, columns);
+    renderedKey = key;
     index.setAttribute("data-photo-current", key);
     index.setAttribute("aria-label", category.label + " photo works");
     root.dispatchEvent(new CustomEvent("photo-gallery-updated"));
+  }
+
+  function isPhotoActive(){
+    return root.classList.contains("is-active") || document.body.classList.contains("theme-view-photo");
+  }
+
+  function ensureRendered(){
+    if(!isPhotoActive()) return;
+    if(renderedKey === activeKey) return;
+    render(activeKey);
   }
 
   function setActiveButton(key){
@@ -6782,7 +6796,13 @@
     index.classList.add("is-switching");
     window.clearTimeout(switchingTimer);
     switchingTimer = window.setTimeout(function(){
-      render(activeKey);
+      if(isPhotoActive()){
+        render(activeKey);
+      }else{
+        renderedKey = "";
+        index.replaceChildren();
+        index.removeAttribute("data-photo-current");
+      }
       requestAnimationFrame(function(){
         index.classList.remove("is-switching");
       });
@@ -6797,8 +6817,13 @@
     });
   });
 
-  render(activeKey);
   setActiveButton(activeKey);
+  ensureRendered();
+  if("MutationObserver" in window){
+    var observer = new MutationObserver(ensureRendered);
+    observer.observe(root, { attributes:true, attributeFilter:["class"] });
+    observer.observe(document.body, { attributes:true, attributeFilter:["class"] });
+  }
 })();
 
 
