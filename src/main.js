@@ -59,11 +59,11 @@
       }
       var _loaderStart = Date.now();
       /* ── INITIAL LOADER ──
-         Keep the first screen covered until the critical intro assets report
-         ready. Broken assets resolve through their error handlers, but there
-         is no timer that hides the loader before the ready signal arrives. */
+         Wait for the first-screen essentials, but never let a large video or
+         a slow CDN edge trap the visitor behind the loader. */
       var MIN_LOADER_MS = 850;
-      try{ console.log("[loader] FULL-WAIT MODE  MIN=", MIN_LOADER_MS, "ms"); }catch(_){}
+      var MAX_LOADER_MS = 5200;
+      try{ console.log("[loader] RESILIENT MODE  MIN=", MIN_LOADER_MS, "ms  MAX=", MAX_LOADER_MS, "ms"); }catch(_){}
 
       function _ready(){
         return window._viewAssetsReady === true;
@@ -72,6 +72,11 @@
         var elapsed = Date.now() - _loaderStart;
         if(_ready() && elapsed >= MIN_LOADER_MS){
           try{ window._viewImagesReady = true; }catch(_){}
+          __dropLoader();
+          return;
+        }
+        if(elapsed >= MAX_LOADER_MS){
+          try{ window._viewAssetsReady = true; window._viewImagesReady = true; }catch(_){}
           __dropLoader();
           return;
         }
@@ -247,6 +252,31 @@
     }
   }
 
+  function shouldUseMobileIntroVideo(){
+    try{
+      var mobileLike = window.matchMedia &&
+        window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
+      var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      var slowConnection = false;
+      if(connection){
+        var effectiveType = String(connection.effectiveType || "");
+        slowConnection = /(^|-)2g$/.test(effectiveType) ||
+          /slow-2g/.test(effectiveType) ||
+          (typeof connection.downlink === "number" && connection.downlink > 0 && connection.downlink < 2.5);
+      }
+      return !!(mobileLike || slowConnection);
+    }catch(_){
+      return false;
+    }
+  }
+
+  function getIntroVideoSrc(video){
+    if(!video) return "";
+    var desktopSrc = video.getAttribute("data-src") || "/media/sasisho.mp4";
+    var mobileSrc = video.getAttribute("data-mobile-src") || "";
+    return shouldUseMobileIntroVideo() && mobileSrc ? mobileSrc : desktopSrc;
+  }
+
   function splitAssetSuffix(src){
     var match = String(src || "").match(/^([^?#]+)([?#].*)?$/);
     return {
@@ -309,6 +339,7 @@
   const introFilmStageEl = document.getElementById("introFilmStage");
   const introFilmVideoEl = document.getElementById("introFilmVideo");
   const introFilmScrollEl = document.getElementById("introFilmScroll");
+  let introFilmRecoveryTimer = 0;
   const heroEl = document.getElementById("hero3d") || document.getElementById("viewLegacy3d");
   const threeWrap = document.getElementById("three-wrap");
   const storySectionEl = document.getElementById("story");
@@ -1227,7 +1258,7 @@
         return;
       }
       if(introFilmVideoEl && !introFilmVideoEl.getAttribute("src")){
-        const introSrc = introFilmVideoEl.getAttribute("data-src");
+        const introSrc = getIntroVideoSrc(introFilmVideoEl);
         if(introSrc){
           introFilmVideoEl.src = introSrc;
           try{ introFilmVideoEl.load(); }catch(_){}
@@ -1278,8 +1309,8 @@
     introFilmVideoEl.setAttribute("webkit-playsinline", "");
     introFilmVideoEl.setAttribute("autoplay", "");
     introFilmVideoEl.setAttribute("loop", "");
-    introFilmVideoEl.preload = "auto";
-    introFilmVideoEl.setAttribute("preload", "auto");
+    introFilmVideoEl.preload = "metadata";
+    introFilmVideoEl.setAttribute("preload", "metadata");
     introFilmVideoEl.removeAttribute("src");
 
     if(shouldUseIntroPosterOnly()){
@@ -1294,9 +1325,11 @@
 
     introFilmVideoEl.preload = "auto";
     introFilmVideoEl.setAttribute("preload", "auto");
-    const introSrc = introFilmVideoEl.getAttribute("data-src");
+    const introSrc = getIntroVideoSrc(introFilmVideoEl);
+    const desktopIntroSrc = introFilmVideoEl.getAttribute("data-src") || "/media/sasisho.mp4";
     const rawCandidates = [
       introSrc,
+      desktopIntroSrc,
       "/media/sasisho.mp4"
     ];
     const candidates = [...new Set(rawCandidates.filter(Boolean))];
@@ -1320,6 +1353,24 @@
       window.setTimeout(()=>playIntroFilm(), 900);
     };
 
+    const scheduleIntroRecovery = ()=>{
+      if(introFilmRecoveryTimer) return;
+      introFilmRecoveryTimer = window.setTimeout(()=>{
+        introFilmRecoveryTimer = 0;
+        if(!viewSectionActive || document.hidden || shouldUseIntroPosterOnly()) return;
+        if(!introFilmVideoEl.currentSrc && !introFilmVideoEl.getAttribute("src")){
+          tryIntroCandidate();
+          return;
+        }
+        try{
+          if(introFilmVideoEl.readyState < 2 && introFilmVideoEl.networkState === HTMLMediaElement.NETWORK_IDLE){
+            introFilmVideoEl.load();
+          }
+        }catch(_){}
+        playIntroFilm();
+      }, 700);
+    };
+
     introFilmVideoEl.addEventListener("loadedmetadata", ()=>playIntroFilm());
     introFilmVideoEl.addEventListener("loadeddata", ()=>{
       markIntroVideoReady();
@@ -1330,6 +1381,16 @@
       playIntroFilm();
     });
     introFilmVideoEl.addEventListener("playing", markIntroVideoReady);
+    introFilmVideoEl.addEventListener("waiting", scheduleIntroRecovery);
+    introFilmVideoEl.addEventListener("stalled", scheduleIntroRecovery);
+    introFilmVideoEl.addEventListener("suspend", ()=>{
+      if(introFilmVideoEl.readyState < 2) scheduleIntroRecovery();
+    });
+    introFilmVideoEl.addEventListener("pause", ()=>{
+      if(viewSectionActive && !document.hidden && !shouldUseIntroPosterOnly()){
+        scheduleIntroRecovery();
+      }
+    });
     introFilmVideoEl.addEventListener("error", ()=>{
       introFilmCandidateIndex += 1;
       tryIntroCandidate();
@@ -6117,42 +6178,44 @@
         resolve();
         return;
       }
-      var src = video.currentSrc || video.getAttribute("src") || video.getAttribute("data-src") || "";
+      var src = video.currentSrc || video.getAttribute("src") || getIntroVideoSrc(video) || "";
       if(!src){
         resolve();
         return;
       }
 
-      function hasPlayableBuffer(){
+      function hasFirstFrame(){
         try{
-          return video.readyState >= 4;
+          return video.readyState >= 2;
         }catch(_){
           return false;
         }
       }
 
-      if(hasPlayableBuffer()){
+      if(hasFirstFrame()){
         resolve();
         return;
       }
 
       var settled = false;
+      var timeoutId = 0;
+      function cleanup(){
+        video.removeEventListener("loadeddata", settle);
+        video.removeEventListener("canplay", settle);
+        video.removeEventListener("error", settle);
+        if(timeoutId) window.clearTimeout(timeoutId);
+      }
       function settle(){
         if(settled) return;
         settled = true;
+        cleanup();
         resolve();
       }
-      function settleWhenReady(){
-        if(hasPlayableBuffer()){
-          settle();
-        }
-      }
 
-      video.addEventListener("canplaythrough", settle, { once:true });
-      video.addEventListener("canplay", settleWhenReady, { once:true });
-      video.addEventListener("loadeddata", settleWhenReady, { once:true });
-      video.addEventListener("progress", settleWhenReady);
+      video.addEventListener("loadeddata", settle, { once:true });
+      video.addEventListener("canplay", settle, { once:true });
       video.addEventListener("error", settle, { once:true });
+      timeoutId = window.setTimeout(settle, 4600);
       try{
         video.muted = true;
         video.defaultMuted = true;

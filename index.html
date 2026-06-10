@@ -8,8 +8,10 @@
 <link rel="icon" href="/assets/branding/web-lite.png?v=17332e9" type="image/png" />
 <link rel="shortcut icon" href="/assets/branding/web-lite.png?v=17332e9" type="image/png" />
 <link rel="apple-touch-icon" href="/assets/branding/web-lite.png?v=17332e9" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&amp;family=Shippori+Mincho:wght@400;600&amp;family=Zen+Kaku+Gothic+New:wght@300;500;700&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet" />
-<link rel="preload" href="/media/sasisho.mp4" as="video" type="video/mp4" />
+<link rel="preload" href="/assets/optimized/video/sasisho-poster.jpg" as="image" fetchpriority="high" />
 
 <link rel="stylesheet" href="./src/styles.css" />
 
@@ -151,13 +153,14 @@
           <video
             id="introFilmVideo"
             class="intro-film-video"
-            data-src="/media/sasisho.mp4"
+            data-src="/media/sasisho.mp4?v=20260610"
+            data-mobile-src="/media/sasisho-mobile.mp4?v=20260610"
             poster="/assets/optimized/video/sasisho-poster.jpg"
             autoplay
             muted
             loop
             playsinline
-            preload="auto"
+            preload="metadata"
           ></video>
           <div class="intro-film-veil" aria-hidden="true"></div>
           <div class="intro-film-ui">
