@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/view", "destination": "/index.html" },
+    { "source": "/design", "destination": "/index.html" },
+    { "source": "/photo", "destination": "/index.html" },
+    { "source": "/art", "destination": "/index.html" },
+    { "source": "/illustration", "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" }
+  ]
+}

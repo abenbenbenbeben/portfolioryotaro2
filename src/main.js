@@ -471,13 +471,71 @@
     illustration: { label: "ILLUSTRATION / ART", no: "04 / INDEX", kicker: "LINE RENDER" },
     "profile-only": { label: "PROFILE", no: "05 / INDEX", kicker: "IDENTITY SCAN" }
   };
+  const routeToViewMap = {
+    "/": "profile",
+    "/view": "profile",
+    "/design": "design",
+    "/photo": "photo",
+    "/art": "illustration",
+    "/illustration": "illustration",
+    "/profile": "profile-only"
+  };
+  const viewToRouteMap = {
+    profile: "/view",
+    design: "/design",
+    photo: "/photo",
+    illustration: "/art",
+    "profile-only": "/profile"
+  };
+  const viewTitleMap = {
+    profile: "VIEW | Ryotaro Portfolio",
+    design: "DESIGN | Ryotaro Portfolio",
+    photo: "PHOTO | Ryotaro Portfolio",
+    illustration: "ILLUSTRATION / ART | Ryotaro Portfolio",
+    "profile-only": "PROFILE | Ryotaro Portfolio"
+  };
   const viewTransitionEl = document.getElementById("nav-curtain");
   let viewTransitionTimer = 0;
   let viewTransitionUnlockTimer = 0;
   let viewTransitionSeq = 0;
   let pendingViewKey = "";
-  let currentViewKey = "profile";
-  let viewSectionActive = true;
+  function normalizeRoutePath(pathname){
+    var path = String(pathname || "/").replace(/\/+$/, "");
+    return path || "/";
+  }
+  function getViewFromLocation(){
+    if(typeof window === "undefined") return "profile";
+    var path = normalizeRoutePath(window.location.pathname);
+    return routeToViewMap[path] || "profile";
+  }
+  function getRouteForView(view){
+    return viewToRouteMap[view] || "/view";
+  }
+  function syncDocumentRouteMeta(view){
+    document.title = viewTitleMap[view] || "Ryotaro Portfolio";
+  }
+  function writeRouteForView(view, mode){
+    if(!window.history || window.location.protocol === "file:") return;
+    var nextPath = getRouteForView(view);
+    var currentPath = normalizeRoutePath(window.location.pathname);
+    var state = { portfolioView: view };
+    syncDocumentRouteMeta(view);
+    if(currentPath === nextPath){
+      try{ window.history.replaceState(state, "", nextPath); }catch(_){}
+      return;
+    }
+    try{
+      if(mode === "replace"){
+        window.history.replaceState(state, "", nextPath);
+      }else{
+        window.history.pushState(state, "", nextPath);
+      }
+    }catch(_){}
+  }
+  const initialRoutePath = typeof window !== "undefined" ? normalizeRoutePath(window.location.pathname) : "/";
+  const initialRouteWriteMode = initialRoutePath === "/" ? "silent" : "replace";
+  let currentViewKey = getViewFromLocation();
+  let viewSectionActive = currentViewKey === "profile";
   let introFilmProgressFrame = 0;
   let introFilmUnlockBound = false;
   let introAutoEnterLocked = false;
@@ -1870,6 +1928,7 @@
     document.body.classList.add("theme-view-" + view);
   }
   syncThemeViewClass(currentViewKey);
+  syncDocumentRouteMeta(currentViewKey);
 
   /* ── Sliding indicator ─────────────────────────────── */
   const _menuEl = document.querySelector(".menu");
@@ -1976,10 +2035,11 @@
   }
 
   /* ── setView ────────────────────────────────────────── */
-  function setView(view, instant = false, forceTop = false){
+  function setView(view, instant = false, forceTop = false, routeMode = "push"){
     const visibleViews = getVisibleViews(view);
     if(!visibleViews.length || visibleViews.some((key)=>!viewMap[key])) return;
     if(view === currentViewKey && forceTop){
+      if(routeMode !== "silent") writeRouteForView(view, routeMode);
       cancelProgrammaticScroll();
       cancelSlowScroll();
       scheduleViewScrollReset(view, true);
@@ -2020,6 +2080,8 @@
       viewSwitchLinks.forEach((a)=>a.classList.toggle("active", a.dataset.view === view));
       currentViewKey = view;
       syncThemeViewClass(view);
+      syncDocumentRouteMeta(view);
+      if(routeMode !== "silent") writeRouteForView(view, routeMode);
       requestAnimationFrame(()=> _updateIndicator(false));
 
       /* 新ビュー: グラスの抜けだけで一度見せる。ページ側の二重フェードはしない。 */
@@ -2094,6 +2156,11 @@
         setView("profile", false, true);
       }
     });
+  });
+
+  window.addEventListener("popstate", ()=>{
+    const nextView = getViewFromLocation();
+    setView(nextView, true, true, "silent");
   });
 
   const cursor = document.getElementById("cursor");
@@ -2674,7 +2741,7 @@
 
   if(useScrollViewSystem && initViewScrollSystem()){
     threeInteractionReady = false;
-    setView(currentViewKey, true);
+    setView(currentViewKey, true, false, initialRouteWriteMode);
   } else {
   if(typeof THREE === "undefined"){
     if(threeWrap){
@@ -3551,7 +3618,7 @@
 
   resize3D();
   threeInteractionReady = true;
-  setView(currentViewKey, true); // Default view set to the active profile screen
+  setView(currentViewKey, true, false, initialRouteWriteMode); // Default view set to the routed screen
 
   /* ── Stability: always start the render loop and always dismiss
      the loader, even if an auxiliary init step is missing. Without
@@ -6175,6 +6242,10 @@
   function waitForVideo(video){
     return new Promise(function(resolve){
       if(!video){
+        resolve();
+        return;
+      }
+      if(video.id === "introFilmVideo" && !viewSectionActive){
         resolve();
         return;
       }
