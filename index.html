@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Ryotaro Portfolio</title>
-<meta name="portfolio-build" content="stable-intro-2026-06-01" />
+<meta name="portfolio-build" content="resilient-intro-2026-06-10" />
 <link rel="icon" href="/assets/branding/web-lite.png?v=17332e9" type="image/png" />
 <link rel="shortcut icon" href="/assets/branding/web-lite.png?v=17332e9" type="image/png" />
 <link rel="apple-touch-icon" href="/assets/branding/web-lite.png?v=17332e9" />
@@ -37,6 +37,33 @@
       <div class="loading-text">LOADING</div>
     </div>
   </div>
+  <script>
+    (function(){
+      var released = false;
+      function releaseLoader(){
+        if(released) return;
+        var loader = document.getElementById("loader");
+        if(!loader || loader.classList.contains("hide")) return;
+        released = true;
+        try{
+          window._viewAssetsReady = true;
+          window._viewImagesReady = true;
+          document.body.classList.add("page-revealed");
+          loader.classList.add("hide");
+          setTimeout(function(){
+            try{ loader.style.display = "none"; }catch(_){}
+          }, 900);
+        }catch(_){
+          try{ loader.style.display = "none"; }catch(__){}
+        }
+      }
+      window.__forceLoaderRelease = releaseLoader;
+      setTimeout(releaseLoader, 6500);
+      window.addEventListener("pageshow", function(){
+        setTimeout(releaseLoader, 8500);
+      }, { once:true });
+    })();
+  </script>
   <div class="opening-reveal" id="openingReveal" aria-hidden="true">
     <div class="opening-reveal-copy">
       <span>RYOTARO / VISUAL MOTION</span>
