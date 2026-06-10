@@ -534,8 +534,9 @@
   }
   const initialRoutePath = typeof window !== "undefined" ? normalizeRoutePath(window.location.pathname) : "/";
   const initialRouteWriteMode = initialRoutePath === "/" ? "silent" : "replace";
-  let currentViewKey = getViewFromLocation();
-  let viewSectionActive = currentViewKey === "profile";
+  const initialViewKey = getViewFromLocation();
+  let currentViewKey = "profile";
+  let viewSectionActive = initialViewKey === "profile";
   let introFilmProgressFrame = 0;
   let introFilmUnlockBound = false;
   let introAutoEnterLocked = false;
@@ -1350,6 +1351,30 @@
     introFilmVideoEl.pause();
   }
 
+  function ensureIntroFilmLoaded(){
+    if(!introFilmVideoEl || shouldUseIntroPosterOnly()) return;
+    const introSrc = getIntroVideoSrc(introFilmVideoEl);
+    if(!introSrc) return;
+    introFilmVideoEl.muted = true;
+    introFilmVideoEl.defaultMuted = true;
+    introFilmVideoEl.playsInline = true;
+    introFilmVideoEl.setAttribute("muted", "");
+    introFilmVideoEl.setAttribute("playsinline", "");
+    introFilmVideoEl.setAttribute("webkit-playsinline", "");
+    introFilmVideoEl.preload = "auto";
+    introFilmVideoEl.setAttribute("preload", "auto");
+    if(!introFilmVideoEl.currentSrc && !introFilmVideoEl.getAttribute("src")){
+      introFilmVideoEl.src = introSrc;
+      try{ introFilmVideoEl.load(); }catch(_){}
+      return;
+    }
+    try{
+      if(introFilmVideoEl.readyState < 2 && introFilmVideoEl.networkState === HTMLMediaElement.NETWORK_IDLE){
+        introFilmVideoEl.load();
+      }
+    }catch(_){}
+  }
+
   async function initIntroFilm(){
     if(!introFilmVideoEl) return;
 
@@ -1927,8 +1952,8 @@
     document.body.classList.remove(...themeViewClasses);
     document.body.classList.add("theme-view-" + view);
   }
-  syncThemeViewClass(currentViewKey);
-  syncDocumentRouteMeta(currentViewKey);
+  syncThemeViewClass(initialViewKey);
+  syncDocumentRouteMeta(initialViewKey);
 
   /* ── Sliding indicator ─────────────────────────────── */
   const _menuEl = document.querySelector(".menu");
@@ -2098,12 +2123,18 @@
             _staggerView(el);
           });
         }
+        if(view === "photo" && typeof window.__ensurePhotoRendered === "function"){
+          window.__ensurePhotoRendered();
+        }
         scheduleViewScrollReset(view, forceTop);
       }, ENTER_DELAY);
 
       /* 動画 / 3D */
       viewSectionActive = visibleViews.includes("profile");
       if(viewSectionActive){
+        if(typeof ensureIntroFilmLoaded === "function"){
+          ensureIntroFilmLoaded();
+        }
         if(threeInteractionReady){
           viewScrollSpinCarry = 0;
           viewScrollSpinDirection = 0;
@@ -2741,7 +2772,7 @@
 
   if(useScrollViewSystem && initViewScrollSystem()){
     threeInteractionReady = false;
-    setView(currentViewKey, true, false, initialRouteWriteMode);
+    setView(initialViewKey, true, false, initialRouteWriteMode);
   } else {
   if(typeof THREE === "undefined"){
     if(threeWrap){
@@ -3618,7 +3649,7 @@
 
   resize3D();
   threeInteractionReady = true;
-  setView(currentViewKey, true, false, initialRouteWriteMode); // Default view set to the routed screen
+  setView(initialViewKey, true, false, initialRouteWriteMode); // Default view set to the routed screen
 
   /* ── Stability: always start the render loop and always dismiss
      the loader, even if an auxiliary init step is missing. Without
@@ -6851,6 +6882,7 @@
     if(renderedKey === activeKey) return;
     render(activeKey);
   }
+  window.__ensurePhotoRendered = ensureRendered;
 
   function setActiveButton(key){
     buttons.forEach(function(button){
