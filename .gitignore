@@ -11,3 +11,9 @@ view13.jpeg
 node_modules/
 dist/
 .codex-tools/
+
+# local source assets kept out of git
+newohoto/
+背景映像、VJ隣の画像/
+public/assets/mobile/optimized/profile/IMG_1088.png
+public/media/a.mp4
