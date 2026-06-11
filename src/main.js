@@ -5413,9 +5413,12 @@
     /* overflow restored */
   }
 
-  function init(){ setTimeout(build, 300); }
-  if(document.readyState === "complete"){ init(); }
-  else { window.addEventListener("load", init); }
+  function init(){ setTimeout(build, 0); }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init, { once:true });
+  } else {
+    init();
+  }
 
 })();
 
