@@ -7238,7 +7238,7 @@
     product: {
       label: "PRODUCT",
       key: "product",
-      count: 88,
+      count: 96,
       alt: "Product photo"
     },
     outside: {
