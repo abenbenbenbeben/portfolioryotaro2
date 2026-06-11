@@ -24525,3 +24525,45 @@ img.is-quality-upgrading{
 img.is-quality-ready{
   filter:none;
 }
+
+
+/* Profile copy and contact emphasis */
+#view-profile-only .profile-only-hero .profile-only-lead{
+  max-width:18em !important;
+}
+
+#view-profile-only .profile-only-hero p:not(.profile-only-lead){
+  max-width:56em !important;
+}
+
+#view-profile-only .profile-only-detail div:nth-child(4){
+  grid-column:1 / -1 !important;
+  min-height:clamp(118px, 12vw, 168px) !important;
+  padding:clamp(22px, 3vw, 34px) 0 !important;
+  border-top:1px solid rgba(212,181,114,0.34) !important;
+  border-bottom:1px solid rgba(212,181,114,0.2) !important;
+}
+
+#view-profile-only .profile-only-detail div:nth-child(4) span{
+  display:block !important;
+  margin-bottom:12px !important;
+  font-size:clamp(12px, 1.1vw, 16px) !important;
+  letter-spacing:0.32em !important;
+}
+
+#view-profile-only .profile-only-detail div:nth-child(4) strong,
+#view-profile-only .profile-only-detail div:nth-child(4) a{
+  font-size:clamp(24px, 4vw, 52px) !important;
+  line-height:1.08 !important;
+  letter-spacing:-0.01em !important;
+  color:#fff7ea !important;
+  -webkit-text-fill-color:#fff7ea !important;
+}
+
+@media(max-width:720px){
+  #view-profile-only .profile-only-detail div:nth-child(4) strong,
+  #view-profile-only .profile-only-detail div:nth-child(4) a{
+    font-size:clamp(20px, 6vw, 30px) !important;
+    overflow-wrap:anywhere !important;
+  }
+}
