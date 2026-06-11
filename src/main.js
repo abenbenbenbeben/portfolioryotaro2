@@ -4325,47 +4325,47 @@
   var closingFromRoute = false;
 
   var DESSIN_GALLERY = [
-    "/assets/illustration-art/dessin-updated/1.jpg",
-    "/assets/illustration-art/dessin-updated/2.jpg",
-    "/assets/illustration-art/dessin-updated/2-1.jpg",
-    "/assets/illustration-art/dessin-updated/2-2.jpg",
-    "/assets/illustration-art/dessin-updated/2-3.jpg",
-    "/assets/illustration-art/dessin-updated/2-4.jpg",
-    "/assets/illustration-art/dessin-updated/2-5.jpg",
-    "/assets/illustration-art/dessin-updated/2-6.jpg",
-    "/assets/illustration-art/dessin-updated/2-7.jpg",
-    "/assets/illustration-art/dessin-updated/3.jpg",
-    "/assets/illustration-art/dessin-updated/4.jpg",
-    "/assets/illustration-art/dessin-updated/5.jpg",
-    "/assets/illustration-art/dessin-updated/6.jpg",
-    "/assets/illustration-art/dessin-updated/7.jpg",
-    "/assets/illustration-art/dessin-updated/8.jpg",
-    "/assets/illustration-art/dessin-updated/9.jpg",
-    "/assets/illustration-art/dessin-updated/10.jpg"
+    "/assets/illustration-art/デッサン、色彩構成/1.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2-1.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2-2.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2-3.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2-4.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2-5.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2-6.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/2-7.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/3.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/4.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/5.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/6.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/7.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/8.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/9.jpg",
+    "/assets/illustration-art/デッサン、色彩構成/10.jpg"
   ];
 
   var ILLUSTRATION_FOLDER_GALLERIES = {
     "メカ軍団": [
-      "/assets/illustration-art/monochrome-flow/01-view7.jpeg",
-      "/assets/illustration-art/monochrome-flow/02-view8.jpeg"
+      "/assets/illustration-art/メカ軍団/01-view7.jpeg",
+      "/assets/illustration-art/メカ軍団/02-view8.jpeg"
     ],
     "ペン画": [
-      "/assets/illustration-art/city-noise/03-bill.jpg",
-      "/assets/illustration-art/city-noise/04-meka.jpg",
-      "/assets/illustration-art/city-noise/05-meka2.jpg"
+      "/assets/illustration-art/ペン画/03-bill.jpg",
+      "/assets/illustration-art/ペン画/04-meka.jpg",
+      "/assets/illustration-art/ペン画/05-meka2.jpg"
     ],
     "絵画": [
-      "/assets/illustration-art/dust-and-light/06-img-9457-2.jpg",
-      "/assets/illustration-art/dust-and-light/07-img-9458-3.jpg",
-      "/assets/illustration-art/dust-and-light/08-img-9459.jpg",
-      "/assets/illustration-art/dust-and-light/09-img-9460-3.jpg",
-      "/assets/illustration-art/dust-and-light/10-img-9461-2.jpg",
-      "/assets/illustration-art/dust-and-light/11-img-9464.jpg",
-      "/assets/illustration-art/dust-and-light/12-img-9465-2.jpg",
-      "/assets/illustration-art/dust-and-light/13-img-9508.jpg"
+      "/assets/illustration-art/絵画/06-img-9457-2.jpg",
+      "/assets/illustration-art/絵画/07-img-9458-3.jpg",
+      "/assets/illustration-art/絵画/08-img-9459.jpg",
+      "/assets/illustration-art/絵画/09-img-9460-3.jpg",
+      "/assets/illustration-art/絵画/10-img-9461-2.jpg",
+      "/assets/illustration-art/絵画/11-img-9464.jpg",
+      "/assets/illustration-art/絵画/12-img-9465-2.jpg",
+      "/assets/illustration-art/絵画/13-img-9508.jpg"
     ],
     "animal": [
-      "/assets/illustration-art/quiet-surface/14-view8.jpeg"
+      "/assets/illustration-art/animal/14-view8.jpeg"
     ],
     "デッサン、色彩構成": DESSIN_GALLERY
   };
