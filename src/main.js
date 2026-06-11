@@ -310,9 +310,18 @@
     if(typeof src !== "string" || !src) return src || "";
     var parts = splitAssetSuffix(src.trim());
     var path = parts.path;
+    var origin = "";
+    var protocolIndex = path.indexOf("://");
+    if(protocolIndex > -1){
+      var slashIndex = path.indexOf("/", protocolIndex + 3);
+      if(slashIndex > -1){
+        origin = path.slice(0, slashIndex);
+        path = path.slice(slashIndex);
+      }
+    }
     if(!/^\/assets\/mobile\//.test(path)) return src;
     var desktopPath = "/assets/" + path.slice("/assets/mobile/".length);
-    return desktopPath + parts.suffix;
+    return origin + desktopPath + parts.suffix;
   }
 
   function canUpgradeImageQuality(){
@@ -332,12 +341,27 @@
     return window.setTimeout(fn, Math.min(timeout || 900, 900));
   }
 
+  function getAssignedImageSrc(image){
+    if(!image) return "";
+    return image.getAttribute("src") || image.getAttribute("data-src") || image.currentSrc || image.src || "";
+  }
+
+  function getHighQualityImageSrc(image, lowSrc){
+    if(!image) return getDesktopAssetSrc(lowSrc || "");
+    return image.getAttribute("data-full-src") || image.getAttribute("data-quality-src") || getDesktopAssetSrc(lowSrc || getAssignedImageSrc(image));
+  }
+
   function upgradeImageQuality(image, lowSrc, highSrc){
     if(!image || !canUpgradeImageQuality()) return;
+    lowSrc = lowSrc || getAssignedImageSrc(image);
     var current = image.currentSrc || image.src || lowSrc || "";
-    var target = highSrc || getDesktopAssetSrc(lowSrc || current);
+    var target = highSrc || getHighQualityImageSrc(image, lowSrc || current);
     if(!target || target === current || target === lowSrc) return;
-    if(image.dataset.qualitySrc === target || image.dataset.qualityReady === "1") return;
+    if(image.dataset.qualitySrc === target && image.dataset.qualityReady === "1") return;
+    if(image.dataset.qualitySrc !== target){
+      image.dataset.qualityReady = "";
+      image.dataset.qualityFailed = "";
+    }
     image.dataset.qualitySrc = target;
     image.classList.add("is-progressive-image");
     runWhenIdle(function(){
@@ -348,6 +372,9 @@
         function swap(){
           if(image.dataset.qualitySrc !== target) return;
           image.classList.add("is-quality-upgrading");
+          if(image.getAttribute("data-full-src") === target && image.hasAttribute("srcset")){
+            image.removeAttribute("srcset");
+          }
           image.src = target;
           image.dataset.qualityReady = "1";
           window.setTimeout(function(){
@@ -5026,7 +5053,8 @@
       imgWrap.appendChild(im);
       im.onload = function(){
         im.classList.add("lo");
-        upgradeImageQuality(im, im.currentSrc || im.src, getDesktopAssetSrc(im.currentSrc || im.src));
+        var lowSrc = getAssignedImageSrc(im);
+        upgradeImageQuality(im, lowSrc, getHighQualityImageSrc(im, lowSrc));
       };
       im.onerror = function(){
         var desktopSrc = getDesktopAssetSrc(im.getAttribute("src") || im.getAttribute("data-src") || "");
@@ -7125,6 +7153,75 @@
   }
 })();
 
+
+/* ── Progressive upgrade for visible gallery images ── */
+(function(){
+  "use strict";
+
+  var SELECTOR = "img[data-full-src], .illus-art-frame img";
+  var observed = new WeakSet();
+  var observer = null;
+
+  function upgradeWhenLoaded(image){
+    if(!image) return;
+    function run(){
+      var lowSrc = getAssignedImageSrc(image);
+      var highSrc = getHighQualityImageSrc(image, lowSrc);
+      upgradeImageQuality(image, lowSrc, highSrc);
+    }
+    if(image.complete && image.naturalWidth > 0){
+      run();
+      return;
+    }
+    image.addEventListener("load", run, { once:true });
+  }
+
+  function observeImage(image){
+    if(!image || observed.has(image)) return;
+    observed.add(image);
+    if(!("IntersectionObserver" in window)){
+      upgradeWhenLoaded(image);
+      return;
+    }
+    observer.observe(image);
+  }
+
+  function refresh(root){
+    var host = root && root.querySelectorAll ? root : document;
+    host.querySelectorAll(SELECTOR).forEach(observeImage);
+  }
+
+  function init(){
+    if("IntersectionObserver" in window){
+      observer = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          upgradeWhenLoaded(entry.target);
+        });
+      }, { root:null, rootMargin:"420px 0px", threshold:0.01 });
+    }
+    refresh(document);
+    if("MutationObserver" in window){
+      var mo = new MutationObserver(function(mutations){
+        mutations.forEach(function(mutation){
+          Array.from(mutation.addedNodes || []).forEach(function(node){
+            if(node.nodeType !== 1) return;
+            if(node.matches && node.matches(SELECTOR)) observeImage(node);
+            refresh(node);
+          });
+        });
+      });
+      mo.observe(document.body, { childList:true, subtree:true });
+    }
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init, { once:true });
+  }else{
+    init();
+  }
+})();
 
 /* ── PHOTO gallery: render the new product / outdoor sets on demand ── */
 (function(){
