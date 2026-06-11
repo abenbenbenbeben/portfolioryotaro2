@@ -315,6 +315,56 @@
     return desktopPath + parts.suffix;
   }
 
+  function canUpgradeImageQuality(){
+    try{
+      var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if(connection && connection.saveData) return false;
+      var type = connection ? String(connection.effectiveType || "") : "";
+      if(type === "slow-2g" || type === "2g") return false;
+    }catch(_){}
+    return true;
+  }
+
+  function runWhenIdle(fn, timeout){
+    if("requestIdleCallback" in window){
+      return window.requestIdleCallback(fn, { timeout:timeout || 1800 });
+    }
+    return window.setTimeout(fn, Math.min(timeout || 900, 900));
+  }
+
+  function upgradeImageQuality(image, lowSrc, highSrc){
+    if(!image || !canUpgradeImageQuality()) return;
+    var current = image.currentSrc || image.src || lowSrc || "";
+    var target = highSrc || getDesktopAssetSrc(lowSrc || current);
+    if(!target || target === current || target === lowSrc) return;
+    if(image.dataset.qualitySrc === target || image.dataset.qualityReady === "1") return;
+    image.dataset.qualitySrc = target;
+    image.classList.add("is-progressive-image");
+    runWhenIdle(function(){
+      if(image.dataset.qualityReady === "1" || image.dataset.qualitySrc !== target) return;
+      var hi = new Image();
+      hi.decoding = "async";
+      hi.onload = function(){
+        function swap(){
+          if(image.dataset.qualitySrc !== target) return;
+          image.classList.add("is-quality-upgrading");
+          image.src = target;
+          image.dataset.qualityReady = "1";
+          window.setTimeout(function(){
+            image.classList.remove("is-quality-upgrading");
+            image.classList.add("is-quality-ready");
+          }, 260);
+        }
+        if(typeof hi.decode === "function") hi.decode().then(swap, swap);
+        else swap();
+      };
+      hi.onerror = function(){
+        image.dataset.qualityFailed = "1";
+      };
+      hi.src = target;
+    }, 1600);
+  }
+
   function getImageDisplaySrc(img, preferredSrc){
     var src = preferredSrc || (img ? (img.currentSrc || img.getAttribute("src") || img.src || "") : "");
     return getDisplayAssetSrc(src);
@@ -4590,7 +4640,7 @@
 
     function lbShow(idx){
       lbIdx = idx;
-      var src = lbSrcs[lbIdx];
+      var src = getDesktopAssetSrc(lbSrcs[lbIdx]) || lbSrcs[lbIdx];
       lightboxImg.style.opacity = "0";
       lightboxImg.onload = function(){
         if(lightbox.classList.contains("is-native")){
@@ -4976,6 +5026,7 @@
       imgWrap.appendChild(im);
       im.onload = function(){
         im.classList.add("lo");
+        upgradeImageQuality(im, im.currentSrc || im.src, getDesktopAssetSrc(im.currentSrc || im.src));
       };
       im.onerror = function(){
         var desktopSrc = getDesktopAssetSrc(im.getAttribute("src") || im.getAttribute("data-src") || "");
@@ -5202,6 +5253,7 @@
     var activeSrc = src;
     t.onload = function(){
       img.src = activeSrc;
+      upgradeImageQuality(img, activeSrc, fallbackSrc);
       requestAnimationFrame(function(){
         if(dir === "right")     img.classList.add("wv-in-r");
         else if(dir === "left") img.classList.add("wv-in-l");

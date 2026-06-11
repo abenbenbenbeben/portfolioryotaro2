@@ -24511,3 +24511,17 @@ body.is-opening-reveal #view-profile .intro-film-scroll{
     height:54px !important;
   }
 }
+
+
+/* Progressive image quality upgrade */
+img.is-progressive-image{
+  transition:filter .28s ease, opacity .28s ease, transform .72s cubic-bezier(0.16,1,0.3,1);
+}
+
+img.is-quality-upgrading{
+  filter:saturate(1.02) contrast(1.015);
+}
+
+img.is-quality-ready{
+  filter:none;
+}
