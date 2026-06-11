@@ -1,7 +1,6 @@
-# portfolioryotaro2
+# ryotaroportfolio
 
 Static portfolio site.
-aa
 
 ## Structure
 
