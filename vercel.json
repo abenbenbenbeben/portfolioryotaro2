@@ -5,6 +5,7 @@
     { "source": "/photo", "destination": "/index.html" },
     { "source": "/art", "destination": "/index.html" },
     { "source": "/illustration", "destination": "/index.html" },
-    { "source": "/profile", "destination": "/index.html" }
+    { "source": "/profile", "destination": "/index.html" },
+    { "source": "/work/:slug", "destination": "/index.html" }
   ]
 }

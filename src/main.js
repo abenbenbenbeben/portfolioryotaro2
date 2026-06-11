@@ -512,6 +512,7 @@
   function getViewFromLocation(){
     if(typeof window === "undefined") return "profile";
     var path = normalizeRoutePath(window.location.pathname);
+    if(path.indexOf("/work/") === 0) return "design";
     return routeToViewMap[path] || "profile";
   }
   function getRouteForView(view){
@@ -539,7 +540,7 @@
     }catch(_){}
   }
   const initialRoutePath = typeof window !== "undefined" ? normalizeRoutePath(window.location.pathname) : "/";
-  const initialRouteWriteMode = initialRoutePath === "/" ? "silent" : "replace";
+  const initialRouteWriteMode = (initialRoutePath === "/" || initialRoutePath.indexOf("/work/") === 0) ? "silent" : "replace";
   const initialViewKey = getViewFromLocation();
   let currentViewKey = "profile";
   let viewSectionActive = initialViewKey === "profile";
@@ -2254,6 +2255,9 @@
     const nextView = getViewFromLocation();
     setView(nextView, true, true, "silent");
   });
+
+  window.__portfolioSetView = setView;
+  window.__portfolioGetRouteForView = getRouteForView;
 
   const cursor = document.getElementById("cursor");
   if(isCoarsePointer){
@@ -4316,6 +4320,9 @@
   var workTransitioning = false;
   var workTransitionOpenTimer = 0;
   var workTransitionEndTimer = 0;
+  var slugToIndex = Object.create(null);
+  var workRoutePopBound = false;
+  var closingFromRoute = false;
 
   var DESSIN_GALLERY = [
     "/assets/illustration-art/dessin-updated/1.jpg",
@@ -4373,10 +4380,145 @@
     });
   }
 
+  function getWorkViewForItem(item){
+    return item && item.classList && item.classList.contains("illus-card") ? "illustration" : "design";
+  }
+
+  function getWorkListRouteForItem(item){
+    var view = getWorkViewForItem(item);
+    if(window.__portfolioGetRouteForView){
+      return window.__portfolioGetRouteForView(view);
+    }
+    return view === "illustration" ? "/art" : "/design";
+  }
+
+  function getKnownWorkSlug(title){
+    var key = String(title || "").trim();
+    var known = {
+      "重なる": "kasanaru",
+      "リアルタイム色立体": "realtime-color-volume",
+      "リミナルスペース": "liminal-space",
+      "エヴィス": "evice",
+      "背景映像、VJ": "background-vj",
+      "視点の可視化": "visualizing-viewpoints",
+      "メカ軍団": "mecha",
+      "ペン画": "pen-drawing",
+      "絵画": "painting",
+      "デッサン、色彩構成": "dessin-color",
+      "animal": "animal"
+    };
+    return known[key] || "";
+  }
+
+  function makeWorkSlug(title, index){
+    var known = getKnownWorkSlug(title);
+    if(known) return known;
+    var slug = String(title || "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return slug || ("work-" + pad(index + 1));
+  }
+
+  function setupWorkSlugs(){
+    slugToIndex = Object.create(null);
+    var used = Object.create(null);
+    items.forEach(function(item, index){
+      var d = getData(item);
+      var baseSlug = item.dataset.workSlug || makeWorkSlug(d.title, index);
+      var slug = baseSlug;
+      var count = used[baseSlug] || 0;
+      used[baseSlug] = count + 1;
+      if(count > 0) slug = baseSlug + "-" + (count + 1);
+      item.dataset.workSlug = slug;
+      item.dataset.workHref = "/work/" + encodeURIComponent(slug);
+      slugToIndex[slug] = index;
+    });
+  }
+
+  function getWorkRoute(idx){
+    var item = items[idx];
+    var slug = item && item.dataset ? item.dataset.workSlug : "";
+    return slug ? "/work/" + encodeURIComponent(slug) : "";
+  }
+
+  function getWorkSlugFromLocation(){
+    if(typeof window === "undefined") return "";
+    var match = window.location.pathname.match(/^\/work\/([^/]+)\/?$/);
+    if(!match) return "";
+    try{ return decodeURIComponent(match[1]); }
+    catch(_){ return match[1]; }
+  }
+
+  function isWorkRoute(){
+    return !!getWorkSlugFromLocation();
+  }
+
+  function syncUnderlyingWorkView(idx, routeMode){
+    var item = items[idx];
+    if(!item || !window.__portfolioSetView) return;
+    window.__portfolioSetView(getWorkViewForItem(item), true, false, routeMode || "silent");
+  }
+
+  function writeWorkRoute(idx, mode){
+    if(!window.history || window.location.protocol === "file:") return;
+    var route = getWorkRoute(idx);
+    if(!route) return;
+    var item = items[idx];
+    var d = getData(item);
+    var state = {
+      portfolioView:getWorkViewForItem(item),
+      portfolioWork:item.dataset.workSlug || "",
+      portfolioReturn:getWorkListRouteForItem(item)
+    };
+    try{ document.title = (d.title ? d.title + " | " : "") + "Ryotaro Portfolio"; }catch(_){}
+    try{
+      if(mode === "replace") window.history.replaceState(state, "", route);
+      else window.history.pushState(state, "", route);
+    }catch(_){}
+  }
+
+  function writeListRouteForWork(idx, mode){
+    if(!window.history || window.location.protocol === "file:") return;
+    var item = items[idx];
+    if(!item) return;
+    var view = getWorkViewForItem(item);
+    var route = getWorkListRouteForItem(item);
+    try{
+      if(mode === "replace") window.history.replaceState({ portfolioView:view }, "", route);
+      else window.history.pushState({ portfolioView:view }, "", route);
+    }catch(_){}
+    if(window.__portfolioSetView){
+      window.__portfolioSetView(view, true, false, "silent");
+    }
+  }
+
+  function handleWorkRouteChange(){
+    var slug = getWorkSlugFromLocation();
+    if(!slug){
+      if(ov && ov.classList.contains("open")){
+        close({ skipRoute:true });
+      }
+      return;
+    }
+    var idx = slugToIndex[slug];
+    if(typeof idx !== "number") return;
+    syncUnderlyingWorkView(idx, "silent");
+    if(ov && ov.classList.contains("open")){
+      cur = idx;
+      buildDots();
+      render(cur, null);
+    }else{
+      openAt(idx, { skipRoute:true });
+    }
+  }
+
   function build(){
     applyIllustrationFolderGalleries();
     items = Array.from(document.querySelectorAll(SELECTOR));
     if(!items.length) return;
+    setupWorkSlugs();
 
     ov = document.createElement("div"); ov.id = "wv";
     ov.innerHTML =
@@ -4521,10 +4663,25 @@
     /* card clicks (capture) */
     items.forEach(function(el, i){
       el.style.cursor = "pointer";
+      el.setAttribute("role", el.getAttribute("role") || "link");
+      el.setAttribute("tabindex", el.getAttribute("tabindex") || "0");
+      el.setAttribute("aria-label", (getData(el).title || "WORK") + " detail page");
       el.addEventListener("click", function(e){
+        var href = getWorkRoute(i);
+        if(href && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1)){
+          try{ window.open(href, "_blank", "noopener,noreferrer"); }catch(_){}
+          return;
+        }
+        e.preventDefault();
         e.stopPropagation();
-        openWithShowcaseTransition(i, el);
+        openWithShowcaseTransition(i, el, null, { routeMode:"push" });
       }, true);
+      el.addEventListener("keydown", function(e){
+        if(e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        e.stopPropagation();
+        openWithShowcaseTransition(i, el, null, { routeMode:"push" });
+      });
     });
 
     window.__openWorkFromElement = function(targetEl, opts){
@@ -4539,7 +4696,7 @@
             }
           }catch(_){}
         }, 420);
-      });
+      }, { routeMode:"push" });
       return true;
     };
 
@@ -4574,7 +4731,10 @@
 
     /* home */
     document.getElementById("wv-home").addEventListener("click", function(){
-      close();
+      close({ skipRoute:true });
+      if(window.__portfolioSetView){
+        window.__portfolioSetView("profile", false, true, "push");
+      }
       setTimeout(function(){
         try{
           var p = document.getElementById("view-profile");
@@ -4596,6 +4756,12 @@
       if(e.key === "ArrowLeft" ){ go(cur - 1, "left"); }
       if(e.key === "Home"){ try{ scrollEl.scrollTo({top:0,behavior:"smooth"}); }catch(_){} }
     });
+
+    if(!workRoutePopBound){
+      workRoutePopBound = true;
+      window.addEventListener("popstate", handleWorkRouteChange);
+    }
+    handleWorkRouteChange();
   }
 
   function buildDots(){
@@ -5109,7 +5275,10 @@
 
   function go(idx, dir){
     if(idx < 0 || idx >= items.length) return;
-    cur = idx; render(cur, dir);
+    cur = idx;
+    syncUnderlyingWorkView(cur, "silent");
+    writeWorkRoute(cur, "push");
+    render(cur, dir);
   }
 
   function ensureWorkTransition(){
@@ -5139,13 +5308,13 @@
     return card.querySelector(".design-thumb img:not(.swap-hover), .illus-thumb img:not(.swap-hover), img.swap-base, img:not(.swap-hover), img");
   }
 
-  function openWithShowcaseTransition(idx, sourceEl, afterOpen){
+  function openWithShowcaseTransition(idx, sourceEl, afterOpen, opts){
     if(idx < 0 || idx >= items.length) return;
     var reduce = false;
     try{ reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(_){}
     if(workTransitioning) return;
     if(reduce){
-      openAt(idx);
+      openAt(idx, opts);
       if(typeof afterOpen === "function") afterOpen();
       return;
     }
@@ -5203,7 +5372,7 @@
 
     workTransitionOpenTimer = setTimeout(function(){
       if(ov) ov.classList.add("is-showcase-opening");
-      openAt(idx);
+      openAt(idx, opts);
       if(typeof afterOpen === "function") afterOpen();
     }, 320);
 
@@ -5219,16 +5388,28 @@
     }, 680);
   }
 
-  function openAt(idx){
+  function openAt(idx, opts){
+    opts = opts || {};
+    syncUnderlyingWorkView(idx, "silent");
+    if(!opts.skipRoute){
+      writeWorkRoute(idx, opts.routeMode || "push");
+    }
     ov.classList.add("open");
     cur = idx; buildDots(); render(cur, null);
     /* no body overflow lock — conflicts with custom scroll */
   }
 
-  function close(){
+  function close(opts){
+    opts = opts || {};
+    if(closingFromRoute) return;
+    closingFromRoute = true;
     ov.classList.remove("open");
     clearTimeout(videoTimer);
     if(videoFrame) videoFrame.innerHTML = "";
+    if(!opts.skipRoute && isWorkRoute()){
+      writeListRouteForWork(cur, opts.routeMode || "push");
+    }
+    closingFromRoute = false;
     /* overflow restored */
   }
 
