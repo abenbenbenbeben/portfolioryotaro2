@@ -12499,7 +12499,7 @@ main,
 }
 
 #view-illustration .illus-page::after{
-  content:"ILLUSTRATION / ART" !important;
+  content:"ART" !important;
   display:block !important;
   position:absolute !important;
   right:clamp(-72px, -4vw, -28px) !important;
@@ -19104,7 +19104,7 @@ svg{
   contain:paint;
 }
 
-/* Final dark gallery theme for PHOTO and ILLUSTRATION / ART. */
+/* Final dark gallery theme for PHOTO and ART. */
 body.theme-view-photo,
 body.theme-view-photo main,
 body.theme-view-photo .view,
@@ -24776,12 +24776,12 @@ img.is-quality-ready{
 
 .view-card::after,
 .design-item::after{
-  content:"DETAIL" !important;
+  content:"VIEW DETAIL" !important;
 }
 
 .illus-card::after,
 .illus-art-item::after{
-  content:"VIEW ART" !important;
+  content:"VIEW" !important;
 }
 
 .photo-item::after{
@@ -24840,5 +24840,39 @@ img.is-quality-ready{
   .illus-art-frame,
   .photo-frame{
     touch-action:manipulation !important;
+  }
+}
+
+
+/* Work detail contact route */
+#wv-contact{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  width:fit-content !important;
+  margin-left:8px !important;
+  padding:10px 20px !important;
+  border:1px solid rgba(29,29,31,0.18) !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:#1D1D1F !important;
+  font:700 10.5px/1 "Zen Kaku Gothic New", sans-serif !important;
+  letter-spacing:.16em !important;
+  text-decoration:none !important;
+  transition:background .2s ease, color .2s ease, border-color .2s ease, opacity .38s .34s, transform .46s .34s cubic-bezier(0.16,1,0.3,1) !important;
+}
+
+#wv-contact:hover{
+  background:#1D1D1F !important;
+  color:#fff !important;
+  border-color:#1D1D1F !important;
+}
+
+@media(max-width:720px){
+  #wv-contact,
+  #wv-lnk{
+    width:100% !important;
+    justify-content:center !important;
+    margin-left:0 !important;
   }
 }

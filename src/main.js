@@ -551,7 +551,7 @@
     profile: { label: "VIEW", no: "01 / INDEX", kicker: "MUSEUM TRANSFER" },
     design: { label: "DESIGN", no: "02 / INDEX", kicker: "BLACK INDEX" },
     photo: { label: "PHOTO", no: "03 / INDEX", kicker: "EXPOSURE SHIFT" },
-    illustration: { label: "ILLUSTRATION / ART", no: "04 / INDEX", kicker: "LINE RENDER" },
+    illustration: { label: "ART", no: "04 / INDEX", kicker: "LINE RENDER" },
     "profile-only": { label: "PROFILE", no: "05 / INDEX", kicker: "IDENTITY SCAN" }
   };
   const routeToViewMap = {
@@ -574,7 +574,7 @@
     profile: "VIEW | Ryotaro Portfolio",
     design: "DESIGN | Ryotaro Portfolio",
     photo: "PHOTO | Ryotaro Portfolio",
-    illustration: "ILLUSTRATION / ART | Ryotaro Portfolio",
+    illustration: "ART | Ryotaro Portfolio",
     "profile-only": "PROFILE | Ryotaro Portfolio"
   };
   const viewTransitionEl = document.getElementById("nav-curtain");
@@ -3891,7 +3891,7 @@
 
 
 
-/* ── ILLUSTRATION / ART lightbox: photo-style large view ── */
+/* ── ART lightbox: photo-style large view ── */
 (function(){
   "use strict";
   return;
@@ -4041,7 +4041,7 @@
   }
 })();
 
-/* ── ILLUSTRATION / ART folder view: open a whole work folder, photo-style ── */
+/* ── ART folder view: open a whole work folder, photo-style ── */
 (function(){
   "use strict";
 
@@ -4108,7 +4108,7 @@
       '<button class="illus-folder-close" type="button" aria-label="Close">×</button>',
       '<section class="illus-folder-panel" aria-label="Illustration folder gallery">',
       '  <header class="illus-folder-head">',
-      '    <p>ILLUSTRATION / ART</p>',
+      '    <p>ART</p>',
       '    <h2></h2>',
       '    <span></span>',
       '  </header>',
@@ -4624,6 +4624,7 @@
               '<p  id="wv-dsc" class="wvi"></p>' +
               '<div id="wv-meta" class="wvi"></div>' +
               '<a  id="wv-lnk" class="wvi" target="_blank" rel="noopener">VIEW PROJECT &#8594;</a>' +
+              '<a  id="wv-contact" class="wvi" href="mailto:ryotaro.a09@gmail.com">CONTACT &#8594;</a>' +
             '</div>' +
             '<div id="wv-theme-wrap">' +
               '<p id="wv-theme-label">THEME / SIDE IMAGES</p>' +
@@ -4634,7 +4635,7 @@
           '</div>' +
           '<div class="wv-section-divider"></div>' +
           '<div id="wv-long-wrap">' +
-            '<p id="wv-long-label">DETAILED DESCRIPTION</p>' +
+            '<p id="wv-long-label">DESCRIPTION</p>' +
             '<div id="wv-long"></div>' +
           '</div>' +
           '<div id="wv-process-wrap">' +
@@ -5594,7 +5595,7 @@
 
       var info = document.createElement("div");
       info.className = "view-info";
-      var targetLabel = entry.targetView === "illustration" ? "ILLUSTRATION / ART" : "DESIGN";
+      var targetLabel = entry.targetView === "illustration" ? "ART" : "DESIGN";
       info.innerHTML =
         '<p class="view-no" data-target="' + targetLabel + '">' + entry.no + '</p>' +
         '<p class="view-title">' + entry.title + '</p>' +
@@ -6075,7 +6076,7 @@
     profile: { label:"VIEW", no:"01" },
     design:  { label:"DESIGN", no:"02" },
     photo: { label:"PHOTO", no:"03" },
-    illustration: { label:"ILLUSTRATION / ART", no:"04" },
+    illustration: { label:"ART", no:"04" },
     "profile-only": { label:"PROFILE", no:"05" }
   };
   var meta = document.querySelector(".sidebar-meta");
@@ -6214,9 +6215,9 @@
     if(!target || !target.closest) return "";
     var labeled = target.closest("[data-cursor-label]");
     if(labeled) return labeled.getAttribute("data-cursor-label") || "";
-    if(target.closest(".design-item, .view-card, .view-legacy-card")) return "OPEN DETAIL";
+    if(target.closest(".design-item, .view-card, .view-legacy-card")) return "VIEW DETAIL";
     if(target.closest(".photo-item, .photo-frame")) return "VIEW PHOTO";
-    if(target.closest(".illus-card, .illus-art-item, .illus-thumb, .illus-art-frame")) return "VIEW ART";
+    if(target.closest(".illus-card, .illus-art-item, .illus-thumb, .illus-art-frame")) return "VIEW";
     if(target.closest(".wv-story-img-wrap, .wv-g-item")) return "EXPAND";
     if(target.closest(".wv-video-play")) return "PLAY FILM";
     if(target.closest("#wv-x, .photo-lightbox-close")) return "CLOSE";
