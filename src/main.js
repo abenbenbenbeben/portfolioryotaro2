@@ -4888,13 +4888,17 @@
     var youtube = youtubeList[0] || "";
     var themeRaw = ds.themeGallery || "";
     var themeGallery = themeRaw ? themeRaw.split("|").map(function(s){ return getFastDisplayAssetSrc(s.trim()); }).filter(Boolean) : [];
-    var href  = ds.url || ds.href ||
+    var download = ds.download || "";
+    var downloadName = ds.downloadName || "";
+    var linkLabel = ds.linkLabel || "";
+    var href  = download || ds.url || ds.href ||
                 (el.querySelector("a[href]") ? el.querySelector("a[href]").href : "") || "";
     var process = ds.process || "";
     var tools   = ds.tools   || "";
     return { src:src, fallbackSrc:desktopFallbackSrc, title:title, cat:catTx, desc:desc,
              long:long, year:year, role:role, media:media,
-             gallery:gallery, galleryLayout:galleryLayout, youtube:youtube, youtubeList:youtubeList, themeGallery:themeGallery, href:href,
+             gallery:gallery, galleryLayout:galleryLayout, youtube:youtube, youtubeList:youtubeList, themeGallery:themeGallery,
+             href:href, download:download, downloadName:downloadName, linkLabel:linkLabel,
              process:process, tools:tools };
   }
 
@@ -5332,8 +5336,23 @@
 
     /* link */
     if(d.href && d.href !== "#" && d.href !== window.location.href){
-      lnk.href = d.href; lnk.classList.add("visible");
-    } else { lnk.classList.remove("visible"); }
+      lnk.href = d.href;
+      lnk.textContent = (d.linkLabel || "VIEW PROJECT") + " \u2192";
+      if(d.download){
+        lnk.setAttribute("download", d.downloadName || "");
+        lnk.removeAttribute("target");
+        lnk.removeAttribute("rel");
+      }else{
+        lnk.removeAttribute("download");
+        lnk.target = "_blank";
+        lnk.rel = "noopener";
+      }
+      lnk.classList.add("visible");
+    } else {
+      lnk.classList.remove("visible");
+      lnk.removeAttribute("download");
+      lnk.textContent = "VIEW PROJECT \u2192";
+    }
 
     prev.disabled    = (idx === 0);
     nextBig.disabled = (idx === items.length - 1);
