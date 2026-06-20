@@ -11,7 +11,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
 (function(){
   "use strict";
 
-  var SELECTOR = ".design-item, .illus-card"; /* all cards clickable even if image missing */
+  var SELECTOR = ".design-item:not([hidden]), .illus-card"; /* all visible cards clickable even if image missing */
   var items = [], cur = 0;
   var ov, panel, bg, img, wrap, num, cat, ttl, dsc, metaEl, lnk;
   var dots, prev, nextBig, scrollEl, topFab, longEl, longWrap;

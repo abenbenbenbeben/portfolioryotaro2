@@ -2309,7 +2309,7 @@
   function buildLegacy3dFromWorkCards(){
     if(!viewLegacy3dEl || !legacy3dRingEl) return;
     var sources = [];
-    document.querySelectorAll("#view-design .design-item").forEach(function(card, i){
+    document.querySelectorAll("#view-design .design-item:not([hidden])").forEach(function(card, i){
       sources.push({ card:card, label:"DESIGN", index:i + 1 });
     });
     document.querySelectorAll("#illusGrid .illus-card").forEach(function(card, i){
@@ -4056,8 +4056,10 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var grid = document.getElementById("viewGrid");
     if(!grid) return;
 
-    var designItems = shuffle(Array.from(document.querySelectorAll("#view-design .design-item"))).slice(0, 5);
-    var illustrationItems = shuffle(Array.from(document.querySelectorAll("#view-illustration .illus-card"))).slice(0, 4);
+    var designItems = shuffle(Array.from(document.querySelectorAll("#view-design .design-item:not([hidden])"))).slice(0, 5);
+    var illustrationItems = Array.from(document.querySelectorAll("#view-illustration .illus-card")).filter(function(card){
+      return text(card, ".illus-title") === "メカ軍団";
+    }).slice(0, 4);
     var sourceItems = shuffle(designItems.concat(illustrationItems));
     if(!sourceItems.length) return;
 
@@ -4334,7 +4336,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   }
 
   ready(function(){
-    document.querySelectorAll("#view-design .design-item, #view-illustration .illus-card").forEach(applyWorkStatusIcon);
+    document.querySelectorAll("#view-design .design-item:not([hidden]), #view-illustration .illus-card").forEach(applyWorkStatusIcon);
   });
 })();
 
