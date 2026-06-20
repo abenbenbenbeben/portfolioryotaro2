@@ -3,6 +3,11 @@
 *.mp4
 *.mov
 !public/media/*.mp4
+!public/media/intro/
+!public/media/intro/*.mp4
+!public/media/thumbs/
+!public/media/thumbs/*.mp4
+!public/media/thumbs/*.mov
 *.HEIC
 *.pdf
 view13.jpeg

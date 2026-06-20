@@ -13,7 +13,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&amp;family=Shippori+Mincho:wght@400;600&amp;family=Zen+Kaku+Gothic+New:wght@300;500;700&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet" />
 <link rel="preload" href="/assets/optimized/video/sasisho-poster.jpg" as="image" fetchpriority="high" />
 
-<link rel="stylesheet" href="./src/styles.css" />
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -22,6 +21,7 @@
     })(window, document, "clarity", "script", "ww56m3bcji");
 </script>
 
+<link rel="stylesheet" href="./src/styles.css" />
 </head>
 <body>
   <div id="ux-progress" aria-hidden="true"></div>
@@ -97,13 +97,12 @@
       aria-hidden="true"
     ></video>
     <div class="logo">
-      <a href="/view" class="home-back" aria-label="Go to top">
+      <a href="/design" class="home-back" aria-label="Go to top">
         <img src="/assets/branding/logo.png" alt="logo">
       </a>
     </div>
     <nav class="menu">
-      <a class="active" href="/view" data-view="profile" data-force-top="1" data-short="VIEW">VIEW</a>
-      <a href="/design" data-view="design" data-force-top="1" data-short="DESIGN">DESIGN</a>
+      <a class="active" href="/design" data-view="design" data-force-top="1" data-short="DESIGN">DESIGN</a>
       <a href="/photo" data-view="photo" data-force-top="1" data-short="PHOTO">PHOTO</a>
       <a href="/art" data-view="illustration" data-force-top="1" data-short="ART">ART</a>
       <a href="/profile" data-view="profile-only" data-force-top="1" data-short="PROFILE">PROFILE</a>
@@ -184,10 +183,11 @@
 
     <section id="view-profile" class="view is-active">
       <section class="intro-film" id="introFilm" aria-label="Opening film">
-        <div class="intro-film-stage" id="introFilmStage">
+        <div class="intro-film-stage has-random-motion" id="introFilmStage">
           <video
             id="introFilmVideo"
             class="intro-film-video"
+            data-disabled="true"
             data-src="/media/sasisho.mp4?v=20260610"
             data-mobile-src="/media/sasisho-mobile.mp4?v=20260610"
             poster="/assets/optimized/video/sasisho-poster.jpg"
@@ -197,6 +197,43 @@
             playsinline
             preload="metadata"
           ></video>
+          <div class="intro-motion-grid intro-motion-editorial intro-motion-horizontal" data-motion-index="0">
+            <div class="intro-motion-ghost" aria-hidden="true">01</div>
+            <div class="intro-motion-viewport" tabindex="0" role="region" aria-label="映像作品の横スクロールギャラリー">
+              <div class="intro-motion-track">
+            <button class="intro-motion-cell is-active" type="button" data-label="EVICE" data-meta="BRANDING / MUSIC VIDEO / 2024" data-work-title="エヴィス" aria-label="EVICEの作品サムネイルへ移動">
+              <video data-src="/media/intro/evice.mp4" poster="/assets/optimized/design/design4.jpg" muted loop playsinline preload="metadata"></video>
+              <span class="intro-motion-cell-index">01</span>
+            </button>
+            <button class="intro-motion-cell" type="button" data-label="KASANARU" data-meta="VISUAL FILM / SOUND / 2025" data-work-title="重なる" aria-label="重なるの作品サムネイルへ移動">
+              <video data-src="/media/intro/kasanaru.mp4" poster="/assets/optimized/design/design1.jpg" muted loop playsinline preload="none"></video>
+              <span class="intro-motion-cell-index">02</span>
+            </button>
+            <button class="intro-motion-cell" type="button" data-label="TOKYO TEXTURE" data-meta="IMAGE ARCHIVE / MOTION / 2024" data-work-title="TokyoTexture" aria-label="Tokyo Textureの作品サムネイルへ移動">
+              <video data-src="/media/intro/tokyo-texture.mp4" poster="/assets/optimized/TokyoTexture/1.jpg" muted loop playsinline preload="none"></video>
+              <span class="intro-motion-cell-index">03</span>
+            </button>
+            <button class="intro-motion-cell" type="button" data-label="REALTIME COLOR VOLUME" data-meta="INTERACTIVE INSTALLATION / 2025" data-work-title="リアルタイム色立体" aria-label="リアルタイム色立体の作品サムネイルへ移動">
+              <video data-src="/media/intro/realtime-color-volume.mp4" poster="/assets/optimized/design/design2.jpg" muted loop playsinline preload="none"></video>
+              <span class="intro-motion-cell-index">04</span>
+            </button>
+            <button class="intro-motion-cell" type="button" data-label="LIMINAL SPACE" data-meta="CG FILM / SPATIAL STUDY / 2023" data-work-title="リミナルスペース" aria-label="リミナルスペースの作品サムネイルへ移動">
+              <video data-src="/media/intro/liminal-space.mp4?v=20260620-2214" poster="/assets/optimized/design/design3.jpg" muted loop playsinline preload="none"></video>
+              <span class="intro-motion-cell-index">05</span>
+            </button>
+              </div>
+            </div>
+            <div class="intro-motion-hud" aria-live="polite">
+              <p class="intro-motion-eyebrow"><span>HORIZONTAL FILM INDEX</span><span>01 / 05</span></p>
+              <div class="intro-motion-heading">
+                <strong>EVICE</strong>
+                <span>BRANDING / MUSIC VIDEO / 2024</span>
+              </div>
+              <div class="intro-motion-progress" aria-hidden="true">
+                <i class="is-active"></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+          </div>
           <div class="intro-film-veil" aria-hidden="true"></div>
           <div class="intro-film-ui">
             <div class="intro-film-marks" aria-hidden="true">
@@ -212,8 +249,8 @@
               <span>RYOTARO</span>
               <span>VISUAL DIRECTION / MOTION</span>
             </div>
-            <button class="intro-film-scroll" id="introFilmScroll" type="button" aria-label="Scroll to main view">
-              <span>ENTER VIEW</span>
+            <button class="intro-film-scroll" id="introFilmScroll" type="button" aria-label="Scroll to DESIGN works">
+              <span>VIEW DESIGN</span>
             </button>
           </div>
         </div>
@@ -460,37 +497,8 @@
           </section>
 
           <section class="design-list">
-            <article class="design-item" data-gallery-layout="visual-film" data-youtube="QozLYKNsplY" data-theme-gallery="/assets/重なる-theme/1.jpeg|/assets/重なる-theme/2.jpg|/assets/重なる-theme/3.jpg|/assets/重なる-theme/4.jpg|/assets/重なる-theme/5.jpg|/assets/重なる-theme/6.jpg" data-long="水滴が重なって雨音になるように、ひとつの音は重なり合うことで音楽へ変わる。この作品では、滝、雨、海の流れなど、自然の音が偶然に重なって新しい響きを生む現象に注目しました。自然に生まれる音の重なりと、人が音を設計して音楽をつくる行為の近さを、映像と音で表現しています。" data-year="2025" data-role="映像" data-media="映像" data-gallery="/assets/重なる/1-1.jpg?v=hires|/assets/重なる/1-2.jpg?v=hires|/assets/重なる/1-3.jpg?v=hires|/assets/重なる/1-4.jpg?v=hires|/assets/重なる/1-5.jpg?v=hires|/assets/重なる/1-6.jpg?v=hires|/assets/重なる/1-7.jpg?v=hires|/assets/重なる/1-8.jpg?v=hires|/assets/重なる/1-9.jpg?v=hires|/assets/重なる/1-10.jpg?v=hires|/assets/重なる/1-11.jpg?v=hires|/assets/重なる/1-12.jpg?v=hires|/assets/重なる/1-13.jpg?v=hires|/assets/重なる/1-14.jpg?v=hires|/assets/重なる/1-15.jpg?v=hires">
-              <div class="design-thumb"><img src="/assets/optimized/design/design1.jpg" srcset="/assets/mobile/optimized/design/design1.jpg 1400w, /assets/optimized/design/design1.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design1.jpg?v=hires" alt="work 01" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/project-theme-2.jpg" srcset="/assets/mobile/optimized/design/project-theme-2.jpg 1400w, /assets/optimized/design/project-theme-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
-              <div class="design-info">
-                <div class="design-title">重なる</div>
-                <div class="design-meta">映像 / 2025</div>
-                <div class="design-desc">水滴、雨、滝、海の音が重なり、新しい響きになる現象をもとにした作品。自然に生まれる音の重なりと、人が音を設計して音楽をつくる行為の近さを表現しました。</div>
-              </div>
-            </article>
 
-            <article class="design-item" data-gallery-layout="visual-film" data-youtube="x-_SRk7HIa0" data-download="/media/a.mp4" data-download-name="realtime-color-volume.mp4" data-link-label="DOWNLOAD MP4" data-theme-gallery="/assets/リアルタイム色立体-theme/1.jpeg|/assets/リアルタイム色立体-theme/2.png|/assets/リアルタイム色立体-theme/3.png" data-long="私たちが普段、知覚している景色は、どういった色で構成されているのか。人が美しいと感じる瞬間に、色という一つの情報の中で何が起こっているのかを、感覚的にわかりやすいメディアと体験として提示した作品です。" data-year="2025" data-role="インスタレーション" data-media="インスタレーション" data-gallery="/assets/リアルタイム色立体/2-1.jpg?v=hires|/assets/リアルタイム色立体/2-2.jpg?v=hires|/assets/リアルタイム色立体/2-3.jpg?v=hires|/assets/リアルタイム色立体/2-4.jpg?v=hires|/assets/リアルタイム色立体/2-5.jpg?v=hires|/assets/リアルタイム色立体/2-6.jpg?v=hires|/assets/リアルタイム色立体/2-7.jpg?v=hires|/assets/リアルタイム色立体/2-8.jpg?v=hires|/assets/リアルタイム色立体/2-9.jpg?v=hires|/assets/リアルタイム色立体/2-10.jpg?v=hires|/assets/リアルタイム色立体/2-11.jpg?v=hires|/assets/リアルタイム色立体/2-12.jpg?v=hires">
-              <div class="design-thumb"><img src="/assets/optimized/design/design2.jpg" srcset="/assets/mobile/optimized/design/design2.jpg 1400w, /assets/optimized/design/design2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design2.jpg" alt="work 02" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design2-2.jpg" srcset="/assets/mobile/optimized/design/design2-2.jpg 1400w, /assets/optimized/design/design2-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
-              <div class="design-info">
-                <div class="design-title">リアルタイム色立体</div>
-                <div class="design-meta">インスタレーション / 2025</div>
-                <div class="design-desc">私たちが普段、知覚している景色は、どういった色で構成されているのか。人が美しいと感じる瞬間に、色という一つの情報の中で何が起こっているのかを、感覚的にわかりやすいメディアと体験として提示しました。</div>
-              </div>
-            </article>
-
-            <article class="design-item" data-gallery-layout="visual-film" data-youtube="_hiudGZnPTk" data-youtube-list="_hiudGZnPTk|ik1xVz-Kum4" data-theme-gallery="/assets/リミナルスペース-theme/1.jpeg|/assets/リミナルスペース-theme/2.jpg|/assets/リミナルスペース-theme/3.jpg|/assets/リミナルスペース-theme/4.jpg|/assets/リミナルスペース-theme/5.jpg|/assets/リミナルスペース-theme/6.jpg|/assets/リミナルスペース-theme/7.jpg|/assets/リミナルスペース-theme/8.jpg|/assets/リミナルスペース-theme/9.jpg|/assets/リミナルスペース-theme/10.jpeg|/assets/リミナルスペース-theme/11.jpg" data-long="自分以外誰もいない空間が魅力的なのはなぜだろう。学校、駅、家、街、階段など、いつも誰かがいるような場所にたまたま人がいない時、その場所はどこか魅力的で、不思議な空間になる。あの不思議で静かな空気感には、どこか惹かれてしまう。そういった誰もいない空間、リミナルスペースの魅力をCG空間で人工的に作り出すことで、新しい世界が開かれるのではないかという実験も含めた作品です。" data-year="2023" data-role="映像" data-media="映像" data-gallery="/assets/リミナルスペース/4-1.jpg?v=hires|/assets/リミナルスペース/4-2.jpg?v=hires|/assets/リミナルスペース/4-3.jpg?v=hires|/assets/リミナルスペース/4-4.jpg?v=hires|/assets/リミナルスペース/4-5.jpg?v=hires|/assets/リミナルスペース/4-6.jpg?v=hires|/assets/リミナルスペース/4-7.jpg?v=hires|/assets/リミナルスペース/4-8.jpg?v=hires|/assets/リミナルスペース/4-9.jpg?v=hires|/assets/リミナルスペース/4-10.jpg?v=hires">
-              <div class="design-thumb"><img src="/assets/optimized/design/design3.jpg" srcset="/assets/mobile/optimized/design/design3.jpg 1400w, /assets/optimized/design/design3.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design3.jpg?v=hires" alt="work 03" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design3-2.jpg" srcset="/assets/mobile/optimized/design/design3-2.jpg 1400w, /assets/optimized/design/design3-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
-              <div class="design-info">
-                <div class="design-title">リミナルスペース</div>
-                <div class="design-meta">映像 / 2023</div>
-                <div class="design-desc">自分以外誰もいない空間が魅力的なのはなぜだろう。学校、駅、家、街、階段など、いつも誰かがいるような場所にたまたま人がいない時、その場所はどこか魅力的で、不思議な空間になる。そういった誰もいない空間、リミナルスペースの魅力をCG空間で人工的に作り出すことで、新しい世界が開かれるのではないかという実験も含めた作品です。</div>
-              </div>
-            </article>
-
-            <article class="design-item" data-gallery-layout="visual-film" data-youtube="Zm18wg63j34" data-theme-gallery="/assets/エヴィス-theme/1.jpg|/assets/エヴィス-theme/2.jpg|/assets/エヴィス-theme/3.jpg|/assets/エヴィス-theme/4.jpg|/assets/エヴィス-theme/5.jpg|/assets/エヴィス-theme/6.jpg" data-long="Z世代の丸太メタルをコンセプトにしたメタルバンド”EVICE”のロゴ、メインビジュアル、MVを任命され制作した。" data-year="2024" data-role="ブランディング/MV" data-media="ブランディング/MV" data-gallery="/assets/エヴィス/3-1.jpg?v=hires|/assets/エヴィス/3-2.jpg?v=hires|/assets/エヴィス/3-3.jpg?v=hires|/assets/エヴィス/3-4.jpg?v=hires|/assets/エヴィス/3-5.jpg?v=hires|/assets/エヴィス/3-6.jpg?v=hires|/assets/エヴィス/3-7.jpg?v=hires|/assets/エヴィス/3-8.jpg?v=hires|/assets/エヴィス/3-9.jpg?v=hires">
+            <article class="design-item" data-thumb-video="/media/intro/evice.mp4" data-gallery-layout="visual-film" data-youtube="Zm18wg63j34" data-theme-gallery="/assets/エヴィス-theme/1.jpg|/assets/エヴィス-theme/2.jpg|/assets/エヴィス-theme/3.jpg|/assets/エヴィス-theme/4.jpg|/assets/エヴィス-theme/5.jpg|/assets/エヴィス-theme/6.jpg" data-long="Z世代の丸太メタルをコンセプトにしたメタルバンド”EVICE”のロゴ、メインビジュアル、MVを任命され制作した。" data-year="2024" data-role="ブランディング/MV" data-media="ブランディング/MV" data-gallery="/assets/エヴィス/3-1.jpg?v=hires|/assets/エヴィス/3-2.jpg?v=hires|/assets/エヴィス/3-3.jpg?v=hires|/assets/エヴィス/3-4.jpg?v=hires|/assets/エヴィス/3-5.jpg?v=hires|/assets/エヴィス/3-6.jpg?v=hires|/assets/エヴィス/3-7.jpg?v=hires|/assets/エヴィス/3-8.jpg?v=hires|/assets/エヴィス/3-9.jpg?v=hires">
               <div class="design-thumb"><img src="/assets/optimized/design/design4.jpg" srcset="/assets/mobile/optimized/design/design4.jpg 1400w, /assets/optimized/design/design4.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design4.jpg" alt="work 04" loading="lazy" decoding="async"></div>
               <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design4-2.jpg" srcset="/assets/mobile/optimized/design/design4-2.jpg 1400w, /assets/optimized/design/design4-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
@@ -500,24 +508,49 @@
               </div>
             </article>
 
-            <article class="design-item" data-gallery-layout="visual-film" data-theme-gallery="/assets/背景映像、VJ-theme/1.jpg|/assets/背景映像、VJ-theme/2.jpg|/assets/背景映像、VJ-theme/3.jpg|/assets/背景映像、VJ-theme/4.jpg|/assets/背景映像、VJ-theme/5.jpg|/assets/背景映像、VJ-theme/6.jpg|/assets/背景映像、VJ-theme/7.jpg" data-long="舞台背景や、バンドの背景映像を制作した経験は、自分自身にとって大きな影響をもたらした。自分で制作した映像が会場の大画面に投影され、何千人の人が見る舞台やライブの一部になっているあの瞬間が自分にとって、とても刺激的だった。" data-year="2024, 2025" data-role="映像" data-media="映像" data-gallery="/assets/背景映像、VJ/1.jpg?v=hires|/assets/背景映像、VJ/2.jpg?v=hires|/assets/背景映像、VJ/3.jpg?v=hires|/assets/背景映像、VJ/4.jpg?v=hires|/assets/背景映像、VJ/5.jpg?v=hires|/assets/背景映像、VJ/6.jpg?v=hires">
-              <div class="design-thumb"><img src="/assets/optimized/design/design6.jpg" srcset="/assets/mobile/optimized/design/design6.jpg 1400w, /assets/optimized/design/design6.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design6.jpg?v=hires" alt="work 06" loading="lazy" decoding="async"></div>
-              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design6-2.jpg" srcset="/assets/mobile/optimized/design/design6-2.jpg 1400w, /assets/optimized/design/design6-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
+
+            <article class="design-item" data-thumb-video="/media/intro/kasanaru.mp4" data-gallery-layout="visual-film" data-youtube="QozLYKNsplY" data-theme-gallery="/assets/重なる-theme/1.jpeg|/assets/重なる-theme/2.jpg|/assets/重なる-theme/3.jpg|/assets/重なる-theme/4.jpg|/assets/重なる-theme/5.jpg|/assets/重なる-theme/6.jpg" data-long="水滴が重なって雨音になるように、ひとつの音は重なり合うことで音楽へ変わる。この作品では、滝、雨、海の流れなど、自然の音が偶然に重なって新しい響きを生む現象に注目しました。自然に生まれる音の重なりと、人が音を設計して音楽をつくる行為の近さを、映像と音で表現しています。" data-year="2025" data-role="映像" data-media="映像" data-gallery="/assets/重なる/1-1.jpg?v=20260620-order|/assets/重なる/1-2.jpg?v=20260620-order|/assets/重なる/1-3.jpg?v=20260620-order|/assets/重なる/1-4.jpg?v=20260620-order|/assets/重なる/1-5.jpg?v=20260620-order|/assets/重なる/1-6.jpg?v=20260620-order|/assets/重なる/1-7.jpg?v=20260620-order|/assets/重なる/1-8.jpg?v=20260620-order|/assets/重なる/1-9.jpg?v=20260620-order|/assets/重なる/1-10.jpg?v=20260620-order|/assets/重なる/1-11.jpg?v=20260620-order|/assets/重なる/1-12.jpg?v=20260620-order|/assets/重なる/1-13.jpg?v=20260620-order|/assets/重なる/1-14.jpg?v=20260620-order|/assets/重なる/1-15.jpg?v=20260620-order">
+              <div class="design-thumb"><img src="/assets/optimized/design/design1.jpg" srcset="/assets/mobile/optimized/design/design1.jpg 1400w, /assets/optimized/design/design1.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design1.jpg?v=hires" alt="work 01" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/project-theme-2.jpg" srcset="/assets/mobile/optimized/design/project-theme-2.jpg 1400w, /assets/optimized/design/project-theme-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
-                <div class="design-title">背景映像、VJ</div>
-                <div class="design-meta">映像 / 2024, 2025</div>
-                <div class="design-desc">舞台背景や、バンドの背景映像を制作した経験は、自分自身にとって大きな影響をもたらした。自分で制作した映像が会場の大画面に投影され、何千人の人が見る舞台やライブの一部になっているあの瞬間が自分にとって、とても刺激的だった。</div>
+                <div class="design-title">重なる</div>
+                <div class="design-meta">映像 / 2025</div>
+                <div class="design-desc">水滴、雨、滝、海の音が重なり、新しい響きになる現象をもとにした作品。自然に生まれる音の重なりと、人が音を設計して音楽をつくる行為の近さを表現しました。</div>
               </div>
             </article>
 
-            <article class="design-item" hidden aria-hidden="true" data-long="空間に設置された半透過スクリーン群に映像を投影する展示インスタレーション。複数のプロジェクションが重なるレイヤー設計により、観客が歩みながら映像の遠近感を感じる体験を構築しました。現地測量からコンテンツ設計まで一貫して担当しています。" data-year="2022" data-role="Installation" data-media="Projection Mapping" data-gallery="/assets/optimized/design/design7.jpg?v=hires">
-              <div class="design-thumb"><img src="/assets/optimized/design/design7.jpg" srcset="/assets/mobile/optimized/design/design7.jpg 1400w, /assets/optimized/design/design7.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design7.jpg?v=hires" alt="work 07" loading="lazy" decoding="async"></div>
+            <article class="design-item" data-thumb-video="/media/intro/tokyo-texture.mp4" data-gallery-layout="visual-film" data-youtube="qRAFrcXN9Vo" data-youtube-list="qRAFrcXN9Vo|ExEPxHsvwTc|uXk5V1K1sMg" data-theme-gallery="/assets/optimized/TokyoTexture-theme/1.jpg|/assets/optimized/TokyoTexture-theme/2.jpg|/assets/optimized/TokyoTexture-theme/3.jpg" data-long="東京の魅力をテーマに、自分で撮った東京の画像1.2万枚を使って、新しい質感や動きを映像として再構築する作品です。" data-year="2024" data-role="映像" data-media="CG / 映像" data-gallery="/assets/optimized/TokyoTexture/1.jpg|/assets/optimized/TokyoTexture/2.jpg|/assets/optimized/TokyoTexture/3.jpg">
+              <div class="design-thumb"><img src="/assets/optimized/TokyoTexture/1.jpg" srcset="/assets/mobile/optimized/TokyoTexture/1.jpg 1400w, /assets/optimized/TokyoTexture/1.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/TokyoTexture/1.jpg" alt="work 05" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/TokyoTexture/2.jpg" srcset="/assets/mobile/optimized/TokyoTexture/2.jpg 1400w, /assets/optimized/TokyoTexture/2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
               <div class="design-info">
-                <div class="design-title">INSTALLATION</div>
-                <div class="design-meta">SPACE / 2022</div>
-                <div class="design-desc">半透過スクリーンへの多重投影で奥行きを作り、観客の歩行とともに遠近感が変容する展示空間を構築。現地測量からコンテンツ設計までを一貫して担当しました。</div>
+                <div class="design-title">TokyoTexture</div>
+                <div class="design-meta">CG / 映像 / 2024</div>
+                <div class="design-desc">東京の魅力をテーマに、自分で撮った東京の画像1.2万枚を使って、新しい質感や動きを映像として再構築する作品です。</div>
               </div>
             </article>
+
+
+            <article class="design-item" data-thumb-video="/media/intro/realtime-color-volume.mp4" data-gallery-layout="visual-film" data-youtube="x-_SRk7HIa0" data-download="/media/a.mp4" data-download-name="realtime-color-volume.mp4" data-link-label="DOWNLOAD MP4" data-theme-gallery="/assets/リアルタイム色立体-theme/1.jpeg|/assets/リアルタイム色立体-theme/2.png|/assets/リアルタイム色立体-theme/3.png" data-long="私たちが普段、知覚している景色は、どういった色で構成されているのか。人が美しいと感じる瞬間に、色という一つの情報の中で何が起こっているのかを、感覚的にわかりやすいメディアと体験として提示した作品です。" data-year="2025" data-role="インスタレーション" data-media="インスタレーション" data-gallery="/assets/リアルタイム色立体/2-1.jpg?v=hires|/assets/リアルタイム色立体/2-2.jpg?v=hires|/assets/リアルタイム色立体/2-3.jpg?v=hires|/assets/リアルタイム色立体/2-4.jpg?v=hires|/assets/リアルタイム色立体/2-5.jpg?v=hires|/assets/リアルタイム色立体/2-6.jpg?v=hires|/assets/リアルタイム色立体/2-7.jpg?v=hires|/assets/リアルタイム色立体/2-8.jpg?v=hires|/assets/リアルタイム色立体/2-9.jpg?v=hires|/assets/リアルタイム色立体/2-10.jpg?v=hires|/assets/リアルタイム色立体/2-11.jpg?v=hires|/assets/リアルタイム色立体/2-12.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design2.jpg" srcset="/assets/mobile/optimized/design/design2.jpg 1400w, /assets/optimized/design/design2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design2.jpg" alt="work 02" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design2-2.jpg" srcset="/assets/mobile/optimized/design/design2-2.jpg 1400w, /assets/optimized/design/design2-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
+              <div class="design-info">
+                <div class="design-title">リアルタイム色立体</div>
+                <div class="design-meta">インスタレーション / 2025</div>
+                <div class="design-desc">私たちが普段、知覚している景色は、どういった色で構成されているのか。人が美しいと感じる瞬間に、色という一つの情報の中で何が起こっているのかを、感覚的にわかりやすいメディアと体験として提示しました。</div>
+              </div>
+            </article>
+
+
+            <article class="design-item" data-thumb-video="/media/intro/liminal-space.mp4" data-gallery-layout="visual-film" data-youtube="_hiudGZnPTk" data-youtube-list="_hiudGZnPTk|ik1xVz-Kum4" data-theme-gallery="/assets/リミナルスペース-theme/1.jpeg|/assets/リミナルスペース-theme/2.jpg|/assets/リミナルスペース-theme/3.jpg|/assets/リミナルスペース-theme/4.jpg|/assets/リミナルスペース-theme/5.jpg|/assets/リミナルスペース-theme/6.jpg|/assets/リミナルスペース-theme/7.jpg|/assets/リミナルスペース-theme/8.jpg|/assets/リミナルスペース-theme/9.jpg|/assets/リミナルスペース-theme/10.jpeg|/assets/リミナルスペース-theme/11.jpg" data-long="自分以外誰もいない空間が魅力的なのはなぜだろう。学校、駅、家、街、階段など、いつも誰かがいるような場所にたまたま人がいない時、その場所はどこか魅力的で、不思議な空間になる。あの不思議で静かな空気感には、どこか惹かれてしまう。そういった誰もいない空間、リミナルスペースの魅力をCG空間で人工的に作り出すことで、新しい世界が開かれるのではないかという実験も含めた作品です。" data-year="2023" data-role="映像" data-media="映像" data-gallery="/assets/リミナルスペース/4-1.jpg?v=hires|/assets/リミナルスペース/4-2.jpg?v=hires|/assets/リミナルスペース/4-3.jpg?v=hires|/assets/リミナルスペース/4-4.jpg?v=hires|/assets/リミナルスペース/4-5.jpg?v=hires|/assets/リミナルスペース/4-6.jpg?v=hires|/assets/リミナルスペース/4-7.jpg?v=hires|/assets/リミナルスペース/4-8.jpg?v=hires|/assets/リミナルスペース/4-9.jpg?v=hires|/assets/リミナルスペース/4-10.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design3.jpg" srcset="/assets/mobile/optimized/design/design3.jpg 1400w, /assets/optimized/design/design3.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design3.jpg?v=hires" alt="work 03" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design3-2.jpg" srcset="/assets/mobile/optimized/design/design3-2.jpg 1400w, /assets/optimized/design/design3-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
+              <div class="design-info">
+                <div class="design-title">リミナルスペース</div>
+                <div class="design-meta">映像 / 2023</div>
+                <div class="design-desc">自分以外誰もいない空間が魅力的なのはなぜだろう。学校、駅、家、街、階段など、いつも誰かがいるような場所にたまたま人がいない時、その場所はどこか魅力的で、不思議な空間になる。そういった誰もいない空間、リミナルスペースの魅力をCG空間で人工的に作り出すことで、新しい世界が開かれるのではないかという実験も含めた作品です。</div>
+              </div>
+            </article>
+
 
             <article class="design-item" data-hover-src="/assets/optimized/design/design9-2.jpg" data-gallery-layout="visual-film" data-youtube="dtQ8YR8yCmA" data-theme-gallery="/assets/視点の可視化-theme/desgin9.jpeg|/assets/視点の可視化-theme/design9-2.jpg|/assets/視点の可視化-theme/スクリーンショット 2026-05-20 13.46.50.png|/assets/視点の可視化-theme/スクリーンショット 2026-05-23 14.33.51.png" data-long="視線から体験をデザインする。動画やwebサイトなどの動くメディアで、見る人がどこを見ているのかを分析、可視化することで表現の届き方を解析するツールを作った。感覚的で言語化しにくい、動くメディアの新しい分析方法として提示した。" data-year="2026" data-role="インスタレーション" data-media="インスタレーション" data-gallery="/assets/視点の可視化/1.jpg|/assets/視点の可視化/2.jpg|/assets/視点の可視化/3.jpg|/assets/視点の可視化/4.jpg|/assets/視点の可視化/5.jpg|/assets/視点の可視化/6.jpg|/assets/視点の可視化/7.jpg">
               <div class="design-thumb"><img src="/assets/optimized/design/desgin9.jpg" srcset="/assets/mobile/optimized/design/desgin9.jpg 1400w, /assets/optimized/design/desgin9.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/desgin9.jpg" data-hover-src="/assets/optimized/design/design9-2.jpg" alt="work 09" loading="lazy" decoding="async"></div>
@@ -529,6 +562,26 @@
               </div>
             </article>
 
+
+            <article class="design-item" data-gallery-layout="visual-film" data-theme-gallery="/assets/背景映像、VJ-theme/1.jpg|/assets/背景映像、VJ-theme/2.jpg|/assets/背景映像、VJ-theme/3.jpg|/assets/背景映像、VJ-theme/4.jpg|/assets/背景映像、VJ-theme/5.jpg|/assets/背景映像、VJ-theme/6.jpg|/assets/背景映像、VJ-theme/7.jpg" data-long="舞台背景や、バンドの背景映像を制作した経験は、自分自身にとって大きな影響をもたらした。自分で制作した映像が会場の大画面に投影され、何千人の人が見る舞台やライブの一部になっているあの瞬間が自分にとって、とても刺激的だった。" data-year="2024, 2025" data-role="映像" data-media="映像" data-gallery="/assets/背景映像、VJ/1.jpg?v=hires|/assets/背景映像、VJ/2.jpg?v=hires|/assets/背景映像、VJ/3.jpg?v=hires|/assets/背景映像、VJ/4.jpg?v=hires|/assets/背景映像、VJ/5.jpg?v=hires|/assets/背景映像、VJ/6.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design6.jpg" srcset="/assets/mobile/optimized/design/design6.jpg 1400w, /assets/optimized/design/design6.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design6.jpg?v=hires" alt="work 06" loading="lazy" decoding="async"></div>
+              <div class="design-companion" aria-hidden="true"><img src="/assets/optimized/design/design6-2.jpg" srcset="/assets/mobile/optimized/design/design6-2.jpg 1400w, /assets/optimized/design/design6-2.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" alt="" loading="lazy" decoding="async"></div>
+              <div class="design-info">
+                <div class="design-title">背景映像、VJ</div>
+                <div class="design-meta">映像 / 2024, 2025</div>
+                <div class="design-desc">舞台背景や、バンドの背景映像を制作した経験は、自分自身にとって大きな影響をもたらした。自分で制作した映像が会場の大画面に投影され、何千人の人が見る舞台やライブの一部になっているあの瞬間が自分にとって、とても刺激的だった。</div>
+              </div>
+            </article>
+
+
+            <article class="design-item" data-long="空間に設置された半透過スクリーン群に映像を投影する展示インスタレーション。複数のプロジェクションが重なるレイヤー設計により、観客が歩みながら映像の遠近感を感じる体験を構築しました。現地測量からコンテンツ設計まで一貫して担当しています。" data-year="2022" data-role="Installation" data-media="Projection Mapping" data-gallery="/assets/optimized/design/design7.jpg?v=hires">
+              <div class="design-thumb"><img src="/assets/optimized/design/design7.jpg" srcset="/assets/mobile/optimized/design/design7.jpg 1400w, /assets/optimized/design/design7.jpg 2400w" sizes="(max-width: 720px) 92vw, 50vw" data-full-src="/assets/optimized/design/design7.jpg?v=hires" alt="work 07" loading="lazy" decoding="async"></div>
+              <div class="design-info">
+                <div class="design-title">INSTALLATION</div>
+                <div class="design-meta">SPACE / 2022</div>
+                <div class="design-desc">半透過スクリーンへの多重投影で奥行きを作り、観客の歩行とともに遠近感が変容する展示空間を構築。現地測量からコンテンツ設計までを一貫して担当しました。</div>
+              </div>
+            </article>
           </section>
         </div>
       </section>
@@ -544,8 +597,8 @@
           </section>
 
           <div class="photo-filter" role="tablist" aria-label="Photo categories">
-            <button class="photo-filter-btn is-active" type="button" role="tab" aria-selected="true" aria-controls="photoIndex" data-photo-category-button="product">PRODUCT</button>
-            <button class="photo-filter-btn" type="button" role="tab" aria-selected="false" aria-controls="photoIndex" data-photo-category-button="outside">OUTDOOR</button>
+            <button class="photo-filter-btn" type="button" role="tab" aria-selected="false" aria-controls="photoIndex" data-photo-category-button="product">PRODUCT</button>
+            <button class="photo-filter-btn is-active" type="button" role="tab" aria-selected="true" aria-controls="photoIndex" data-photo-category-button="outside">OUTDOOR</button>
           </div>
 
           <section class="photo-index" id="photoIndex" aria-label="Photo works" aria-live="polite"></section>
@@ -656,10 +709,11 @@
     <div class="cursor-dot"></div>
     <div class="cursor-ring"></div>
   </div>
+
+
+
+
   <script type="module" src="./src/main.js?v=click-fix-2026-05-27"></script>
-
-
-
 
 <!-- ═══════════════════════════════════════════════════════
      SIDEBAR: SHARP / MECHANICAL REDESIGN

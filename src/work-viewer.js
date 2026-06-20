@@ -103,6 +103,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       "リアルタイム色立体": "realtime-color-volume",
       "リミナルスペース": "liminal-space",
       "エヴィス": "evice",
+      "TokyoTexture": "tokyo-texture",
       "背景映像、VJ": "background-vj",
       "視点の可視化": "visualizing-viewpoints",
       "メカ軍団": "mecha",
@@ -1070,14 +1071,14 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
 
     var vw = window.innerWidth || 1440;
     var vh = window.innerHeight || 900;
-    var targetW = Math.min(vw * 0.36, 620);
-    var targetH = Math.min(vh * 0.48, 430);
+    var targetW = Math.min(vw * 0.58, 960);
+    var targetH = Math.min(vh * 0.68, 650);
     if(vw < 760){
-      targetW = Math.min(vw - 36, 560);
-      targetH = Math.min(vh * 0.42, 420);
+      targetW = Math.min(vw - 24, 620);
+      targetH = Math.min(vh * 0.56, 520);
     }
-    var targetLeft = vw < 760 ? 18 : Math.max(vw * 0.56, vw - targetW - 68);
-    var targetTop = vw < 760 ? Math.max(116, vh * 0.2) : Math.max(112, vh * 0.2);
+    var targetLeft = vw < 760 ? 12 : Math.max(vw * 0.36, vw - targetW - 42);
+    var targetTop = vw < 760 ? Math.max(92, (vh - targetH) * 0.5) : Math.max(72, (vh - targetH) * 0.5);
 
     if(media){
       media.style.left = Math.round(sourceRect.left) + "px";
