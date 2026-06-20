@@ -16,18 +16,117 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
     product: {
       label: "PRODUCT",
       key: "product",
-      count: 96,
+      files: [
+        "01.jpg",
+        "product-002.jpg",
+        "product-003.jpg",
+        "product-004.jpg",
+        "product-005.jpg",
+        "product-016.jpg",
+        "product-017.jpg",
+        "product-019.jpg",
+        "product-024.jpg",
+        "product-025.jpg",
+        "product-026.jpg",
+        "product-029.jpg",
+        "product-030.jpg",
+        "product-031.jpg",
+        "product-034.jpg",
+        "product-036.jpg",
+        "product-038.jpg",
+        "product-039.jpg",
+        "product-041.jpg",
+        "product-042.jpg",
+        "product-043.jpg",
+        "product-044.jpg",
+        "product-045.jpg",
+        "product-046.jpg",
+        "product-047.jpg",
+        "product-048.jpg",
+        "product-049.jpg",
+        "product-050.jpg",
+        "product-051.jpg",
+        "product-052.jpg",
+        "product-053.jpg",
+        "product-054.jpg",
+        "product-055.jpg",
+        "product-056.jpg",
+        "product-057.jpg",
+        "product-058.jpg",
+        "product-059.jpg",
+        "product-060.jpg",
+        "product-061.jpg",
+        "product-062.jpg",
+        "product-063.jpg",
+        "product-065.jpg",
+        "product-067.jpg",
+        "product-069.jpg",
+        "product-073.jpg",
+        "product-074.jpg",
+        "product-076.jpg",
+        "product-077.jpg",
+        "product-078.jpg",
+        "product-081.jpg",
+        "product-082.jpg",
+        "product-083.jpg",
+        "product-084.jpg",
+        "product-085.jpg",
+        "product-086.jpg",
+        "product-087.jpg"
+      ],
       alt: "Product photo"
     },
     outside: {
       label: "OUTDOOR",
       key: "outside",
-      count: 51,
+      files: [
+        "outside-011.jpg",
+        "outside-012.jpg",
+        "outside-013.jpg",
+        "outside-014.jpg",
+        "outside-015.jpg",
+        "outside-016.jpg",
+        "outside-017.jpg",
+        "outside-018.jpg",
+        "outside-020.jpg",
+        "outside-021.jpg",
+        "outside-022.jpg",
+        "outside-023.jpg",
+        "outside-024.jpg",
+        "outside-025.jpg",
+        "outside-026.jpg",
+        "outside-027.jpg",
+        "outside-028.jpg",
+        "outside-029.jpg",
+        "outside-030.jpg",
+        "outside-032.jpg",
+        "outside-034.jpg",
+        "outside-035.jpg",
+        "outside-036.jpg",
+        "outside-037.jpg",
+        "outside-038.jpg",
+        "outside-039.jpg",
+        "outside-040.jpg",
+        "outside-041.jpg",
+        "outside-042.jpg",
+        "outside-043.jpg",
+        "outside-045.jpg",
+        "outside-047.jpg",
+        "outside-048.jpg",
+        "outside-049.jpg",
+        "outside-050.jpg",
+        "outside-051.jpg",
+        "outside-052.jpg",
+        "outside-053.jpg",
+        "outside-054.jpg",
+        "outside-055.jpg",
+        "outside-056.jpg"
+      ],
       alt: "Outdoor photo"
     }
   };
 
-  var activeKey = "product";
+  var activeKey = "outside";
   var renderedKey = "";
   var switchingTimer = 0;
 
@@ -35,10 +134,8 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
     return String(number).padStart(3, "0");
   }
 
-  function buildPhoto(category, number){
-    var file = category.key + "-" + pad(number) + ".jpg";
+  function buildPhoto(category, file, number){
     var desktop = "/assets/newphoto/" + category.key + "/" + file;
-    var mobile = "/assets/mobile/newphoto/" + category.key + "/" + file;
 
     var figure = document.createElement("figure");
     figure.className = "photo-item";
@@ -49,7 +146,6 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
 
     var img = document.createElement("img");
     img.src = desktop;
-    img.srcset = mobile + " 1000w, " + desktop + " 1800w";
     img.sizes = "(max-width: 720px) 92vw, (max-width: 980px) 46vw, 31vw";
     img.alt = category.alt + " " + pad(number);
     img.loading = "lazy";
@@ -78,9 +174,9 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
       return column;
     });
 
-    for(var i = 1; i <= category.count; i++){
-      columns[(i - 1) % columns.length].appendChild(buildPhoto(category, i));
-    }
+    category.files.forEach(function(file, index){
+      columns[index % columns.length].appendChild(buildPhoto(category, file, index + 1));
+    });
 
     index.replaceChildren.apply(index, columns);
     renderedKey = key;
