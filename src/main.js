@@ -5956,8 +5956,14 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var video = ensureVideo(card);
     if(!video || video.getAttribute("src")) return video;
     var thumbVideoSrc = card.dataset.thumbVideo;
+    var thumbVideoVersion = "";
     if(thumbVideoSrc.indexOf("/media/intro/liminal-space.mp4") === 0){
-      thumbVideoSrc += (thumbVideoSrc.indexOf("?") === -1 ? "?" : "&") + "v=20260620-2214";
+      thumbVideoVersion = "20260620-2309";
+    }else if(thumbVideoSrc.indexOf("/media/intro/realtime-color-volume.mp4") === 0){
+      thumbVideoVersion = "20260620-2320";
+    }
+    if(thumbVideoVersion){
+      thumbVideoSrc += (thumbVideoSrc.indexOf("?") === -1 ? "?" : "&") + "v=" + thumbVideoVersion;
     }
     video.src = thumbVideoSrc;
     video.load();
