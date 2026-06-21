@@ -26341,6 +26341,51 @@ body.theme-view-design #view-design.merged-design-section .design-item:not([data
     touch-action:pan-x !important;
   }
 
+  .intro-film:has(.intro-motion-horizontal.is-mobile-random-motion){
+    height:112svh !important;
+  }
+
+  .intro-motion-horizontal.is-mobile-random-motion .intro-motion-viewport{
+    overflow:hidden !important;
+    touch-action:pan-y !important;
+  }
+
+  .intro-motion-horizontal.is-mobile-random-motion .intro-motion-track{
+    display:flex !important;
+    align-items:stretch !important;
+    justify-content:center !important;
+    width:100% !important;
+    min-width:100% !important;
+    gap:0 !important;
+    padding:64px 8vw 160px !important;
+  }
+
+  .intro-motion-horizontal.is-mobile-random-motion .intro-motion-track::before{
+    content:"RANDOM FILM / TAP TO VIEW WORK" !important;
+  }
+
+  .intro-motion-horizontal.is-mobile-random-motion .intro-motion-track::after{
+    display:none !important;
+  }
+
+  .intro-motion-grid.intro-motion-horizontal.is-mobile-random-motion .intro-motion-track .intro-motion-cell{
+    flex:0 0 84vw !important;
+    width:84vw !important;
+    opacity:1 !important;
+    transform:none !important;
+    pointer-events:auto !important;
+  }
+
+  .intro-motion-grid.intro-motion-horizontal.is-mobile-random-motion .intro-motion-track .intro-motion-cell.is-mobile-random-hidden{
+    display:none !important;
+  }
+
+  .intro-motion-grid.intro-motion-horizontal.is-mobile-random-motion .intro-motion-cell video,
+  .intro-motion-grid.intro-motion-horizontal.is-mobile-random-motion .intro-motion-cell.is-active video{
+    transform:scale(1.02) !important;
+    filter:saturate(1.02) contrast(1.08) brightness(.96) !important;
+  }
+
   .intro-motion-horizontal .intro-motion-hud{
     right:18px !important;
     bottom:18px !important;

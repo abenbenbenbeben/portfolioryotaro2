@@ -5907,6 +5907,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   var SELECTOR = "#view-design .design-item[data-thumb-video]";
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var saveData = !!(navigator.connection && navigator.connection.saveData);
+  var isMobileOpening = window.matchMedia && window.matchMedia("(max-width: 720px)").matches;
   var observed = new WeakSet();
   var observer = null;
 
@@ -6296,6 +6297,52 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     root.style.setProperty("--motion-y", ((y - 0.5) * 2).toFixed(3));
   }
 
+  function bindVisibilityPlayback(){
+    if("IntersectionObserver" in window){
+      var visibilityObserver = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting && entry.intersectionRatio > 0.08) playActive();
+          else pauseAll();
+        });
+      }, { threshold:[0, 0.08, 0.5] });
+      visibilityObserver.observe(root);
+    }
+
+    document.addEventListener("visibilitychange", function(){
+      if(document.hidden) pauseAll();
+      else playActive();
+    });
+    window.addEventListener("pageshow", function(){
+      playActive();
+      if(!root.classList.contains("is-mobile-random-motion")) requestHorizontalSync();
+    });
+  }
+
+  function initMobileRandomMotion(){
+    var index = Math.floor(Math.random() * cells.length);
+    root.classList.add("is-mobile-random-motion");
+    root.dataset.motionMode = "random-mobile";
+    activeIndex = index;
+    cells.forEach(function(cell, cellIndex){
+      var isActive = cellIndex === index;
+      cell.classList.toggle("is-active", isActive);
+      cell.classList.toggle("is-mobile-random-pick", isActive);
+      cell.classList.toggle("is-mobile-random-hidden", !isActive);
+      cell.classList.remove("is-prev", "is-next", "is-far", "is-peeking");
+      cell.setAttribute("aria-pressed", isActive ? "true" : "false");
+      cell.setAttribute("aria-hidden", isActive ? "false" : "true");
+      if(isActive){
+        cell.addEventListener("click", function(event){
+          if(scrollToWorkThumbnail(cell)) return;
+          event.preventDefault();
+        });
+      }
+    });
+    updateHud(index);
+    playActive();
+    bindVisibilityPlayback();
+  }
+
   function initOpeningMotion(){
     root = document.querySelector(".intro-motion-grid.intro-motion-horizontal");
     if(!root) return;
@@ -6319,6 +6366,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
           });
         }
       }
+      if(isMobileOpening) return;
       cell.addEventListener("click", function(event){
         if(suppressClick){
           event.preventDefault();
@@ -6328,6 +6376,11 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
         navigateToIndex(index, "smooth");
       });
     });
+
+    if(isMobileOpening){
+      initMobileRandomMotion();
+      return;
+    }
 
     viewport.addEventListener("scroll", function(){
       requestHorizontalSync();
@@ -6410,24 +6463,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     window.addEventListener("scroll", requestPageSync, { passive:true });
     window.addEventListener("resize", requestPageSync, { passive:true });
 
-    if("IntersectionObserver" in window){
-      var visibilityObserver = new IntersectionObserver(function(entries){
-        entries.forEach(function(entry){
-          if(entry.isIntersecting && entry.intersectionRatio > 0.08) playActive();
-          else pauseAll();
-        });
-      }, { threshold:[0, 0.08, 0.5] });
-      visibilityObserver.observe(root);
-    }
-
-    document.addEventListener("visibilitychange", function(){
-      if(document.hidden) pauseAll();
-      else playActive();
-    });
-    window.addEventListener("pageshow", function(){
-      playActive();
-      requestHorizontalSync();
-    });
+    bindVisibilityPlayback();
 
     setActive(0);
     requestAnimationFrame(function(){
