@@ -25765,6 +25765,128 @@ body.page-revealed #view-profile .intro-motion-grid.intro-motion-editorial{
   }
 }
 
+/* TokyoTexture: one primary film with two supporting motion studies. */
+.intro-motion-video-collage{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  display:grid !important;
+  grid-template-columns:minmax(0, 1.62fr) minmax(0, 1fr) !important;
+  grid-template-rows:repeat(2, minmax(0, 1fr)) !important;
+  gap:3px !important;
+  overflow:hidden !important;
+  background:#050505 !important;
+  pointer-events:none !important;
+}
+
+.intro-motion-grid.intro-motion-horizontal .intro-motion-cell.has-video-collage .intro-motion-video-collage video{
+  position:relative !important;
+  inset:auto !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  object-fit:cover !important;
+  transform:scale(1.02) !important;
+}
+
+.intro-motion-video-collage video.is-primary{
+  grid-row:1 / -1 !important;
+}
+
+.intro-motion-video-collage video:not(.is-primary){
+  border-left:1px solid rgba(255,255,255,.2) !important;
+}
+
+.intro-motion-video-collage video:last-child{
+  border-top:1px solid rgba(255,255,255,.2) !important;
+}
+
+.intro-motion-cell-action{
+  position:absolute !important;
+  right:18px !important;
+  bottom:18px !important;
+  z-index:8 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  min-height:36px !important;
+  padding:0 14px !important;
+  border:1px solid rgba(247,241,229,.38) !important;
+  border-radius:999px !important;
+  background:rgba(5,5,5,.62) !important;
+  color:#f7f1e5 !important;
+  font:600 8px/1 "JetBrains Mono", ui-monospace, monospace !important;
+  letter-spacing:.16em !important;
+  text-transform:uppercase !important;
+  backdrop-filter:blur(10px) !important;
+  pointer-events:none !important;
+  transition:background 220ms ease, border-color 220ms ease, transform 220ms ease !important;
+}
+
+.intro-motion-cell-action::after{
+  content:"↘" !important;
+  margin-left:10px !important;
+  color:#d7ba73 !important;
+  font-size:12px !important;
+}
+
+.intro-motion-cell:hover .intro-motion-cell-action,
+.intro-motion-cell:focus-visible .intro-motion-cell-action{
+  border-color:rgba(215,186,115,.82) !important;
+  background:rgba(12,10,7,.84) !important;
+  transform:translate3d(0,-2px,0) !important;
+}
+
+@media(max-width:720px){
+  .intro-film:has(.intro-motion-horizontal){
+    height:225svh !important;
+  }
+
+  .intro-motion-horizontal .intro-motion-viewport{
+    touch-action:pan-x !important;
+  }
+
+  .intro-motion-video-collage{
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows:minmax(0, 1.55fr) minmax(0, .8fr) !important;
+    gap:2px !important;
+  }
+
+  .intro-motion-video-collage video.is-primary{
+    grid-column:1 / -1 !important;
+    grid-row:1 !important;
+  }
+
+  .intro-motion-video-collage video:not(.is-primary){
+    grid-row:2 !important;
+    border-top:1px solid rgba(255,255,255,.2) !important;
+    border-left:0 !important;
+  }
+
+  .intro-motion-video-collage video:last-child{
+    border-left:1px solid rgba(255,255,255,.2) !important;
+  }
+
+  .intro-motion-cell-action{
+    right:12px !important;
+    bottom:12px !important;
+    min-height:42px !important;
+    padding:0 14px !important;
+    font-size:8px !important;
+    letter-spacing:.12em !important;
+    background:rgba(5,5,5,.78) !important;
+  }
+
+  .intro-motion-horizontal .intro-motion-track::before{
+    content:"SWIPE / TAP A FILM TO VIEW WORK  →" !important;
+  }
+
+  .intro-motion-horizontal .intro-motion-hud{
+    right:18px !important;
+    bottom:18px !important;
+  }
+}
+
 /* Keep PHOTO / ART hero spacing as compact as the DESIGN heading. */
 #view-photo .photo-hero,
 #view-illustration .illus-hero{
@@ -26204,5 +26326,21 @@ body.theme-view-design #view-design.merged-design-section .design-item:not([data
   .intro-motion-grid.intro-motion-horizontal .intro-motion-cell,
   .intro-motion-grid.intro-motion-horizontal .intro-motion-cell video{
     transition:none !important;
+  }
+}
+
+/* Final mobile interaction lock: declared after the horizontal reel rules. */
+@media(max-width:720px){
+  .intro-film:has(.intro-motion-horizontal){
+    height:225svh !important;
+  }
+
+  .intro-motion-horizontal .intro-motion-viewport{
+    touch-action:pan-x !important;
+  }
+
+  .intro-motion-horizontal .intro-motion-hud{
+    right:18px !important;
+    bottom:18px !important;
   }
 }

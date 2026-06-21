@@ -6074,15 +6074,25 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     if(pending && typeof pending.catch === "function") pending.catch(function(){});
   }
 
-  function playAll(){
-    cells.forEach(function(cell){ playVideo(cell.querySelector("video")); });
+  function playCellVideos(cell){
+    if(!cell) return;
+    cell.querySelectorAll("video").forEach(playVideo);
+  }
+
+  function pauseCellVideos(cell){
+    if(!cell) return;
+    cell.querySelectorAll("video").forEach(function(video){ video.pause(); });
+  }
+
+  function playActive(){
+    cells.forEach(function(cell, index){
+      if(index === activeIndex) playCellVideos(cell);
+      else pauseCellVideos(cell);
+    });
   }
 
   function pauseAll(){
-    cells.forEach(function(cell){
-      var video = cell.querySelector("video");
-      if(video) video.pause();
-    });
+    cells.forEach(pauseCellVideos);
   }
 
   function updateHud(index){
@@ -6117,6 +6127,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
       cell.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
     updateHud(index);
+    playActive();
   }
 
   function closestIndex(){
@@ -6245,9 +6256,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     if(!viewport || !track || !cells.length) return;
 
     cells.forEach(function(cell, index){
-      var video = cell.querySelector("video");
-      configureVideo(video);
-      playVideo(video);
+      cell.querySelectorAll("video").forEach(configureVideo);
       cell.addEventListener("click", function(event){
         if(suppressClick){
           event.preventDefault();
@@ -6342,7 +6351,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     if("IntersectionObserver" in window){
       var visibilityObserver = new IntersectionObserver(function(entries){
         entries.forEach(function(entry){
-          if(entry.isIntersecting && entry.intersectionRatio > 0.08) playAll();
+          if(entry.isIntersecting && entry.intersectionRatio > 0.08) playActive();
           else pauseAll();
         });
       }, { threshold:[0, 0.08, 0.5] });
@@ -6351,10 +6360,10 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
 
     document.addEventListener("visibilitychange", function(){
       if(document.hidden) pauseAll();
-      else playAll();
+      else playActive();
     });
     window.addEventListener("pageshow", function(){
-      playAll();
+      playActive();
       requestHorizontalSync();
     });
 
