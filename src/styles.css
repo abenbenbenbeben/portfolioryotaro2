@@ -28129,3 +28129,312 @@ body.theme-view-design #view-design.merged-design-section .design-item:not([data
     letter-spacing:.055em !important;
   }
 }
+
+/* MOBILE NAV EDITORIAL PASS: SDB / TWOÉ inspired, quiet and typographic. */
+@media(max-width:900px){
+  :root{
+    --topbar-h:118px !important;
+  }
+
+  body.is-intro-mode.page-revealed.theme-view-design .sidebar,
+  body.is-intro-mode.page-revealed.theme-view-photo .sidebar,
+  body.is-intro-mode.page-revealed.theme-view-illustration .sidebar,
+  body.page-revealed.theme-view-design .sidebar,
+  body.page-revealed.theme-view-photo .sidebar,
+  body.page-revealed.theme-view-illustration .sidebar,
+  body.page-revealed .sidebar,
+  body .sidebar{
+    inset:16px 18px auto 18px !important;
+    height:88px !important;
+    min-height:88px !important;
+    max-width:calc(100vw - 36px) !important;
+    padding:14px 14px 12px !important;
+    border:1px solid rgba(255,255,255,.13) !important;
+    border-radius:4px 24px 4px 24px !important;
+    background:
+      linear-gradient(90deg, rgba(242,236,222,.94) 0 34%, transparent 34%),
+      radial-gradient(120px 80px at 100% 0%, rgba(255,255,255,.11), transparent 72%),
+      linear-gradient(135deg, rgba(5,5,5,.96), rgba(10,10,11,.88) 58%, rgba(0,0,0,.94)) !important;
+    box-shadow:
+      0 20px 46px rgba(0,0,0,.50),
+      inset 0 1px 0 rgba(255,255,255,.10) !important;
+    backdrop-filter:blur(18px) saturate(150%) !important;
+    -webkit-backdrop-filter:blur(18px) saturate(150%) !important;
+    overflow:hidden !important;
+  }
+
+  body .sidebar::before,
+  body.page-revealed .sidebar::before,
+  body.theme-view-design .sidebar::before,
+  body.theme-view-photo .sidebar::before,
+  body.theme-view-illustration .sidebar::before{
+    content:"Ryotaro" !important;
+    position:absolute !important;
+    top:13px !important;
+    left:20px !important;
+    width:auto !important;
+    height:auto !important;
+    display:block !important;
+    color:#080808 !important;
+    font-family:"Times New Roman", "Shippori Mincho", serif !important;
+    font-size:23px !important;
+    font-weight:700 !important;
+    font-style:italic !important;
+    line-height:.9 !important;
+    letter-spacing:-.065em !important;
+    text-transform:none !important;
+    background:none !important;
+    border:0 !important;
+    transform:none !important;
+    opacity:1 !important;
+    pointer-events:none !important;
+    z-index:2 !important;
+  }
+
+  body .sidebar::after,
+  body.page-revealed .sidebar::after,
+  body.theme-view-design .sidebar::after,
+  body.theme-view-photo .sidebar::after,
+  body.theme-view-illustration .sidebar::after{
+    content:"PORTFOLIO / 2026" !important;
+    position:absolute !important;
+    top:18px !important;
+    right:18px !important;
+    left:auto !important;
+    width:auto !important;
+    height:auto !important;
+    display:block !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:none !important;
+    box-shadow:none !important;
+    color:rgba(242,236,222,.62) !important;
+    font:700 7px/1 "JetBrains Mono", ui-monospace, monospace !important;
+    letter-spacing:.18em !important;
+    text-align:right !important;
+    white-space:nowrap !important;
+    opacity:1 !important;
+    pointer-events:none !important;
+    z-index:2 !important;
+  }
+
+  body .sidebar .menu,
+  body.is-intro-mode .sidebar .menu,
+  body.page-revealed .sidebar .menu,
+  body.theme-view-design .sidebar .menu,
+  body.theme-view-photo .sidebar .menu,
+  body.theme-view-illustration .sidebar .menu{
+    position:absolute !important;
+    z-index:3 !important;
+    left:14px !important;
+    right:14px !important;
+    bottom:12px !important;
+    width:auto !important;
+    height:30px !important;
+    display:grid !important;
+    grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
+    gap:0 !important;
+    align-items:end !important;
+    margin:0 !important;
+    padding:0 !important;
+    border-top:1px solid rgba(242,236,222,.18) !important;
+  }
+
+  body .sidebar .menu a,
+  body.is-intro-mode .sidebar .menu a,
+  body.page-revealed .sidebar .menu a,
+  body.theme-view-design .sidebar .menu a,
+  body.theme-view-photo .sidebar .menu a,
+  body.theme-view-illustration .sidebar .menu a{
+    position:relative !important;
+    height:30px !important;
+    min-height:30px !important;
+    padding:12px 0 0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:rgba(242,236,222,.66) !important;
+    font-family:"JetBrains Mono", ui-monospace, monospace !important;
+    font-size:8px !important;
+    font-weight:700 !important;
+    line-height:1 !important;
+    letter-spacing:.13em !important;
+    text-indent:.13em !important;
+    opacity:1 !important;
+    overflow:visible !important;
+  }
+
+  body .sidebar .menu a::before,
+  body.is-intro-mode .sidebar .menu a::before,
+  body.page-revealed .sidebar .menu a::before,
+  body.theme-view-design .sidebar .menu a::before,
+  body.theme-view-photo .sidebar .menu a::before,
+  body.theme-view-illustration .sidebar .menu a::before{
+    content:"" !important;
+    position:absolute !important;
+    display:block !important;
+    top:-1px !important;
+    left:50% !important;
+    width:0 !important;
+    height:2px !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    background:#e6362e !important;
+    opacity:0 !important;
+    transform:translateX(-50%) !important;
+    transition:none !important;
+  }
+
+  body .sidebar .menu a::after,
+  body.is-intro-mode .sidebar .menu a::after,
+  body.page-revealed .sidebar .menu a::after,
+  body.theme-view-design .sidebar .menu a::after,
+  body.theme-view-photo .sidebar .menu a::after,
+  body.theme-view-illustration .sidebar .menu a::after{
+    display:none !important;
+    content:none !important;
+  }
+
+  body .sidebar .menu a.active,
+  body.is-intro-mode .sidebar .menu a.active,
+  body.page-revealed .sidebar .menu a.active,
+  body.theme-view-design .sidebar .menu a.active,
+  body.theme-view-photo .sidebar .menu a.active,
+  body.theme-view-illustration .sidebar .menu a.active{
+    color:#fffaf0 !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    opacity:1 !important;
+  }
+
+  body .sidebar .menu a.active::before,
+  body.is-intro-mode .sidebar .menu a.active::before,
+  body.page-revealed .sidebar .menu a.active::before,
+  body.theme-view-design .sidebar .menu a.active::before,
+  body.theme-view-photo .sidebar .menu a.active::before,
+  body.theme-view-illustration .sidebar .menu a.active::before{
+    width:22px !important;
+    opacity:1 !important;
+  }
+}
+
+@media(max-width:380px){
+  :root{
+    --topbar-h:110px !important;
+  }
+
+  body.is-intro-mode.page-revealed.theme-view-design .sidebar,
+  body.is-intro-mode.page-revealed.theme-view-photo .sidebar,
+  body.is-intro-mode.page-revealed.theme-view-illustration .sidebar,
+  body.page-revealed.theme-view-design .sidebar,
+  body.page-revealed.theme-view-photo .sidebar,
+  body.page-revealed.theme-view-illustration .sidebar,
+  body.page-revealed .sidebar,
+  body .sidebar{
+    inset:14px 14px auto 14px !important;
+    max-width:calc(100vw - 28px) !important;
+    height:84px !important;
+    min-height:84px !important;
+    padding:13px 12px 11px !important;
+    border-radius:4px 22px 4px 22px !important;
+  }
+
+  body .sidebar::before,
+  body.page-revealed .sidebar::before{
+    top:12px !important;
+    left:17px !important;
+    font-size:21px !important;
+  }
+
+  body .sidebar::after,
+  body.page-revealed .sidebar::after{
+    top:17px !important;
+    right:16px !important;
+    font-size:6.5px !important;
+    letter-spacing:.14em !important;
+  }
+
+  body .sidebar .menu,
+  body.is-intro-mode .sidebar .menu,
+  body.page-revealed .sidebar .menu{
+    left:12px !important;
+    right:12px !important;
+    bottom:10px !important;
+    height:29px !important;
+  }
+
+  body .sidebar .menu a,
+  body.is-intro-mode .sidebar .menu a,
+  body.page-revealed .sidebar .menu a{
+    height:29px !important;
+    min-height:29px !important;
+    padding-top:12px !important;
+    font-size:7.3px !important;
+    letter-spacing:.09em !important;
+    text-indent:.09em !important;
+  }
+}
+
+/* MOBILE NAV EDITORIAL REFINEMENT: remove heavy panel, keep type-led elegance. */
+@media(max-width:900px){
+  body.is-intro-mode.page-revealed.theme-view-design .sidebar,
+  body.is-intro-mode.page-revealed.theme-view-photo .sidebar,
+  body.is-intro-mode.page-revealed.theme-view-illustration .sidebar,
+  body.page-revealed.theme-view-design .sidebar,
+  body.page-revealed.theme-view-photo .sidebar,
+  body.page-revealed.theme-view-illustration .sidebar,
+  body.page-revealed .sidebar,
+  body .sidebar{
+    background:
+      radial-gradient(130px 88px at 0% 0%, rgba(230,54,46,.16), transparent 72%),
+      radial-gradient(160px 92px at 100% 0%, rgba(242,236,222,.10), transparent 72%),
+      linear-gradient(135deg, rgba(3,3,3,.98), rgba(12,12,13,.90) 58%, rgba(0,0,0,.96)) !important;
+  }
+
+  body .sidebar::before,
+  body.page-revealed .sidebar::before,
+  body.theme-view-design .sidebar::before,
+  body.theme-view-photo .sidebar::before,
+  body.theme-view-illustration .sidebar::before{
+    color:#f2ecde !important;
+    text-shadow:0 10px 24px rgba(0,0,0,.28) !important;
+  }
+
+  body .sidebar::after,
+  body.page-revealed .sidebar::after,
+  body.theme-view-design .sidebar::after,
+  body.theme-view-photo .sidebar::after,
+  body.theme-view-illustration .sidebar::after{
+    color:rgba(242,236,222,.48) !important;
+  }
+
+  body .sidebar .menu,
+  body.is-intro-mode .sidebar .menu,
+  body.page-revealed .sidebar .menu,
+  body.theme-view-design .sidebar .menu,
+  body.theme-view-photo .sidebar .menu,
+  body.theme-view-illustration .sidebar .menu{
+    border-top-color:rgba(242,236,222,.16) !important;
+  }
+
+  body .sidebar .menu a,
+  body.is-intro-mode .sidebar .menu a,
+  body.page-revealed .sidebar .menu a,
+  body.theme-view-design .sidebar .menu a,
+  body.theme-view-photo .sidebar .menu a,
+  body.theme-view-illustration .sidebar .menu a{
+    color:rgba(242,236,222,.52) !important;
+  }
+
+  body .sidebar .menu a.active,
+  body.is-intro-mode .sidebar .menu a.active,
+  body.page-revealed .sidebar .menu a.active,
+  body.theme-view-design .sidebar .menu a.active,
+  body.theme-view-photo .sidebar .menu a.active,
+  body.theme-view-illustration .sidebar .menu a.active{
+    color:#f9f2e4 !important;
+  }
+}
