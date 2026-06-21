@@ -970,7 +970,6 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     if(ov){
       ov.classList.toggle("is-visual-film", d.galleryLayout === "visual-film");
       ov.classList.toggle("is-illustration-work", isIllustrationWork);
-      ov.classList.toggle("is-dessin-color-work", isIllustrationWork && d.title === "デッサン、色彩構成");
     }
 
     /* breadcrumb */
