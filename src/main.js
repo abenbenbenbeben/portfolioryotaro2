@@ -6319,7 +6319,15 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   }
 
   function initMobileRandomMotion(){
-    var index = Math.floor(Math.random() * cells.length);
+    var mobileCandidates = cells.filter(function(cell){
+      var label = (cell.dataset.label || "").toUpperCase();
+      return label === "EVICE" ||
+        label === "KASANARU" ||
+        label === "TOKYO TEXTURE 01";
+    });
+    if(!mobileCandidates.length) mobileCandidates = cells;
+    var pickedCell = mobileCandidates[Math.floor(Math.random() * mobileCandidates.length)];
+    var index = Math.max(0, cells.indexOf(pickedCell));
     root.classList.add("is-mobile-random-motion");
     root.dataset.motionMode = "random-mobile";
     activeIndex = index;
