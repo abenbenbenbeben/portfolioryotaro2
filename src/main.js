@@ -5958,8 +5958,9 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var thumbVideoSrc = card.dataset.thumbVideo;
     if(thumbVideoSrc.indexOf("/media/intro/tokyo-texture.mp4") === 0){
       var tokyoPlaylist = [
-        "/media/intro/tokyo-texture.mp4?v=20260621-sequence",
-        "/media/intro/tokyo-texture-02.mp4?v=20260621-sequence"
+        "/media/intro/tokyo-texture.mp4?v=20260621-1315",
+        "/media/intro/tokyo-texture-02.mp4?v=20260621-1315",
+        "/media/intro/tokyo-texture-03.mp4?v=20260621-1315"
       ];
       video.loop = false;
       video.removeAttribute("loop");
@@ -5979,10 +5980,14 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
       return video;
     }
     var thumbVideoVersion = "";
-    if(thumbVideoSrc.indexOf("/media/intro/liminal-space.mp4") === 0){
-      thumbVideoVersion = "20260620-2309";
+    if(thumbVideoSrc.indexOf("/media/intro/evice.mp4") === 0){
+      thumbVideoVersion = "20260621-1315";
+    }else if(thumbVideoSrc.indexOf("/media/intro/kasanaru.mp4") === 0){
+      thumbVideoVersion = "20260621-1315";
+    }else if(thumbVideoSrc.indexOf("/media/intro/liminal-space.mp4") === 0){
+      thumbVideoVersion = "20260621-1315";
     }else if(thumbVideoSrc.indexOf("/media/intro/realtime-color-volume.mp4") === 0){
-      thumbVideoVersion = "20260620-2320";
+      thumbVideoVersion = "20260621-1315";
     }
     if(thumbVideoVersion){
       thumbVideoSrc += (thumbVideoSrc.indexOf("?") === -1 ? "?" : "&") + "v=" + thumbVideoVersion;
