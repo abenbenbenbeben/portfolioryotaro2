@@ -21374,6 +21374,45 @@ body.theme-view-design #view-design.is-active .design-item{
   min-width:0;
 }
 
+#view-illustration .illus-art-item.is-landscape-art{
+  position:relative;
+  z-index:2;
+}
+
+#view-illustration .illus-art-item.is-landscape-art .illus-art-frame{
+  width:min(142%, calc((1360px - clamp(44px, 5vw, 76px)) / 2));
+  max-width:calc(100vw - clamp(52px, 7vw, 112px));
+}
+
+#view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art .illus-art-frame{
+  transform:translateX(-14%);
+}
+
+#view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art .illus-art-frame{
+  transform:translateX(-30%);
+}
+
+#view-illustration .illus-art-item.is-landscape-art figcaption{
+  width:min(142%, calc((1360px - clamp(44px, 5vw, 76px)) / 2));
+  max-width:calc(100vw - clamp(52px, 7vw, 112px));
+}
+
+#view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art figcaption{
+  transform:translate3d(-14%, 8px, 0);
+}
+
+#view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art.is-photo-visible figcaption{
+  transform:translate3d(-14%, 0, 0);
+}
+
+#view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art figcaption{
+  transform:translate3d(-30%, 8px, 0);
+}
+
+#view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art.is-photo-visible figcaption{
+  transform:translate3d(-30%, 0, 0);
+}
+
 #view-illustration .illus-art-frame{
   position:relative;
   display:block;
@@ -21492,6 +21531,27 @@ body.theme-view-design #view-design.is-active .design-item{
     gap:clamp(28px, 4vw, 52px) clamp(20px, 3vw, 32px);
     margin-top:0;
   }
+
+  #view-illustration .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-item.is-landscape-art figcaption{
+    width:118%;
+    max-width:calc(100vw - 40px);
+  }
+
+  #view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art .illus-art-frame{
+    transform:none;
+  }
+
+  #view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art figcaption,
+  #view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art figcaption{
+    transform:translate3d(0, 8px, 0);
+  }
+
+  #view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art.is-photo-visible figcaption,
+  #view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art.is-photo-visible figcaption{
+    transform:translate3d(0, 0, 0);
+  }
 }
 
 @media(max-width:620px){
@@ -21510,6 +21570,12 @@ body.theme-view-design #view-design.is-active .design-item{
     display:contents;
     grid-column:1 / -1;
     margin-top:0;
+  }
+
+  #view-illustration .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-item.is-landscape-art figcaption{
+    width:100%;
+    max-width:100%;
   }
 }
 

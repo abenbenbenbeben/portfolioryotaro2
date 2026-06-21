@@ -2293,11 +2293,10 @@
       "エヴィス",
       "重なる",
       "TokyoTexture",
-      "リアルタイム色立体",
       "リミナルスペース",
+      "リアルタイム色立体",
       "視点の可視化",
-      "背景映像、VJ",
-      "INSTALLATION"
+      "背景映像、VJ"
     ];
     var cards = Array.from(list.querySelectorAll(":scope > .design-item"));
     var titleToCard = new Map();
@@ -2917,8 +2916,8 @@
   const VIEW_TEXTURE_EXT = isHeavyMediaConstrained() ? ".jpg" : ".jpeg";
   const viewCards = [
     { image:VIEW_TEXTURE_BASE + "view1" + VIEW_TEXTURE_EXT,  title:"重なり", url:"" },
-    { image:VIEW_TEXTURE_BASE + "view2" + VIEW_TEXTURE_EXT,  title:"リアルタイム色立体", url:"" },
     { image:VIEW_TEXTURE_BASE + "view3" + VIEW_TEXTURE_EXT,  title:"リミナルスペース", url:"" },
+    { image:VIEW_TEXTURE_BASE + "view2" + VIEW_TEXTURE_EXT,  title:"リアルタイム色立体", url:"" },
     { image:VIEW_TEXTURE_BASE + "view4" + VIEW_TEXTURE_EXT,  title:"ロゴ制作", url:"" },
     { image:VIEW_TEXTURE_BASE + "view5" + VIEW_TEXTURE_EXT,  title:"ゲームエンジンを用いた街制作", url:"" },
     { image:VIEW_TEXTURE_BASE + "view6" + VIEW_TEXTURE_EXT,  title:"ライブ背景映像", url:"" },
@@ -5748,6 +5747,25 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     return !!(el && el.querySelector && el.querySelector("img:not(.swap-hover)"));
   }
 
+  function markLandscapeArt(el){
+    if(!el || !el.classList || !el.classList.contains("illus-art-frame")) return;
+    var item = el.closest ? el.closest(".illus-art-item") : null;
+    var img = el.querySelector ? el.querySelector("img:not(.swap-hover)") : null;
+    if(!item || !img) return;
+    function apply(){
+      var w = img.naturalWidth || 0;
+      var h = img.naturalHeight || 0;
+      if(w > 0 && h > 0){
+        item.classList.toggle("is-landscape-art", (w / h) >= 1.22);
+      }
+    }
+    if(img.complete && img.naturalWidth){
+      apply();
+    }else{
+      img.addEventListener("load", apply, { once:true });
+    }
+  }
+
   function reveal(el){
     if(!el || !el.classList) return;
     el.classList.add("is-lux-visible");
@@ -5763,6 +5781,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     if(observed.has(el) || !hasImage(el)) return;
     observed.add(el);
     el.classList.add("lux-image-reveal");
+    markLandscapeArt(el);
     el.style.setProperty("--lux-delay", Math.min((index % 6) * 44, 176) + "ms");
 
     if(!("IntersectionObserver" in window)){
@@ -6245,7 +6264,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   function scrollToWorkThumbnail(cell){
     if(!cell || !cell.dataset.workTitle) return false;
     var title = cell.dataset.workTitle;
-    var target = Array.from(document.querySelectorAll("#view-design .design-item")).find(function(card){
+    var target = Array.from(document.querySelectorAll("#view-design .design-item:not([hidden])")).find(function(card){
       var titleEl = card.querySelector(".design-title");
       return titleEl && titleEl.textContent.trim() === title;
     });
