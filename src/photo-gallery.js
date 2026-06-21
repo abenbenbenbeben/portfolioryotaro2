@@ -258,6 +258,19 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
   var nextBtn = null;
   var currentIndex = 0;
 
+  function isMobileSafeLightbox(){
+    try{
+      return window.__portfolioAssetUtils &&
+        typeof window.__portfolioAssetUtils.isHeavyMediaConstrained === "function" &&
+        window.__portfolioAssetUtils.isHeavyMediaConstrained();
+    }catch(_){}
+    try{
+      return window.matchMedia && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
+    }catch(_){
+      return window.innerWidth <= 820;
+    }
+  }
+
   function refreshFrames(){
     frames = Array.from(root.querySelectorAll(".photo-frame"));
     frames.forEach(function(frame, index){
@@ -277,7 +290,11 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
     var title = caption ? caption.querySelector("strong") : null;
     var src = "";
     if(img){
-      src = img.getAttribute("data-full-src") || "";
+      if(isMobileSafeLightbox()){
+        src = img.currentSrc || img.getAttribute("src") || img.src || "";
+      }else{
+        src = img.getAttribute("data-full-src") || "";
+      }
       if(!src){
         var raw = img.getAttribute("src") || img.currentSrc || img.src || "";
         src = raw.replace(/\/assets\/optimized\/photo\/([^/?#]+)\.jpg([?#].*)?$/i, "/assets/photo/$1.JPG$2");
@@ -344,7 +361,9 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
 
     ensureOverlay();
     overlay.classList.add("is-loading");
+    overlay.classList.toggle("is-mobile-safe", isMobileSafeLightbox());
     imageEl.style.opacity = "0";
+    imageEl.decoding = "async";
     imageEl.src = data.src;
     imageEl.alt = data.alt;
     captionEl.textContent = data.label;
@@ -354,6 +373,10 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
       requestAnimationFrame(function(){
         imageEl.style.opacity = "1";
       });
+    };
+    imageEl.onerror = function(){
+      overlay.classList.remove("is-loading");
+      imageEl.style.opacity = "1";
     };
 
     prevBtn.disabled = frames.length < 2;

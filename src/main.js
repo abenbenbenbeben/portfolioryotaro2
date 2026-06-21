@@ -5964,7 +5964,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
       thumbVideoSrc.indexOf("/media/thumbs/tokyo-texture.mp4") === 0
     ){
       var tokyoPlaylist = [
-        "/media/thumbs/tokyo-texture.mp4?v=20260621-1358",
+        "/media/thumbs/tokyo-texture.mp4?v=20260621-1610",
         "/media/intro/tokyo-texture-02.mp4?v=20260621-1326",
         "/media/intro/tokyo-texture-03.mp4?v=20260621-1315"
       ];

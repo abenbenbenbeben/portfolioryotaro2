@@ -21568,6 +21568,46 @@ body.is-opening-reveal #view-profile .intro-film-video{
   }
 }
 
+@media(max-width:820px), (pointer:coarse){
+  #wv-lb,
+  #wv-lb.is-native,
+  #wv-lb.is-mobile-safe{
+    overflow:hidden !important;
+    align-items:center !important;
+    justify-content:center !important;
+    padding:14px !important;
+    overscroll-behavior:contain !important;
+    touch-action:manipulation !important;
+  }
+
+  #wv-lb img,
+  #wv-lb.is-native img,
+  #wv-lb.is-mobile-safe img{
+    max-width:calc(100vw - 28px) !important;
+    max-height:calc(100svh - 96px) !important;
+    width:auto !important;
+    height:auto !important;
+    object-fit:contain !important;
+    transform:none !important;
+    margin:auto !important;
+  }
+
+  .photo-lightbox,
+  .photo-lightbox.is-mobile-safe{
+    overscroll-behavior:contain !important;
+    touch-action:manipulation !important;
+  }
+
+  .photo-lightbox-stage img,
+  .photo-lightbox.is-mobile-safe .photo-lightbox-stage img{
+    max-width:calc(100vw - 32px) !important;
+    max-height:calc(100svh - 132px) !important;
+    width:auto !important;
+    height:auto !important;
+    object-fit:contain !important;
+  }
+}
+
 /* Full-size gallery pass: stop shrinking 4.5K work images into a small strip. */
 #wv.is-visual-film #wv-gallery-wrap.is-visual-film-gallery{
   padding:18px clamp(16px, 4vw, 64px) 46px !important;

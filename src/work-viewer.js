@@ -28,6 +28,24 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
   var workRoutePopBound = false;
   var closingFromRoute = false;
 
+  function isMobileSafeLightbox(){
+    try{
+      return isHeavyMediaConstrained() ||
+        (window.matchMedia && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches);
+    }catch(_){
+      return window.innerWidth <= 820;
+    }
+  }
+
+  function getLightboxSrc(src){
+    src = src || "";
+    if(!src) return "";
+    if(isMobileSafeLightbox()){
+      return getFastDisplayAssetSrc(src) || getImageDisplaySrc(lightboxImg, src) || src;
+    }
+    return getDesktopAssetSrc(src) || src;
+  }
+
   var DESSIN_GALLERY = [
     "/assets/illustration-art/デッサン、色彩構成/1.jpg",
     "/assets/illustration-art/デッサン、色彩構成/2.jpg",
@@ -54,9 +72,9 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       "/assets/illustration-art/メカ軍団/02-view8.jpeg"
     ],
     "ペン画": [
-      "/assets/illustration-art/ペン画/03-bill.jpg",
-      "/assets/illustration-art/ペン画/04-meka.jpg",
-      "/assets/illustration-art/ペン画/05-meka2.jpg"
+      "/assets/illustration-art/ペン画/pen1.jpg",
+      "/assets/illustration-art/ペン画/pen2.jpg",
+      "/assets/illustration-art/ペン画/pen3.jpg"
     ],
     "絵画": [
       "/assets/illustration-art/絵画/06-img-9457-2.jpg",
@@ -296,15 +314,23 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
 
     function lbShow(idx){
       lbIdx = idx;
-      var src = getDesktopAssetSrc(lbSrcs[lbIdx]) || lbSrcs[lbIdx];
+      var mobileSafe = isMobileSafeLightbox();
+      var src = getLightboxSrc(lbSrcs[lbIdx]);
+      lightbox.classList.toggle("is-mobile-safe", mobileSafe);
+      if(mobileSafe) lightbox.classList.remove("is-native");
       lightboxImg.style.opacity = "0";
+      lightboxImg.decoding = "async";
       lightboxImg.onload = function(){
-        if(lightbox.classList.contains("is-native")){
+        if(!mobileSafe && lightbox.classList.contains("is-native")){
           requestAnimationFrame(function(){
             lightbox.scrollLeft = Math.max(0, (lightbox.scrollWidth - lightbox.clientWidth) / 2);
             lightbox.scrollTop = Math.max(0, (lightbox.scrollHeight - lightbox.clientHeight) / 2);
           });
         }
+      };
+      lightboxImg.onerror = function(){
+        lightbox.classList.remove("is-loading");
+        lightboxImg.style.opacity = "1";
       };
       lightboxImg.src = src;
       lightbox.classList.add("on");
@@ -327,6 +353,10 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     });
     lightboxImg.addEventListener("click", function(e){
       e.stopPropagation();
+      if(isMobileSafeLightbox()){
+        lightbox.classList.remove("is-native");
+        return;
+      }
       lightbox.classList.toggle("is-native");
       if(lightbox.classList.contains("is-native")){
         requestAnimationFrame(function(){
