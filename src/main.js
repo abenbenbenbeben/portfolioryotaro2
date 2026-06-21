@@ -5907,7 +5907,6 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   var SELECTOR = "#view-design .design-item[data-thumb-video]";
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var saveData = !!(navigator.connection && navigator.connection.saveData);
-  var isMobileOpening = window.matchMedia && window.matchMedia("(max-width: 720px)").matches;
   var observed = new WeakSet();
   var observer = null;
 
@@ -6079,6 +6078,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   var suppressClick = false;
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var saveData = !!(navigator.connection && navigator.connection.saveData);
+  var isMobileOpening = window.matchMedia && window.matchMedia("(max-width: 720px)").matches;
 
   function configureVideo(video){
     if(!video) return;
