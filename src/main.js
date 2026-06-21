@@ -5959,7 +5959,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     if(thumbVideoSrc.indexOf("/media/intro/tokyo-texture.mp4") === 0){
       var tokyoPlaylist = [
         "/media/intro/tokyo-texture.mp4?v=20260621-1315",
-        "/media/intro/tokyo-texture-02.mp4?v=20260621-1315",
+        "/media/intro/tokyo-texture-02.mp4?v=20260621-1326",
         "/media/intro/tokyo-texture-03.mp4?v=20260621-1315"
       ];
       video.loop = false;
