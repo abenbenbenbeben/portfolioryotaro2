@@ -5956,6 +5956,28 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var video = ensureVideo(card);
     if(!video || video.getAttribute("src")) return video;
     var thumbVideoSrc = card.dataset.thumbVideo;
+    if(thumbVideoSrc.indexOf("/media/intro/tokyo-texture.mp4") === 0){
+      var tokyoPlaylist = [
+        "/media/intro/tokyo-texture.mp4?v=20260621-sequence",
+        "/media/intro/tokyo-texture-02.mp4?v=20260621-sequence"
+      ];
+      video.loop = false;
+      video.removeAttribute("loop");
+      video.dataset.playlistIndex = "0";
+      video.addEventListener("ended", function(){
+        var nextIndex = (Number(video.dataset.playlistIndex || 0) + 1) % tokyoPlaylist.length;
+        video.dataset.playlistIndex = String(nextIndex);
+        video.src = tokyoPlaylist[nextIndex];
+        video.load();
+        if(card.classList.contains("is-thumb-video-playing")){
+          var nextPlay = video.play();
+          if(nextPlay && typeof nextPlay.catch === "function") nextPlay.catch(function(){});
+        }
+      });
+      video.src = tokyoPlaylist[0];
+      video.load();
+      return video;
+    }
     var thumbVideoVersion = "";
     if(thumbVideoSrc.indexOf("/media/intro/liminal-space.mp4") === 0){
       thumbVideoVersion = "20260620-2309";
@@ -6076,12 +6098,32 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
 
   function playCellVideos(cell){
     if(!cell) return;
-    cell.querySelectorAll("video").forEach(playVideo);
+    var videos = Array.from(cell.querySelectorAll("video"));
+    if(cell.classList.contains("has-video-collage")){
+      var primary = cell.querySelector("video.is-primary");
+      if(cell.classList.contains("is-supporting-films")){
+        videos.forEach(function(video){
+          if(video === primary) video.pause();
+          else playVideo(video);
+        });
+      }else{
+        videos.forEach(function(video){
+          if(video === primary) playVideo(video);
+          else video.pause();
+        });
+      }
+      return;
+    }
+    videos.forEach(playVideo);
   }
 
   function pauseCellVideos(cell){
     if(!cell) return;
-    cell.querySelectorAll("video").forEach(function(video){ video.pause(); });
+    cell.querySelectorAll("video").forEach(function(video){
+      video.pause();
+      try{ video.currentTime = 0; }catch(_){ }
+    });
+    cell.classList.remove("is-supporting-films");
   }
 
   function playActive(){
@@ -6257,6 +6299,18 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
 
     cells.forEach(function(cell, index){
       cell.querySelectorAll("video").forEach(configureVideo);
+      if(cell.classList.contains("has-video-collage")){
+        var primaryVideo = cell.querySelector("video.is-primary");
+        if(primaryVideo){
+          primaryVideo.loop = false;
+          primaryVideo.removeAttribute("loop");
+          primaryVideo.addEventListener("ended", function(){
+            if(!cell.classList.contains("is-active")) return;
+            cell.classList.add("is-supporting-films");
+            playCellVideos(cell);
+          });
+        }
+      }
       cell.addEventListener("click", function(event){
         if(suppressClick){
           event.preventDefault();
