@@ -29400,3 +29400,219 @@ body.theme-view-design #view-design.merged-design-section .design-item:not([data
     width:28px !important;
   }
 }
+
+/* FINAL STABILITY LOCK: keep desktop navigation usable after the intro reveal. */
+@media (min-width:901px){
+  body.page-revealed:not(.is-collapsed) .sidebar,
+  body.page-revealed.is-intro-mode:not(.is-collapsed) .sidebar,
+  body.page-revealed.theme-view-design:not(.is-collapsed) .sidebar,
+  body.page-revealed.theme-view-photo:not(.is-collapsed) .sidebar,
+  body.page-revealed.theme-view-illustration:not(.is-collapsed) .sidebar,
+  body.page-revealed.theme-view-profile-only:not(.is-collapsed) .sidebar{
+    transform:none !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+
+  body.page-revealed:not(.is-collapsed) .sidebar .menu,
+  body.page-revealed:not(.is-collapsed) .sidebar .menu a{
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+}
+
+/* FINAL MOBILE NAV LOCK: prevent the old black mobile bar from winning on touch devices. */
+@media (max-width:900px), (hover:none) and (pointer:coarse){
+  :root{
+    --topbar-h:62px !important;
+  }
+
+  body .sidebar,
+  body.is-intro-mode .sidebar,
+  body.page-revealed .sidebar,
+  body.is-intro-mode.page-revealed .sidebar,
+  body.theme-view-design .sidebar,
+  body.theme-view-photo .sidebar,
+  body.theme-view-illustration .sidebar,
+  body.theme-view-profile-only .sidebar,
+  body.page-revealed.theme-view-design .sidebar,
+  body.page-revealed.theme-view-photo .sidebar,
+  body.page-revealed.theme-view-illustration .sidebar,
+  body.page-revealed.theme-view-profile-only .sidebar{
+    position:fixed !important;
+    inset:0 0 auto 0 !important;
+    width:100% !important;
+    max-width:none !important;
+    height:56px !important;
+    min-height:56px !important;
+    padding:0 16px !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(16,14,12,.10) !important;
+    border-radius:0 0 22px 22px !important;
+    background-color:rgba(252,249,241,.985) !important;
+    background-image:none !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.16) !important;
+    backdrop-filter:blur(18px) saturate(130%) !important;
+    -webkit-backdrop-filter:blur(18px) saturate(130%) !important;
+    transform:none !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    overflow:hidden !important;
+    z-index:360 !important;
+  }
+
+  body .sidebar-bg-video,
+  body .sidebar .sidebar-bg-video,
+  body .sidebar .nowback-video{
+    display:none !important;
+  }
+
+  body .sidebar .logo,
+  body .sidebar-meta,
+  body .sidebar-toggle,
+  body .menu-indicator{
+    display:none !important;
+  }
+
+  body .sidebar::before,
+  body .sidebar::after,
+  body.page-revealed .sidebar::before,
+  body.page-revealed .sidebar::after,
+  body.theme-view-design .sidebar::before,
+  body.theme-view-design .sidebar::after,
+  body.theme-view-photo .sidebar::before,
+  body.theme-view-photo .sidebar::after,
+  body.theme-view-illustration .sidebar::before,
+  body.theme-view-illustration .sidebar::after,
+  body.theme-view-profile-only .sidebar::before,
+  body.theme-view-profile-only .sidebar::after{
+    display:none !important;
+    content:none !important;
+  }
+
+  body .sidebar .menu,
+  body.is-intro-mode .sidebar .menu,
+  body.page-revealed .sidebar .menu,
+  body.theme-view-design .sidebar .menu,
+  body.theme-view-photo .sidebar .menu,
+  body.theme-view-illustration .sidebar .menu,
+  body.theme-view-profile-only .sidebar .menu{
+    position:absolute !important;
+    inset:0 16px auto 16px !important;
+    display:grid !important;
+    grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
+    gap:0 !important;
+    width:auto !important;
+    height:56px !important;
+    min-height:56px !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    align-items:stretch !important;
+    overflow:visible !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+
+  body .sidebar .menu a,
+  body.is-intro-mode .sidebar .menu a,
+  body.page-revealed .sidebar .menu a,
+  body.theme-view-design .sidebar .menu a,
+  body.theme-view-photo .sidebar .menu a,
+  body.theme-view-illustration .sidebar .menu a,
+  body.theme-view-profile-only .sidebar .menu a{
+    position:relative !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    height:56px !important;
+    min-height:56px !important;
+    width:100% !important;
+    min-width:0 !important;
+    padding:0 2px !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:rgba(12,10,8,.58) !important;
+    font-family:"JetBrains Mono", ui-monospace, monospace !important;
+    font-size:8px !important;
+    font-weight:900 !important;
+    line-height:1 !important;
+    letter-spacing:.08em !important;
+    text-indent:.08em !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    transform:none !important;
+    overflow:visible !important;
+    pointer-events:auto !important;
+    touch-action:manipulation !important;
+    -webkit-tap-highlight-color:transparent !important;
+  }
+
+  body .sidebar .menu a::before,
+  body.is-intro-mode .sidebar .menu a::before,
+  body.page-revealed .sidebar .menu a::before,
+  body.theme-view-design .sidebar .menu a::before,
+  body.theme-view-photo .sidebar .menu a::before,
+  body.theme-view-illustration .sidebar .menu a::before,
+  body.theme-view-profile-only .sidebar .menu a::before{
+    display:none !important;
+    content:none !important;
+  }
+
+  body .sidebar .menu a::after,
+  body.is-intro-mode .sidebar .menu a::after,
+  body.page-revealed .sidebar .menu a::after,
+  body.theme-view-design .sidebar .menu a::after,
+  body.theme-view-photo .sidebar .menu a::after,
+  body.theme-view-illustration .sidebar .menu a::after,
+  body.theme-view-profile-only .sidebar .menu a::after{
+    content:"" !important;
+    position:absolute !important;
+    display:block !important;
+    left:50% !important;
+    bottom:11px !important;
+    width:0 !important;
+    height:3px !important;
+    border-radius:999px !important;
+    background:#15110d !important;
+    opacity:0 !important;
+    transform:translateX(-50%) !important;
+  }
+
+  body .sidebar .menu a.active,
+  body.is-intro-mode .sidebar .menu a.active,
+  body.page-revealed .sidebar .menu a.active,
+  body.theme-view-design .sidebar .menu a.active,
+  body.theme-view-photo .sidebar .menu a.active,
+  body.theme-view-illustration .sidebar .menu a.active,
+  body.theme-view-profile-only .sidebar .menu a.active{
+    color:#15110d !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  body .sidebar .menu a.active::after,
+  body.is-intro-mode .sidebar .menu a.active::after,
+  body.page-revealed .sidebar .menu a.active::after,
+  body.theme-view-design .sidebar .menu a.active::after,
+  body.theme-view-photo .sidebar .menu a.active::after,
+  body.theme-view-illustration .sidebar .menu a.active::after,
+  body.theme-view-profile-only .sidebar .menu a.active::after{
+    width:28px !important;
+    opacity:1 !important;
+  }
+
+  main,
+  body.is-collapsed main,
+  body.is-intro-mode main{
+    padding-top:var(--topbar-h) !important;
+  }
+}
