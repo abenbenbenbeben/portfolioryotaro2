@@ -1,7 +1,8 @@
 
-  /* ページ開始時刻を最優先で記録（最低1.8秒キープ計算の基準） */
+  /* ページ開始時刻を記録し、端末別の最低表示時間を計算する。 */
   window._loaderPageStart = window._loaderPageStart || Date.now();
-  window.__PORTFOLIO_MIN_LOADER_MS = 1800;
+  var __portfolioFastMobile = !!(window.matchMedia && window.matchMedia("(max-width: 720px), (pointer: coarse)").matches);
+  window.__PORTFOLIO_MIN_LOADER_MS = __portfolioFastMobile ? 900 : 1800;
   /* ── Early stability guards (run before main IIFE) ──────────────
      These prevent an uncaught error, missing asset, or slow network
      from leaving the page in an unusable state. */
@@ -62,7 +63,7 @@
       /* ── INITIAL LOADER ──
          Keep the cover up until the first visible film has a decoded frame. */
       var MIN_LOADER_MS = window.__PORTFOLIO_MIN_LOADER_MS || 1800;
-      var MAX_LOADER_MS = 20000;
+      var MAX_LOADER_MS = __portfolioFastMobile ? 7000 : 20000;
       try{ console.log("[loader] RESILIENT MODE  MIN=", MIN_LOADER_MS, "ms  MAX=", MAX_LOADER_MS, "ms"); }catch(_){}
 
       function _ready(){
@@ -5354,7 +5355,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     });
   }
 
-  function waitForVideo(video){
+  function waitForVideo(video, fastMobile){
     return new Promise(function(resolve){
       if(!video){
         window._criticalVideoReady = true;
@@ -5363,6 +5364,22 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
       }
       var src = video.currentSrc || video.getAttribute("src") || video.dataset.src || getIntroVideoSrc(video) || "";
       if(!src){
+        window._criticalVideoReady = true;
+        resolve();
+        return;
+      }
+
+      /* Mobile reveals from the poster while the muted film keeps buffering.
+         Waiting for decoded video data here can add many seconds on cellular. */
+      if(fastMobile){
+        try{
+          video.muted = true;
+          video.defaultMuted = true;
+          if(!video.getAttribute("src")){
+            video.src = src;
+            video.load();
+          }
+        }catch(_){}
         window._criticalVideoReady = true;
         resolve();
         return;
@@ -5431,6 +5448,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
 
   function start(){
     var startedAt = Date.now();
+    var fastMobile = !!(window.matchMedia && window.matchMedia("(max-width: 720px), (pointer: coarse)").matches);
     var criticalImages = Array.from(document.querySelectorAll(
       ".sidebar .logo img, .loader-float[src]"
     ));
@@ -5440,15 +5458,25 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var introVideo = document.querySelector(
       ".intro-motion-cell.is-active:not(.is-mobile-random-hidden) video, .intro-motion-cell.is-active video"
     );
+    var introPoster = introVideo ? introVideo.getAttribute("poster") : "";
+    if(introPoster) criticalViewTextures.push(introPoster);
     window._criticalVideoReady = false;
+
+    var fontsReady = (document.fonts && document.fonts.ready)
+      ? document.fonts.ready.catch(function(){})
+      : Promise.resolve();
+    if(fastMobile){
+      fontsReady = Promise.race([
+        fontsReady,
+        new Promise(function(resolve){ window.setTimeout(resolve, 700); })
+      ]);
+    }
 
     Promise.all([
       Promise.all(criticalImages.map(waitForImage)),
       Promise.all(criticalViewTextures.map(waitForSrc)),
-      waitForVideo(introVideo),
-      (document.fonts && document.fonts.ready)
-        ? document.fonts.ready.catch(function(){})
-        : Promise.resolve()
+      waitForVideo(introVideo, fastMobile),
+      fontsReady
     ]).then(function(){
       requestAnimationFrame(function(){
         markReady(startedAt);
