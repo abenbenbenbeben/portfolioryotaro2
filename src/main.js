@@ -2134,6 +2134,9 @@
       const forceTop = a.dataset.forceTop === "1";
       if(a.dataset.view === "design"){
         pendingDesignSectionScroll = true;
+        if(typeof window.__portfolioRandomizeMobileIntroMotion === "function"){
+          window.__portfolioRandomizeMobileIntroMotion({ allowSame:false });
+        }
       }
       /* tap animation */
       a.classList.remove("is-tapping");
@@ -6319,6 +6322,11 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   }
 
   function initMobileRandomMotion(){
+    applyMobileRandomMotion({ allowSame:true });
+    bindVisibilityPlayback();
+  }
+
+  function getMobileRandomCandidates(){
     var mobileCandidates = cells.filter(function(cell){
       var label = (cell.dataset.label || "").toUpperCase();
       return label === "EVICE" ||
@@ -6326,8 +6334,25 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
         label === "TOKYO TEXTURE 01";
     });
     if(!mobileCandidates.length) mobileCandidates = cells;
+    return mobileCandidates;
+  }
+
+  function pickMobileRandomIndex(allowSame){
+    var mobileCandidates = getMobileRandomCandidates();
+    if(!allowSame && mobileCandidates.length > 1){
+      mobileCandidates = mobileCandidates.filter(function(cell){
+        return cells.indexOf(cell) !== activeIndex;
+      });
+    }
     var pickedCell = mobileCandidates[Math.floor(Math.random() * mobileCandidates.length)];
-    var index = Math.max(0, cells.indexOf(pickedCell));
+    return Math.max(0, cells.indexOf(pickedCell));
+  }
+
+  function applyMobileRandomMotion(options){
+    if(!root || !cells.length) return false;
+    options = options || {};
+    var index = typeof options.index === "number" ? options.index : pickMobileRandomIndex(!!options.allowSame);
+    index = Math.max(0, Math.min(cells.length - 1, index));
     root.classList.add("is-mobile-random-motion");
     root.dataset.motionMode = "random-mobile";
     activeIndex = index;
@@ -6339,7 +6364,8 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
       cell.classList.remove("is-prev", "is-next", "is-far", "is-peeking");
       cell.setAttribute("aria-pressed", isActive ? "true" : "false");
       cell.setAttribute("aria-hidden", isActive ? "false" : "true");
-      if(isActive){
+      if(!cell.dataset.mobileRandomClickBound){
+        cell.dataset.mobileRandomClickBound = "1";
         cell.addEventListener("click", function(event){
           if(scrollToWorkThumbnail(cell)) return;
           event.preventDefault();
@@ -6348,8 +6374,13 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     });
     updateHud(index);
     playActive();
-    bindVisibilityPlayback();
+    return true;
   }
+
+  window.__portfolioRandomizeMobileIntroMotion = function(options){
+    if(!isMobileOpening) return false;
+    return applyMobileRandomMotion(options || { allowSame:false });
+  };
 
   function initOpeningMotion(){
     root = document.querySelector(".intro-motion-grid.intro-motion-horizontal");
