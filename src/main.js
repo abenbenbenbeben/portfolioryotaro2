@@ -5956,9 +5956,12 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var video = ensureVideo(card);
     if(!video || video.getAttribute("src")) return video;
     var thumbVideoSrc = card.dataset.thumbVideo;
-    if(thumbVideoSrc.indexOf("/media/intro/tokyo-texture.mp4") === 0){
+    if(
+      thumbVideoSrc.indexOf("/media/intro/tokyo-texture.mp4") === 0 ||
+      thumbVideoSrc.indexOf("/media/thumbs/tokyo-texture.mp4") === 0
+    ){
       var tokyoPlaylist = [
-        "/media/intro/tokyo-texture.mp4?v=20260621-1315",
+        "/media/thumbs/tokyo-texture.mp4?v=20260621-1325",
         "/media/intro/tokyo-texture-02.mp4?v=20260621-1326",
         "/media/intro/tokyo-texture-03.mp4?v=20260621-1315"
       ];
