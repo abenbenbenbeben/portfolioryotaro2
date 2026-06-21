@@ -27,6 +27,43 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
   var slugToIndex = Object.create(null);
   var workRoutePopBound = false;
   var closingFromRoute = false;
+  var viewerReturnFocus = null;
+  var lightboxReturnFocus = null;
+
+  function getFocusableElements(container){
+    if(!container) return [];
+    return Array.from(container.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(function(el){
+      return el.getAttribute("aria-hidden") !== "true" && el.getClientRects().length > 0;
+    });
+  }
+
+  function focusWithoutScroll(el){
+    if(!el || !el.isConnected || typeof el.focus !== "function") return;
+    try{ el.focus({ preventScroll:true }); }
+    catch(_){ try{ el.focus(); }catch(__){} }
+  }
+
+  function trapDialogFocus(event, container){
+    if(event.key !== "Tab") return;
+    var focusable = getFocusableElements(container);
+    if(!focusable.length){
+      event.preventDefault();
+      focusWithoutScroll(container);
+      return;
+    }
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    var active = document.activeElement;
+    if(event.shiftKey && (active === first || !container.contains(active))){
+      event.preventDefault();
+      focusWithoutScroll(last);
+    }else if(!event.shiftKey && active === last){
+      event.preventDefault();
+      focusWithoutScroll(first);
+    }
+  }
 
   function isMobileSafeLightbox(){
     try{
@@ -166,6 +203,21 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     return slug ? "/work/" + encodeURIComponent(slug) : "";
   }
 
+  function syncWorkRouteMeta(idx){
+    var route = getWorkRoute(idx);
+    var item = items[idx];
+    if(!route || !item) return;
+    var d = getData(item);
+    var routeTitle = (d.title ? d.title + " | " : "") + "Ryotaro Portfolio";
+    var routeDescription = String(d.long || d.desc || "Ryotaro Abeの作品詳細。映像、3D、音、グラフィックを横断した制作を紹介します。").trim();
+    if(routeDescription.length > 160) routeDescription = routeDescription.slice(0, 157) + "...";
+    if(window.__portfolioSyncRouteMeta){
+      window.__portfolioSyncRouteMeta({ title:routeTitle, description:routeDescription, path:route });
+    }else{
+      try{ document.title = routeTitle; }catch(_){}
+    }
+  }
+
   function getWorkSlugFromLocation(){
     if(typeof window === "undefined") return "";
     var match = window.location.pathname.match(/^\/work\/([^/]+)\/?$/);
@@ -189,13 +241,12 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     var route = getWorkRoute(idx);
     if(!route) return;
     var item = items[idx];
-    var d = getData(item);
     var state = {
       portfolioView:getWorkViewForItem(item),
       portfolioWork:item.dataset.workSlug || "",
       portfolioReturn:getWorkListRouteForItem(item)
     };
-    try{ document.title = (d.title ? d.title + " | " : "") + "Ryotaro Portfolio"; }catch(_){}
+    syncWorkRouteMeta(idx);
     try{
       if(mode === "replace") window.history.replaceState(state, "", route);
       else window.history.pushState(state, "", route);
@@ -226,7 +277,16 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       return;
     }
     var idx = slugToIndex[slug];
-    if(typeof idx !== "number") return;
+    if(typeof idx !== "number"){
+      try{
+        window.history.replaceState({ portfolioView:"design" }, "", "/design");
+      }catch(_){}
+      if(window.__portfolioSetView){
+        window.__portfolioSetView("design", true, true, "silent");
+      }
+      return;
+    }
+    syncWorkRouteMeta(idx);
     syncUnderlyingWorkView(idx, "silent");
     if(ov && ov.classList.contains("open")){
       cur = idx;
@@ -244,6 +304,11 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     setupWorkSlugs();
 
     ov = document.createElement("div"); ov.id = "wv";
+    ov.setAttribute("role", "dialog");
+    ov.setAttribute("aria-modal", "true");
+    ov.setAttribute("aria-hidden", "true");
+    ov.setAttribute("aria-labelledby", "wv-ttl");
+    ov.setAttribute("tabindex", "-1");
     ov.innerHTML =
       '<div id="wv-bg"></div>' +
       '<div id="wv-panel">' +
@@ -308,11 +373,19 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     /* lightbox */
     lightbox = document.createElement("div");
     lightbox.id = "wv-lb";
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.setAttribute("aria-hidden", "true");
+    lightbox.setAttribute("aria-label", "作品画像プレビュー");
+    lightbox.setAttribute("tabindex", "-1");
     lightbox.innerHTML = '<button id="wv-lb-prev" type="button" aria-label="前へ">&#8592;</button><img alt=""><button id="wv-lb-next" type="button" aria-label="次へ">&#8594;</button><button id="wv-lb-x" type="button" aria-label="閉じる">&#x2715;</button>';
     document.body.appendChild(lightbox);
     lightboxImg = lightbox.querySelector("img");
 
     function lbShow(idx){
+      if(!lightbox.classList.contains("on")){
+        lightboxReturnFocus = document.activeElement;
+      }
       lbIdx = idx;
       var mobileSafe = isMobileSafeLightbox();
       var src = getLightboxSrc(lbSrcs[lbIdx]);
@@ -334,11 +407,20 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       };
       lightboxImg.src = src;
       lightbox.classList.add("on");
+      lightbox.setAttribute("aria-hidden", "false");
+      ov.setAttribute("aria-hidden", "true");
       requestAnimationFrame(function(){ lightboxImg.style.opacity = "1"; });
       lightbox.querySelector("#wv-lb-prev").classList.toggle("hidden", lbIdx === 0);
       lightbox.querySelector("#wv-lb-next").classList.toggle("hidden", lbIdx === lbSrcs.length - 1);
+      requestAnimationFrame(function(){ focusWithoutScroll(lightbox.querySelector("#wv-lb-x")); });
     }
-    function lbClose(){ lightbox.classList.remove("on", "is-native"); }
+    function lbClose(){
+      lightbox.classList.remove("on", "is-native");
+      lightbox.setAttribute("aria-hidden", "true");
+      if(ov.classList.contains("open")) ov.setAttribute("aria-hidden", "false");
+      focusWithoutScroll(lightboxReturnFocus);
+      lightboxReturnFocus = null;
+    }
 
     lightbox.addEventListener("click", function(e){
       if(e.target === lightbox || e.target.id === "wv-lb-x"){ lbClose(); }
@@ -347,9 +429,13 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     });
     document.addEventListener("keydown", function(e){
       if(!lightbox.classList.contains("on")) return;
-      if(e.key === "ArrowLeft" && lbIdx > 0){ lbShow(lbIdx - 1); }
-      if(e.key === "ArrowRight" && lbIdx < lbSrcs.length - 1){ lbShow(lbIdx + 1); }
-      if(e.key === "Escape"){ lbClose(); }
+      if(e.key === "Tab"){
+        trapDialogFocus(e, lightbox);
+        return;
+      }
+      if(e.key === "ArrowLeft" && lbIdx > 0){ e.preventDefault(); e.stopImmediatePropagation(); lbShow(lbIdx - 1); }
+      if(e.key === "ArrowRight" && lbIdx < lbSrcs.length - 1){ e.preventDefault(); e.stopImmediatePropagation(); lbShow(lbIdx + 1); }
+      if(e.key === "Escape"){ e.preventDefault(); e.stopImmediatePropagation(); lbClose(); }
     });
     lightboxImg.addEventListener("click", function(e){
       e.stopPropagation();
@@ -487,6 +573,10 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
         return;
       }
       if(!ov.classList.contains("open")) return;
+      if(e.key === "Tab"){
+        trapDialogFocus(e, ov);
+        return;
+      }
       if(e.key === "Escape"){ close(); return; }
       if(e.key === "ArrowRight"){ go(cur + 1, "right"); }
       if(e.key === "ArrowLeft" ){ go(cur - 1, "left"); }
@@ -1148,12 +1238,18 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
 
   function openAt(idx, opts){
     opts = opts || {};
+    var wasOpen = ov.classList.contains("open");
+    if(!wasOpen) viewerReturnFocus = document.activeElement;
     syncUnderlyingWorkView(idx, "silent");
     if(!opts.skipRoute){
       writeWorkRoute(idx, opts.routeMode || "push");
     }
     ov.classList.add("open");
+    ov.setAttribute("aria-hidden", "false");
     cur = idx; buildDots(); render(cur, null);
+    if(!wasOpen){
+      requestAnimationFrame(function(){ focusWithoutScroll(document.getElementById("wv-x")); });
+    }
     /* no body overflow lock — conflicts with custom scroll */
   }
 
@@ -1162,12 +1258,15 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     if(closingFromRoute) return;
     closingFromRoute = true;
     ov.classList.remove("open");
+    ov.setAttribute("aria-hidden", "true");
     clearTimeout(videoTimer);
     if(videoFrame) videoFrame.innerHTML = "";
     if(!opts.skipRoute && isWorkRoute()){
       writeListRouteForWork(cur, opts.routeMode || "push");
     }
     closingFromRoute = false;
+    focusWithoutScroll(viewerReturnFocus);
+    viewerReturnFocus = null;
     /* overflow restored */
   }
 

@@ -15,3 +15,12 @@ Static portfolio site.
 npm install
 npm run dev
 ```
+
+## Verification
+
+```bash
+npm run check
+```
+
+This runs the production build, CSS growth guard, route smoke tests, and the
+30 MiB delivery limit for videos in `public/media/intro/`.

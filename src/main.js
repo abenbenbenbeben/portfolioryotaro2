@@ -60,10 +60,9 @@
       }
       var _loaderStart = Date.now();
       /* ── INITIAL LOADER ──
-         Wait for the first-screen essentials, but never let a large video or
-         a slow CDN edge trap the visitor behind the loader. */
+         Keep the cover up until the first visible film has a decoded frame. */
       var MIN_LOADER_MS = window.__PORTFOLIO_MIN_LOADER_MS || 1800;
-      var MAX_LOADER_MS = 5200;
+      var MAX_LOADER_MS = 20000;
       try{ console.log("[loader] RESILIENT MODE  MIN=", MIN_LOADER_MS, "ms  MAX=", MAX_LOADER_MS, "ms"); }catch(_){}
 
       function _ready(){
@@ -77,7 +76,7 @@
           return;
         }
         if(elapsed >= MAX_LOADER_MS){
-          try{ window._viewAssetsReady = true; window._viewImagesReady = true; }catch(_){}
+          try{ window._criticalVideoTimedOut = true; }catch(_){}
           __dropLoader();
           return;
         }
@@ -584,6 +583,14 @@
     illustration: "ART | Ryotaro Portfolio",
     "profile-only": "PROFILE | Ryotaro Portfolio"
   };
+  const defaultPageDescription = "Ryotaro Abeのポートフォリオ。映像、3D、音、グラフィック、写真を横断し、光や空間の質感を設計しています。";
+  const viewDescriptionMap = {
+    profile: defaultPageDescription,
+    design: "映像、ライブ演出、ブランドフィルム、3D作品を紹介するRyotaro Abeのデザインポートフォリオ。",
+    photo: "東京を中心に撮影した屋外写真とプロダクト写真を紹介するRyotaro Abeのフォトポートフォリオ。",
+    illustration: "ペン画、絵画、デッサン、色彩構成を紹介するRyotaro Abeのアートポートフォリオ。",
+    "profile-only": "Ryotaro Abeのプロフィール、制作領域、使用ツール、連絡先。"
+  };
   const viewTransitionEl = document.getElementById("nav-curtain");
   let viewTransitionTimer = 0;
   let viewTransitionUnlockTimer = 0;
@@ -602,9 +609,40 @@
   function getRouteForView(view){
     return viewToRouteMap[view] || "/view";
   }
-  function syncDocumentRouteMeta(view){
-    document.title = viewTitleMap[view] || "Ryotaro Portfolio";
+  function setMetaContent(selector, content){
+    var el = document.head.querySelector(selector);
+    if(el && content) el.setAttribute("content", content);
   }
+  function getAbsoluteRouteUrl(path){
+    try{ return new URL(path || window.location.pathname, window.location.origin).href; }
+    catch(_){ return path || window.location.pathname; }
+  }
+  function syncRouteMeta(meta){
+    meta = meta || {};
+    var title = meta.title || "Ryotaro Portfolio";
+    var description = meta.description || defaultPageDescription;
+    var path = meta.path || window.location.pathname || "/design";
+    var absoluteUrl = getAbsoluteRouteUrl(path);
+    document.title = title;
+    setMetaContent('meta[name="description"]', description);
+    setMetaContent('meta[property="og:title"]', title);
+    setMetaContent('meta[property="og:description"]', description);
+    setMetaContent('meta[property="og:url"]', absoluteUrl);
+    setMetaContent('meta[property="og:image"]', getAbsoluteRouteUrl("/assets/optimized/video/sasisho-poster.jpg"));
+    setMetaContent('meta[name="twitter:title"]', title);
+    setMetaContent('meta[name="twitter:description"]', description);
+    setMetaContent('meta[name="twitter:image"]', getAbsoluteRouteUrl("/assets/optimized/video/sasisho-poster.jpg"));
+    var canonical = document.getElementById("portfolio-canonical");
+    if(canonical) canonical.setAttribute("href", absoluteUrl);
+  }
+  function syncDocumentRouteMeta(view){
+    syncRouteMeta({
+      title:viewTitleMap[view] || "Ryotaro Portfolio",
+      description:viewDescriptionMap[view] || defaultPageDescription,
+      path:getRouteForView(view)
+    });
+  }
+  window.__portfolioSyncRouteMeta = syncRouteMeta;
   function writeRouteForView(view, mode){
     if(!window.history || window.location.protocol === "file:") return;
     var nextPath = getRouteForView(view);
@@ -5319,28 +5357,27 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
   function waitForVideo(video){
     return new Promise(function(resolve){
       if(!video){
+        window._criticalVideoReady = true;
         resolve();
         return;
       }
-      if(video.id === "introFilmVideo" && !viewSectionActive){
-        resolve();
-        return;
-      }
-      var src = video.currentSrc || video.getAttribute("src") || getIntroVideoSrc(video) || "";
+      var src = video.currentSrc || video.getAttribute("src") || video.dataset.src || getIntroVideoSrc(video) || "";
       if(!src){
+        window._criticalVideoReady = true;
         resolve();
         return;
       }
 
-      function hasVideoMetadata(){
+      function hasVideoFrame(){
         try{
-          return video.readyState >= 1;
+          return video.readyState >= 2;
         }catch(_){
           return false;
         }
       }
 
-      if(hasVideoMetadata()){
+      if(hasVideoFrame()){
+        window._criticalVideoReady = true;
         resolve();
         return;
       }
@@ -5354,23 +5391,29 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
         video.removeEventListener("error", settle);
         if(timeoutId) window.clearTimeout(timeoutId);
       }
-      function settle(){
+      function settle(event){
         if(settled) return;
         settled = true;
         cleanup();
+        if(event && event.type === "error"){
+          window._criticalVideoFailed = true;
+        }else if(hasVideoFrame()){
+          window._criticalVideoReady = true;
+        }else{
+          window._criticalVideoTimedOut = true;
+        }
         resolve();
       }
 
-      video.addEventListener("loadedmetadata", settle, { once:true });
       video.addEventListener("loadeddata", settle, { once:true });
       video.addEventListener("canplay", settle, { once:true });
       video.addEventListener("error", settle, { once:true });
-      timeoutId = window.setTimeout(settle, 2200);
+      timeoutId = window.setTimeout(settle, 15000);
       try{
         video.muted = true;
         video.defaultMuted = true;
-        video.preload = "metadata";
-        video.setAttribute("preload", "metadata");
+        video.preload = "auto";
+        video.setAttribute("preload", "auto");
         if(!video.getAttribute("src")){
           video.src = src;
         }
@@ -5394,7 +5437,10 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var criticalViewTextures = [
       "/assets/optimized/video/sasisho-poster.jpg"
     ];
-    var introVideo = document.getElementById("introFilmVideo");
+    var introVideo = document.querySelector(
+      ".intro-motion-cell.is-active:not(.is-mobile-random-hidden) video, .intro-motion-cell.is-active video"
+    );
+    window._criticalVideoReady = false;
 
     Promise.all([
       Promise.all(criticalImages.map(waitForImage)),
@@ -5413,10 +5459,14 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
 
   }
 
+  function queueStart(){
+    requestAnimationFrame(start);
+  }
+
   if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", start, { once:true });
+    document.addEventListener("DOMContentLoaded", queueStart, { once:true });
   } else {
-    start();
+    queueStart();
   }
 })();
 
@@ -5983,9 +6033,9 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
       thumbVideoSrc.indexOf("/media/thumbs/tokyo-texture.mp4") === 0
     ){
       var tokyoPlaylist = [
-        "/media/thumbs/tokyo-texture.mp4?v=20260621-1610",
-        "/media/intro/tokyo-texture-02.mp4?v=20260621-1326",
-        "/media/intro/tokyo-texture-03.mp4?v=20260621-1315"
+        "/media/intro/tokyo-texture.mp4?v=20260621-web",
+        "/media/intro/tokyo-texture-02.mp4?v=20260621-web",
+        "/media/intro/tokyo-texture-03.mp4?v=20260621-web"
       ];
       video.loop = false;
       video.removeAttribute("loop");
@@ -6006,13 +6056,13 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     }
     var thumbVideoVersion = "";
     if(thumbVideoSrc.indexOf("/media/intro/evice.mp4") === 0){
-      thumbVideoVersion = "20260621-1315";
+      thumbVideoVersion = "20260621-web";
     }else if(thumbVideoSrc.indexOf("/media/intro/kasanaru.mp4") === 0){
-      thumbVideoVersion = "20260621-1315";
+      thumbVideoVersion = "20260621-web";
     }else if(thumbVideoSrc.indexOf("/media/intro/liminal-space.mp4") === 0){
-      thumbVideoVersion = "20260621-1315";
+      thumbVideoVersion = "20260621-web";
     }else if(thumbVideoSrc.indexOf("/media/intro/realtime-color-volume.mp4") === 0){
-      thumbVideoVersion = "20260621-1315";
+      thumbVideoVersion = "20260621-web";
     }
     if(thumbVideoVersion){
       thumbVideoSrc += (thumbVideoSrc.indexOf("?") === -1 ? "?" : "&") + "v=" + thumbVideoVersion;

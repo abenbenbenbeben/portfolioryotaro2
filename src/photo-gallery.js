@@ -257,6 +257,42 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
   var prevBtn = null;
   var nextBtn = null;
   var currentIndex = 0;
+  var returnFocus = null;
+
+  function getFocusableElements(container){
+    if(!container) return [];
+    return Array.from(container.querySelectorAll(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(function(el){
+      return el.getAttribute("aria-hidden") !== "true" && el.getClientRects().length > 0;
+    });
+  }
+
+  function focusWithoutScroll(el){
+    if(!el || !el.isConnected || typeof el.focus !== "function") return;
+    try{ el.focus({ preventScroll:true }); }
+    catch(_){ try{ el.focus(); }catch(__){} }
+  }
+
+  function trapDialogFocus(event){
+    if(event.key !== "Tab" || !overlay) return;
+    var focusable = getFocusableElements(overlay);
+    if(!focusable.length){
+      event.preventDefault();
+      focusWithoutScroll(overlay);
+      return;
+    }
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    var active = document.activeElement;
+    if(event.shiftKey && (active === first || !overlay.contains(active))){
+      event.preventDefault();
+      focusWithoutScroll(last);
+    }else if(!event.shiftKey && active === last){
+      event.preventDefault();
+      focusWithoutScroll(first);
+    }
+  }
 
   function isMobileSafeLightbox(){
     try{
@@ -313,6 +349,10 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
 
     overlay = document.createElement("div");
     overlay.className = "photo-lightbox";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", "写真プレビュー");
+    overlay.setAttribute("tabindex", "-1");
     overlay.setAttribute("aria-hidden", "true");
     overlay.innerHTML = [
       '<button class="photo-lightbox-close" type="button" aria-label="Close">×</button>',
@@ -346,9 +386,13 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
 
     document.addEventListener("keydown", function(event){
       if(!overlay || !overlay.classList.contains("is-open")) return;
-      if(event.key === "Escape") close();
-      if(event.key === "ArrowLeft") show(currentIndex - 1);
-      if(event.key === "ArrowRight") show(currentIndex + 1);
+      if(event.key === "Tab"){
+        trapDialogFocus(event);
+        return;
+      }
+      if(event.key === "Escape"){ event.preventDefault(); close(); }
+      if(event.key === "ArrowLeft"){ event.preventDefault(); show(currentIndex - 1); }
+      if(event.key === "ArrowRight"){ event.preventDefault(); show(currentIndex + 1); }
     });
   }
 
@@ -385,10 +429,14 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
 
   function open(index){
     ensureOverlay();
+    if(!overlay.classList.contains("is-open")) returnFocus = document.activeElement;
     show(index);
     overlay.setAttribute("aria-hidden", "false");
     overlay.classList.add("is-open");
     document.body.classList.add("photo-lightbox-open");
+    requestAnimationFrame(function(){
+      focusWithoutScroll(overlay.querySelector(".photo-lightbox-close"));
+    });
   }
 
   function close(){
@@ -396,6 +444,8 @@ const getImageDisplaySrc = __portfolioUtils.getImageDisplaySrc || function(_img,
     overlay.classList.remove("is-open", "is-loading");
     overlay.setAttribute("aria-hidden", "true");
     document.body.classList.remove("photo-lightbox-open");
+    focusWithoutScroll(returnFocus);
+    returnFocus = null;
   }
 
   function bind(){

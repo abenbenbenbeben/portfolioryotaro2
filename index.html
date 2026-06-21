@@ -4,6 +4,21 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
 <title>Ryotaro Portfolio</title>
+<meta name="description" content="Ryotaro Abeのポートフォリオ。映像、3D、音、グラフィック、写真を横断し、光や空間の質感を設計しています。" />
+<meta name="robots" content="index,follow,max-image-preview:large" />
+<meta name="theme-color" content="#050505" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="og:site_name" content="Ryotaro Portfolio" />
+<meta property="og:title" content="Ryotaro Portfolio" />
+<meta property="og:description" content="映像、3D、音、グラフィック、写真を横断するRyotaro Abeのポートフォリオ。" />
+<meta property="og:url" content="/design" />
+<meta property="og:image" content="/assets/optimized/video/sasisho-poster.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Ryotaro Portfolio" />
+<meta name="twitter:description" content="映像、3D、音、グラフィック、写真を横断するRyotaro Abeのポートフォリオ。" />
+<meta name="twitter:image" content="/assets/optimized/video/sasisho-poster.jpg" />
+<link id="portfolio-canonical" rel="canonical" href="/design" />
 <meta name="portfolio-build" content="mobile-polished-safe-nav-2026-06-21" />
 <link rel="icon" href="/assets/branding/web-lite.png?v=17332e9" type="image/png" />
 <link rel="shortcut icon" href="/assets/branding/web-lite.png?v=17332e9" type="image/png" />
@@ -57,9 +72,11 @@
         }
       }
       window.__forceLoaderRelease = releaseLoader;
-      setTimeout(releaseLoader, 6500);
+      /* Final safety only. Normal release is controlled by the first video's
+         decoded-frame readiness in main.js. */
+      setTimeout(releaseLoader, 20000);
       window.addEventListener("pageshow", function(){
-        setTimeout(releaseLoader, 8500);
+        if(window._viewAssetsReady === true) releaseLoader();
       }, { once:true });
     })();
   </script>
@@ -194,37 +211,37 @@
             <div class="intro-motion-viewport" tabindex="0" role="region" aria-label="映像作品の横スクロールギャラリー">
               <div class="intro-motion-track">
             <button class="intro-motion-cell is-active" type="button" data-label="EVICE" data-meta="BRANDING / MUSIC VIDEO / 2024" data-work-title="エヴィス" aria-label="EVICEの作品サムネイルへ移動">
-              <video data-src="/media/intro/evice.mp4?v=20260621-1315" poster="/assets/optimized/design/design4.jpg" muted loop playsinline preload="metadata"></video>
+              <video data-src="/media/intro/evice.mp4?v=20260621-web" poster="/assets/optimized/design/design4.jpg" muted loop playsinline preload="metadata"></video>
               <span class="intro-motion-cell-index">01</span>
               <span class="intro-motion-cell-action" aria-hidden="true">VIEW WORK</span>
             </button>
             <button class="intro-motion-cell" type="button" data-label="KASANARU" data-meta="VISUAL FILM / SOUND / 2025" data-work-title="重なる" aria-label="重なるの作品サムネイルへ移動">
-              <video data-src="/media/intro/kasanaru.mp4?v=20260621-1315" poster="/assets/optimized/design/design1.jpg" muted loop playsinline preload="none"></video>
+              <video data-src="/media/intro/kasanaru.mp4?v=20260621-web" poster="/assets/optimized/design/design1.jpg" muted loop playsinline preload="none"></video>
               <span class="intro-motion-cell-index">02</span>
               <span class="intro-motion-cell-action" aria-hidden="true">VIEW WORK</span>
             </button>
             <button class="intro-motion-cell" type="button" data-label="TOKYO TEXTURE 01" data-meta="IMAGE ARCHIVE / MOTION / 2024" data-work-title="TokyoTexture" aria-label="Tokyo Texture 01の作品サムネイルへ移動">
-              <video data-src="/media/intro/tokyo-texture.mp4?v=20260621-1610" poster="/assets/optimized/TokyoTexture/1.jpg" muted loop playsinline preload="none"></video>
+              <video data-src="/media/intro/tokyo-texture.mp4?v=20260621-web" poster="/assets/optimized/TokyoTexture/1.jpg" muted loop playsinline preload="none"></video>
               <span class="intro-motion-cell-index">03</span>
               <span class="intro-motion-cell-action" aria-hidden="true">VIEW TOKYO TEXTURE</span>
             </button>
             <button class="intro-motion-cell" type="button" data-label="TOKYO TEXTURE 02" data-meta="IMAGE ARCHIVE / MOTION / 2024" data-work-title="TokyoTexture" aria-label="Tokyo Texture 02の作品サムネイルへ移動">
-              <video data-src="/media/intro/tokyo-texture-02.mp4?v=20260621-1326" poster="/assets/optimized/TokyoTexture/2.jpg" muted loop playsinline preload="none"></video>
+              <video data-src="/media/intro/tokyo-texture-02.mp4?v=20260621-web" poster="/assets/optimized/TokyoTexture/2.jpg" muted loop playsinline preload="none"></video>
               <span class="intro-motion-cell-index">04</span>
               <span class="intro-motion-cell-action" aria-hidden="true">VIEW TOKYO TEXTURE</span>
             </button>
             <button class="intro-motion-cell" type="button" data-label="TOKYO TEXTURE 03" data-meta="IMAGE ARCHIVE / MOTION / 2024" data-work-title="TokyoTexture" aria-label="Tokyo Texture 03の作品サムネイルへ移動">
-              <video data-src="/media/intro/tokyo-texture-03.mp4?v=20260621-1315" poster="/assets/optimized/TokyoTexture/3.jpg" muted loop playsinline preload="none"></video>
+              <video data-src="/media/intro/tokyo-texture-03.mp4?v=20260621-web" poster="/assets/optimized/TokyoTexture/3.jpg" muted loop playsinline preload="none"></video>
               <span class="intro-motion-cell-index">05</span>
               <span class="intro-motion-cell-action" aria-hidden="true">VIEW TOKYO TEXTURE</span>
             </button>
             <button class="intro-motion-cell" type="button" data-label="LIMINAL SPACE" data-meta="CG FILM / SPATIAL STUDY / 2023" data-work-title="リミナルスペース" aria-label="リミナルスペースの作品サムネイルへ移動">
-              <video data-src="/media/intro/liminal-space.mp4?v=20260621-1315" poster="/assets/optimized/design/design3.jpg" muted loop playsinline preload="none"></video>
+              <video data-src="/media/intro/liminal-space.mp4?v=20260621-web" poster="/assets/optimized/design/design3.jpg" muted loop playsinline preload="none"></video>
               <span class="intro-motion-cell-index">06</span>
               <span class="intro-motion-cell-action" aria-hidden="true">VIEW WORK</span>
             </button>
             <button class="intro-motion-cell" type="button" data-label="REALTIME COLOR VOLUME" data-meta="INTERACTIVE COLOR / 2025" data-work-title="リアルタイム色立体" aria-label="リアルタイム色立体の作品サムネイルへ移動">
-              <video data-src="/media/intro/realtime-color-volume.mp4?v=20260621-1315" poster="/assets/optimized/design/design2.jpg" muted loop playsinline preload="none"></video>
+              <video data-src="/media/intro/realtime-color-volume.mp4?v=20260621-web" poster="/assets/optimized/design/design2.jpg" muted loop playsinline preload="none"></video>
               <span class="intro-motion-cell-index">07</span>
               <span class="intro-motion-cell-action" aria-hidden="true">VIEW WORK</span>
             </button>
