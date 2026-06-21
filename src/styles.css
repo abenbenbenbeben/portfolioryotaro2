@@ -28189,6 +28189,108 @@ body.theme-view-design #view-design.merged-design-section .design-item:not([data
   }
 }
 
+/* Request lock: keep ART archive visible, make wide works feel intentionally large, and show dessin gallery in two columns on mobile. */
+#view-illustration .illus-art-index{
+  display:grid !important;
+}
+
+#view-illustration .illus-art-item.is-landscape-art{
+  z-index:5 !important;
+}
+
+#view-illustration .illus-art-item.is-landscape-art .illus-art-frame{
+  width:min(196%, 900px) !important;
+  max-width:calc(100vw - clamp(26px, 4vw, 64px)) !important;
+  transform-origin:center center !important;
+}
+
+#view-illustration .illus-art-item.is-landscape-art figcaption{
+  width:min(196%, 900px) !important;
+  max-width:calc(100vw - clamp(26px, 4vw, 64px)) !important;
+}
+
+#view-illustration .illus-art-column:nth-child(1) .illus-art-item.is-landscape-art .illus-art-frame,
+#view-illustration .illus-art-column:nth-child(1) .illus-art-item.is-landscape-art figcaption{
+  transform:translateX(0) !important;
+}
+
+#view-illustration .illus-art-column:nth-child(1) .illus-art-item.is-landscape-art.is-photo-visible figcaption{
+  transform:translateX(0) !important;
+}
+
+#view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art .illus-art-frame,
+#view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art figcaption{
+  transform:translateX(-24%) !important;
+}
+
+#view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art.is-photo-visible figcaption{
+  transform:translateX(-24%) !important;
+}
+
+#view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art .illus-art-frame,
+#view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art figcaption{
+  transform:translateX(-48%) !important;
+}
+
+#view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art.is-photo-visible figcaption{
+  transform:translateX(-48%) !important;
+}
+
+@media(max-width:980px){
+  #view-illustration .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-item.is-landscape-art figcaption{
+    width:min(148%, calc(100vw - 28px)) !important;
+    max-width:calc(100vw - 28px) !important;
+  }
+
+  #view-illustration .illus-art-column:nth-child(1) .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-column:nth-child(1) .illus-art-item.is-landscape-art figcaption{
+    transform:translateX(0) !important;
+  }
+
+  #view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-column:nth-child(2) .illus-art-item.is-landscape-art figcaption,
+  #view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-column:nth-child(3) .illus-art-item.is-landscape-art figcaption{
+    transform:translateX(-12%) !important;
+  }
+}
+
+@media(max-width:620px){
+  #view-illustration .illus-art-index{
+    grid-template-columns:1fr !important;
+  }
+
+  #view-illustration .illus-art-item.is-landscape-art .illus-art-frame,
+  #view-illustration .illus-art-item.is-landscape-art figcaption{
+    width:calc(100vw - 14px) !important;
+    max-width:calc(100vw - 14px) !important;
+    transform:translateX(calc((100vw - 100%) / -2 + 7px)) !important;
+  }
+
+  #wv.is-dessin-color-work #wv-gallery-wrap.is-photo-grid-gallery{
+    padding-inline:12px !important;
+  }
+
+  #wv.is-dessin-color-work #wv-gallery.is-photo-grid-gallery{
+    display:grid !important;
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    columns:initial !important;
+    column-gap:0 !important;
+    gap:14px 10px !important;
+  }
+
+  #wv.is-dessin-color-work #wv-gallery.is-photo-grid-gallery .wv-story-block{
+    margin:0 !important;
+    break-inside:auto !important;
+  }
+
+  #wv.is-dessin-color-work #wv-gallery.is-photo-grid-gallery .wv-story-img-num{
+    font-size:7px !important;
+    padding:4px 5px 3px !important;
+  }
+}
+
 @media(max-width:380px){
   :root{
     --topbar-h:104px !important;
