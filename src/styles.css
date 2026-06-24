@@ -23412,6 +23412,37 @@ body.is-view-transitioning .sidebar{
   }
 }
 
+/* Film preview scale: make YouTube previews feel like the primary work media. */
+#wv.is-visual-film.has-video-preview #wv-video-wrap{
+  padding:clamp(24px, 4.6vw, 58px) clamp(14px, 4.2vw, 64px) clamp(18px, 3vw, 34px) !important;
+}
+
+#wv.is-visual-film #wv-video-label,
+#wv.is-visual-film #wv-video-frame,
+#wv.is-visual-film .wv-video-external{
+  width:min(1280px, 92vw) !important;
+}
+
+#wv.is-visual-film #wv-video-frame{
+  box-shadow:0 26px 72px rgba(0,0,0,0.42) !important;
+}
+
+#wv.is-visual-film #wv-video-frame.is-multi{
+  gap:clamp(12px, 1.6vw, 22px) !important;
+}
+
+@media(max-width:920px){
+  #wv.is-visual-film.has-video-preview #wv-video-wrap{
+    padding:18px 12px 14px !important;
+  }
+
+  #wv.is-visual-film #wv-video-label,
+  #wv.is-visual-film #wv-video-frame,
+  #wv.is-visual-film .wv-video-external{
+    width:100% !important;
+  }
+}
+
 /* Authoritative stable intro: this final layer wins over older experiments. */
 .intro-film{
   height:150svh !important;
