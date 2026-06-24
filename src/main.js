@@ -5433,7 +5433,7 @@
         try{
           video.muted = true;
           video.defaultMuted = true;
-          if(!video.getAttribute("src")){
+          if(!video.currentSrc && !video.getAttribute("src")){
             video.src = src;
             video.load();
           }
@@ -5490,10 +5490,12 @@
         video.defaultMuted = true;
         video.preload = "auto";
         video.setAttribute("preload", "auto");
-        if(!video.getAttribute("src")){
+        if(!video.currentSrc && !video.getAttribute("src")){
           video.src = src;
+          video.load();
+        }else if(video.networkState === 0){
+          video.load();
         }
-        video.load();
       }catch(_){}
     });
   }
@@ -6248,7 +6250,14 @@
   }
 
   function loadVideo(video){
-    if(!video || video.getAttribute("src") || !video.dataset.src) return;
+    if(!video) return;
+    if(video.currentSrc || video.getAttribute("src")){
+      if(video.networkState === 0){
+        try{ video.load(); }catch(_){}
+      }
+      return;
+    }
+    if(!video.dataset.src) return;
     video.src = video.dataset.src;
     video.load();
   }
@@ -6483,7 +6492,7 @@
       var label = (cell.dataset.label || "").toUpperCase();
       return label === "EVICE" ||
         label === "KASANARU" ||
-        label === "TOKYO TEXTURE 01";
+        label === "TOKYO TEXTURE 03";
     });
     if(!mobileCandidates.length) mobileCandidates = cells;
     return mobileCandidates;
