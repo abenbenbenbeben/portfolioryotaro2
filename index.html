@@ -83,6 +83,7 @@
           window._viewAssetsReady = true;
           window._viewImagesReady = true;
           document.body.classList.add("page-revealed");
+          try{ window.dispatchEvent(new Event("portfolio:page-revealed")); }catch(_){}
           loader.classList.add("hide");
           setTimeout(function(){
             try{ loader.style.display = "none"; }catch(_){}
