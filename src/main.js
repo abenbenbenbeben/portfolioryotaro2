@@ -294,6 +294,7 @@
     var path = parts.path;
     if(!/^\/assets\//.test(path)) return src;
     if(/^\/assets\/mobile\//.test(path)) return src;
+    if(/^\/assets\/optimized\/gallery\//.test(path)) return src;
     if(/^\/assets\/branding\//.test(path) || /^\/assets\/loader\//.test(path)) return src;
     if(!/\.(jpe?g|png)$/i.test(path)) return src;
     return "/assets/mobile/" + path.slice("/assets/".length).replace(/\.(jpe?g|png)$/i, ".jpg") + parts.suffix;
@@ -6000,7 +6001,6 @@
 
   var SELECTOR = "img[data-full-src], .illus-art-frame img";
   var observed = new WeakSet();
-  var observer = null;
 
   function upgradeWhenLoaded(image){
     if(!image) return;
@@ -6184,23 +6184,14 @@
     if(!(card instanceof HTMLElement) || observed.has(card)) return;
     observed.add(card);
     card.classList.add("has-thumb-video", "has-motion-layout");
-
-    if(!("IntersectionObserver" in window)){
-      return;
-    }
-    observer.observe(card);
+    card.addEventListener("mouseenter", function(){ play(card); });
+    card.addEventListener("mouseleave", function(){ pause(card); });
+    card.addEventListener("focusin", function(){ play(card); });
+    card.addEventListener("focusout", function(){ pause(card); });
   }
 
   function init(){
     if(reduceMotion || saveData || mobileLike) return;
-    if("IntersectionObserver" in window){
-      observer = new IntersectionObserver(function(entries){
-        entries.forEach(function(entry){
-          if(entry.isIntersecting && entry.intersectionRatio > 0.18) play(entry.target);
-          else pause(entry.target);
-        });
-      }, { rootMargin:"80px 0px", threshold:[0, 0.18, 0.58] });
-    }
     document.querySelectorAll(SELECTOR).forEach(bind);
   }
 
