@@ -5433,6 +5433,8 @@
         try{
           video.muted = true;
           video.defaultMuted = true;
+          video.preload = "metadata";
+          video.setAttribute("preload", "metadata");
           if(!video.currentSrc && !video.getAttribute("src")){
             video.src = src;
             video.load();
@@ -5488,8 +5490,8 @@
       try{
         video.muted = true;
         video.defaultMuted = true;
-        video.preload = "auto";
-        video.setAttribute("preload", "auto");
+        video.preload = "metadata";
+        video.setAttribute("preload", "metadata");
         if(!video.currentSrc && !video.getAttribute("src")){
           video.src = src;
           video.load();
@@ -6265,6 +6267,10 @@
   function playVideo(video){
     if(!video || reduceMotion || saveData) return;
     loadVideo(video);
+    try{
+      video.preload = "auto";
+      video.setAttribute("preload", "auto");
+    }catch(_){}
     var pending = video.play();
     if(pending && typeof pending.catch === "function") pending.catch(function(){});
   }
