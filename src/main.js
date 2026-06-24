@@ -63,7 +63,7 @@
       /* ── INITIAL LOADER ──
          Keep the cover up until the first visible film has a decoded frame. */
       var MIN_LOADER_MS = window.__PORTFOLIO_MIN_LOADER_MS || 1800;
-      var MAX_LOADER_MS = __portfolioFastMobile ? 7000 : 20000;
+      var MAX_LOADER_MS = __portfolioFastMobile ? 5200 : 7200;
       try{ console.log("[loader] RESILIENT MODE  MIN=", MIN_LOADER_MS, "ms  MAX=", MAX_LOADER_MS, "ms"); }catch(_){}
 
       function _ready(){
@@ -78,6 +78,7 @@
         }
         if(elapsed >= MAX_LOADER_MS){
           try{ window._criticalVideoTimedOut = true; }catch(_){}
+          try{ window._viewAssetsReady = true; window._viewImagesReady = true; }catch(_){}
           __dropLoader();
           return;
         }
@@ -4177,7 +4178,64 @@
 
 
 /* Work detail viewer moved to src/work-viewer.js. */
-import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] failed to load", err); });
+(function(){
+  "use strict";
+  var workViewerPromise = null;
+  var workViewerLoaded = false;
+
+  function isWorkRoute(){
+    return /^\/work\/[^/]+\/?$/.test(window.location.pathname || "");
+  }
+
+  function loadWorkViewer(){
+    if(workViewerPromise) return workViewerPromise;
+    workViewerPromise = import("./work-viewer.js")
+      .then(function(mod){
+        workViewerLoaded = true;
+        return mod;
+      })
+      .catch(function(err){
+        workViewerPromise = null;
+        console.error("[work-viewer] failed to load", err);
+      });
+    return workViewerPromise;
+  }
+
+  if(isWorkRoute()){
+    loadWorkViewer();
+  }
+
+  document.addEventListener("pointerover", function(event){
+    if(workViewerLoaded) return;
+    var target = event.target && event.target.closest
+      ? event.target.closest("#view-design .design-item, #view-illustration .illus-card")
+      : null;
+    if(target) loadWorkViewer();
+  }, { passive:true });
+
+  document.addEventListener("focusin", function(event){
+    if(workViewerLoaded) return;
+    var target = event.target && event.target.closest
+      ? event.target.closest("#view-design .design-item, #view-illustration .illus-card")
+      : null;
+    if(target) loadWorkViewer();
+  });
+
+  document.addEventListener("click", function(event){
+    if(workViewerLoaded) return;
+    var target = event.target && event.target.closest
+      ? event.target.closest("#view-design .design-item, #view-illustration .illus-card")
+      : null;
+    if(!target) return;
+    event.preventDefault();
+    event.stopPropagation();
+    loadWorkViewer().then(function(){
+      if(window.__openWorkFromElement){
+        window.__openWorkFromElement(target);
+      }
+    });
+  }, true);
+})();
 
 (function(){
   "use strict";
@@ -5414,7 +5472,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
         cleanup();
         if(event && event.type === "error"){
           window._criticalVideoFailed = true;
-        }else if(hasVideoFrame()){
+        }else if(hasVideoFrame() || (event && event.type === "loadedmetadata")){
           window._criticalVideoReady = true;
         }else{
           window._criticalVideoTimedOut = true;
@@ -5422,10 +5480,11 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
         resolve();
       }
 
+      video.addEventListener("loadedmetadata", settle, { once:true });
       video.addEventListener("loadeddata", settle, { once:true });
       video.addEventListener("canplay", settle, { once:true });
       video.addEventListener("error", settle, { once:true });
-      timeoutId = window.setTimeout(settle, 15000);
+      timeoutId = window.setTimeout(settle, 2400);
       try{
         video.muted = true;
         video.defaultMuted = true;
@@ -6006,6 +6065,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
 
   var SELECTOR = "#view-design .design-item[data-thumb-video]";
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var mobileLike = window.matchMedia && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
   var saveData = !!(navigator.connection && navigator.connection.saveData);
   var observed = new WeakSet();
   var observer = null;
@@ -6056,10 +6116,7 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     var video = ensureVideo(card);
     if(!video || video.getAttribute("src")) return video;
     var thumbVideoSrc = card.dataset.thumbVideo;
-    if(
-      thumbVideoSrc.indexOf("/media/intro/tokyo-texture.mp4") === 0 ||
-      thumbVideoSrc.indexOf("/media/thumbs/tokyo-texture.mp4") === 0
-    ){
+    if(thumbVideoSrc.indexOf("/media/intro/tokyo-texture.mp4") === 0){
       var tokyoPlaylist = [
         "/media/intro/tokyo-texture.mp4?v=20260621-web",
         "/media/intro/tokyo-texture-02.mp4?v=20260621-web",
@@ -6123,24 +6180,22 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
     if(!(card instanceof HTMLElement) || observed.has(card)) return;
     observed.add(card);
     card.classList.add("has-thumb-video", "has-motion-layout");
-    loadVideo(card);
 
     if(!("IntersectionObserver" in window)){
-      play(card);
       return;
     }
     observer.observe(card);
   }
 
   function init(){
-    if(reduceMotion || saveData) return;
+    if(reduceMotion || saveData || mobileLike) return;
     if("IntersectionObserver" in window){
       observer = new IntersectionObserver(function(entries){
         entries.forEach(function(entry){
-          if(entry.isIntersecting && entry.intersectionRatio > 0.12) play(entry.target);
+          if(entry.isIntersecting && entry.intersectionRatio > 0.18) play(entry.target);
           else pause(entry.target);
         });
-      }, { rootMargin:"280px 0px", threshold:[0, 0.12, 0.58] });
+      }, { rootMargin:"80px 0px", threshold:[0, 0.18, 0.58] });
     }
     document.querySelectorAll(SELECTOR).forEach(bind);
   }
@@ -6615,4 +6670,47 @@ import("./work-viewer.js").catch(function(err){ console.error("[work-viewer] fai
 })();
 
 /* Photo gallery moved to src/photo-gallery.js. */
-import("./photo-gallery.js").catch(function(err){ console.error("[photo-gallery] failed to load", err); });
+(function(){
+  "use strict";
+  var photoGalleryPromise = null;
+  var photoGalleryLoaded = false;
+
+  function loadPhotoGallery(){
+    if(photoGalleryPromise) return photoGalleryPromise;
+    photoGalleryPromise = import("./photo-gallery.js")
+      .then(function(mod){
+        photoGalleryLoaded = true;
+        if(window.__ensurePhotoRendered) window.__ensurePhotoRendered();
+        return mod;
+      })
+      .catch(function(err){
+        photoGalleryPromise = null;
+        console.error("[photo-gallery] failed to load", err);
+      });
+    return photoGalleryPromise;
+  }
+
+  function isPhotoRoute(){
+    return /^\/photo\/?$/.test(window.location.pathname || "");
+  }
+
+  if(isPhotoRoute()){
+    loadPhotoGallery();
+  }
+
+  document.addEventListener("pointerover", function(event){
+    if(photoGalleryLoaded) return;
+    var nav = event.target && event.target.closest
+      ? event.target.closest('.menu [data-view="photo"]')
+      : null;
+    if(nav) loadPhotoGallery();
+  }, { passive:true });
+
+  document.addEventListener("click", function(event){
+    if(photoGalleryLoaded) return;
+    var nav = event.target && event.target.closest
+      ? event.target.closest('.menu [data-view="photo"]')
+      : null;
+    if(nav) loadPhotoGallery();
+  }, true);
+})();

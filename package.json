@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prune-dist-assets.mjs",
     "preview": "vite preview",
     "check:css": "node scripts/check-css-health.mjs",
     "test:smoke": "npm run build && node scripts/smoke-routes.mjs",
