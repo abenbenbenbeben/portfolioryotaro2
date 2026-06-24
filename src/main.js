@@ -6071,7 +6071,6 @@
 
   var SELECTOR = "#view-design .design-item[data-thumb-video]";
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var mobileLike = window.matchMedia && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches;
   var saveData = !!(navigator.connection && navigator.connection.saveData);
   var observed = new WeakSet();
   var observer = null;
@@ -6104,7 +6103,11 @@
     }
     video.addEventListener("loadeddata", function(){
       card.classList.add("has-thumb-video-ready");
+      if(card.classList.contains("is-thumb-video-playing")) play(card);
     }, { once:true });
+    video.addEventListener("canplay", function(){
+      if(card.classList.contains("is-thumb-video-playing")) play(card);
+    });
     video.addEventListener("error", function(){
       card.classList.remove("has-thumb-video-ready", "is-thumb-video-playing");
     });
@@ -6186,14 +6189,25 @@
     if(!(card instanceof HTMLElement) || observed.has(card)) return;
     observed.add(card);
     card.classList.add("has-thumb-video", "has-motion-layout");
-    card.addEventListener("mouseenter", function(){ play(card); });
-    card.addEventListener("mouseleave", function(){ pause(card); });
-    card.addEventListener("focusin", function(){ play(card); });
-    card.addEventListener("focusout", function(){ pause(card); });
+    ensureVideo(card);
+
+    if(!observer){
+      play(card);
+      return;
+    }
+    observer.observe(card);
   }
 
   function init(){
-    if(reduceMotion || saveData || mobileLike) return;
+    if(reduceMotion || saveData) return;
+    if("IntersectionObserver" in window){
+      observer = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting && entry.intersectionRatio > 0.12) play(entry.target);
+          else pause(entry.target);
+        });
+      }, { rootMargin:"120px 0px", threshold:[0, 0.12, 0.58] });
+    }
     document.querySelectorAll(SELECTOR).forEach(bind);
   }
 
