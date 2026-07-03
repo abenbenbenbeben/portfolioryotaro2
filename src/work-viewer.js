@@ -634,6 +634,8 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       ? youtubeListRaw.split("|").map(getYoutubeId).filter(Boolean)
       : (youtubeRaw ? youtubeRaw.split("|").map(getYoutubeId).filter(Boolean) : []);
     var youtube = youtubeList[0] || "";
+    var videoLayout = ds.videoLayout || "";
+    var hideYoutubeLinks = ds.hideYoutubeLinks === "1" || ds.hideYoutubeLinks === "true";
     var themeRaw = ds.themeGallery || "";
     var themeGallery = themeRaw ? themeRaw.split("|").map(function(s){ return getFastDisplayAssetSrc(s.trim()); }).filter(Boolean) : [];
     var download = ds.download || "";
@@ -645,7 +647,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     var tools   = ds.tools   || "";
     return { src:src, fallbackSrc:desktopFallbackSrc, title:title, cat:catTx, desc:desc,
              long:long, year:year, role:role, media:media,
-             gallery:gallery, galleryLayout:galleryLayout, youtube:youtube, youtubeList:youtubeList, themeGallery:themeGallery,
+             gallery:gallery, galleryLayout:galleryLayout, youtube:youtube, youtubeList:youtubeList, videoLayout:videoLayout, hideYoutubeLinks:hideYoutubeLinks, themeGallery:themeGallery,
              href:href, download:download, downloadName:downloadName, linkLabel:linkLabel,
              process:process, tools:tools };
   }
@@ -880,7 +882,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     if(!videoWrap || !videoFrame) return;
     clearTimeout(videoTimer);
     videoFrame.innerHTML = "";
-    videoFrame.classList.remove("is-playing", "is-multi");
+    videoFrame.classList.remove("is-playing", "is-multi", "is-hero-stack");
     videoWrap.querySelectorAll(".wv-video-external").forEach(function(link){
       link.remove();
     });
@@ -894,6 +896,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     }
     videoWrap.style.display = "block";
     videoFrame.classList.toggle("is-multi", videos.length > 1);
+    videoFrame.classList.toggle("is-hero-stack", d.videoLayout === "hero-stack" && videos.length > 1);
 
     videos.forEach(function(videoId, index){
       var slot = document.createElement("div");
@@ -932,7 +935,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       videoFrame.appendChild(slot);
 
       var watchUrl = getYoutubeWatchUrl(videoId);
-      if(watchUrl){
+      if(watchUrl && !d.hideYoutubeLinks){
         var externalLink = document.createElement("a");
         externalLink.className = "wv-video-external";
         externalLink.href = watchUrl;
