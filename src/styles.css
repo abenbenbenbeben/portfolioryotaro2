@@ -8283,6 +8283,11 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   aspect-ratio:16 / 8.2;
 }
 
+#wv-video-frame.is-multi.is-hero-stack .wv-video-slot:nth-child(2):nth-last-child(n+4){
+  grid-column:1 / -1;
+  aspect-ratio:16 / 8.2;
+}
+
 #wv-video-frame iframe,
 .wv-video-slot iframe{
   position:absolute;
@@ -8474,6 +8479,11 @@ body.theme-view-design .design-item.visual-film-project .visual-film-frame:hover
   }
 
   #wv-video-frame.is-multi.is-hero-stack .wv-video-slot:first-child{
+    grid-column:auto;
+    aspect-ratio:16 / 9;
+  }
+
+  #wv-video-frame.is-multi.is-hero-stack .wv-video-slot:nth-child(2):nth-last-child(n+4){
     grid-column:auto;
     aspect-ratio:16 / 9;
   }
