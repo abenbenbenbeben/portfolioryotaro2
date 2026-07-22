@@ -792,7 +792,9 @@
   }
 
   function resetViewScrollPosition(view, preferOrbit = false){
-    if(view === "profile" && preferOrbit && heroEl){
+    if(view === "design" && preferOrbit && designViewEl){
+      scrollToDesignTop(true);
+    }else if(view === "profile" && preferOrbit && heroEl){
       scrollToViewHero(true);
     }else{
       safeScrollToTop();
@@ -2206,6 +2208,12 @@
 
   window.__portfolioSetView = setView;
   window.__portfolioGetRouteForView = getRouteForView;
+  window.__portfolioPlayViewTransition = function(view){
+    return playViewTransition(view || "design", false);
+  };
+  window.__portfolioScrollToDesignTop = function(instant){
+    scrollToDesignTop(instant !== false);
+  };
 
   const cursor = document.getElementById("cursor");
   if(isCoarsePointer){

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#080808" />
+  <title>TokyoTexture / Zoom Study</title>
+  <link rel="stylesheet" href="./src/tokyo-texture-experiment.css" />
+</head>
+<body>
+  <main class="zoom-page">
+    <header class="zoom-header">
+      <a class="back-link" href="/work/tokyo-texture">&#8592; BACK TO TOKYOTEXTURE</a>
+      <p class="project-code">TOKYO TEXTURE / EXPERIMENT 01</p>
+    </header>
+
+    <section class="zoom-intro" aria-labelledby="zoom-title">
+      <p class="eyebrow">TRY TO SEE THE DETAILS</p>
+      <h1 id="zoom-title">Look closer.</h1>
+      <p class="zoom-lead">画像の中にある細かい風景を、近づいたり離れたりしながら探してみてください。</p>
+    </section>
+
+    <section class="zoom-gallery" id="zoomGallery" aria-label="TokyoTexture image explorer">
+      <article class="zoom-stage-card" data-image-index="01">
+        <div class="zoom-stage">
+          <div class="stage-grid" aria-hidden="true"></div>
+          <div class="zoom-image-wrap">
+            <img src="./tokyo拡大/photo-mosaic-1781597235080.jpg" alt="TokyoTexture image 01" draggable="false" />
+          </div>
+          <div class="stage-hint">SWIPE TO SCROLL / PINCH TO ZOOM</div>
+          <div class="stage-status" aria-live="polite">
+            <span class="zoom-readout">100%</span><span class="status-divider">/</span><span>01 / 03</span>
+          </div>
+        </div>
+        <div class="stage-controls" aria-label="Image 01 controls">
+          <button type="button" data-stage-action="out" aria-label="画像01を縮小">−</button>
+          <button type="button" data-stage-action="reset">RESET</button>
+          <button type="button" data-stage-action="in" aria-label="画像01を拡大">＋</button>
+        </div>
+      </article>
+
+      <article class="zoom-stage-card" data-image-index="02">
+        <div class="zoom-stage">
+          <div class="stage-grid" aria-hidden="true"></div>
+          <div class="zoom-image-wrap">
+            <img src="./tokyo拡大/photo-mosaic-1781597205788 (1).jpg" alt="TokyoTexture image 02" draggable="false" />
+          </div>
+          <div class="stage-hint">SWIPE TO SCROLL / PINCH TO ZOOM</div>
+          <div class="stage-status" aria-live="polite">
+            <span class="zoom-readout">100%</span><span class="status-divider">/</span><span>02 / 03</span>
+          </div>
+        </div>
+        <div class="stage-controls" aria-label="Image 02 controls">
+          <button type="button" data-stage-action="out" aria-label="画像02を縮小">−</button>
+          <button type="button" data-stage-action="reset">RESET</button>
+          <button type="button" data-stage-action="in" aria-label="画像02を拡大">＋</button>
+        </div>
+      </article>
+
+      <article class="zoom-stage-card" data-image-index="03">
+        <div class="zoom-stage">
+          <div class="stage-grid" aria-hidden="true"></div>
+          <div class="zoom-image-wrap">
+            <img src="./tokyo拡大/photo-mosaic-1781590411874 (1).jpg" alt="TokyoTexture image 03" draggable="false" />
+          </div>
+          <div class="stage-hint">SWIPE TO SCROLL / PINCH TO ZOOM</div>
+          <div class="stage-status" aria-live="polite">
+            <span class="zoom-readout">100%</span><span class="status-divider">/</span><span>03 / 03</span>
+          </div>
+        </div>
+        <div class="stage-controls" aria-label="Image 03 controls">
+          <button type="button" data-stage-action="out" aria-label="画像03を縮小">−</button>
+          <button type="button" data-stage-action="reset">RESET</button>
+          <button type="button" data-stage-action="in" aria-label="画像03を拡大">＋</button>
+        </div>
+      </article>
+    </section>
+
+    <footer class="zoom-footer">
+      <span>TokyoTexture / 2024</span>
+      <span>One image, many small scenes.</span>
+    </footer>
+  </main>
+  <script type="module" src="./src/tokyo-texture-experiment.js"></script>
+</body>
+</html>

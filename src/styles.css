@@ -531,6 +531,56 @@ html.is-light-mobile .opening-reveal-cards i:nth-child(n+3){
     transform:translate(-50%, -46%);
   }
 }
+
+/* Keep the DESIGN section dark after a work viewer returns Home. The section is
+   moved into PROFILE as .merged-design-section, so it cannot rely on the
+   body.theme-view-design selector. */
+#view-design.merged-design-section,
+#view-design.merged-design-section .design-page{
+  background:#050505 !important;
+  color:#f6f3ec !important;
+}
+
+#view-design.merged-design-section .design-page{
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(180deg, #050505 0%, #0b0b0b 42%, #030303 100%) !important;
+  background-size:84px 84px, 100% 100% !important;
+}
+
+#view-design.merged-design-section .design-page::before{
+  background:
+    linear-gradient(115deg, rgba(255,255,255,0.08), transparent 24%, transparent 70%, rgba(201,163,92,0.08)),
+    linear-gradient(180deg, rgba(255,255,255,0.035), transparent 28%, rgba(0,0,0,0.38)) !important;
+  opacity:1 !important;
+}
+
+#view-design.merged-design-section .design-hero{
+  background:transparent !important;
+  border-bottom-color:rgba(246,243,236,0.18) !important;
+}
+
+#view-design.merged-design-section .design-hero h1{
+  color:#f6f3ec !important;
+  -webkit-text-fill-color:#f6f3ec !important;
+}
+
+#view-design.merged-design-section .design-hero > p:last-child{
+  color:rgba(246,243,236,0.68) !important;
+}
+
+#view-design.merged-design-section .design-hero .section-kicker{
+  color:rgba(246,243,236,0.44) !important;
+  -webkit-text-fill-color:rgba(246,243,236,0.44) !important;
+}
+
+/* Temporarily remove the unused archive entrances from the main flow. */
+#viewArchive,
+#viewLegacy3d{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
 .hero-3d{
   position:relative;
   min-height:100svh;
@@ -3270,18 +3320,33 @@ body.perf-stable::after{
   backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
   z-index:3;
 }
+#wv-hd-right{ order:1; }
 #wv-breadcrumb{
+  order:2;
   display:flex; align-items:center; gap:8px;
-  font:300 10px/1 "Zen Kaku Gothic New",sans-serif;
-  letter-spacing:.22em; color:rgba(29,29,31,0.38);
+  min-width:0;
+  justify-content:flex-end;
+  text-align:right;
+  font:500 10px/1 "Zen Kaku Gothic New",sans-serif;
+  letter-spacing:.16em; color:rgba(29,29,31,0.42);
 }
-#wv-breadcrumb span{ color:rgba(29,29,31,0.22); }
+#wv-breadcrumb > span:first-of-type{ color:rgba(29,29,31,0.22); }
+#wv-breadcrumb-title{
+  max-width:min(48vw, 520px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#1D1D1F !important;
+  font:600 14px/1.1 "Shippori Mincho",serif;
+  letter-spacing:.08em;
+}
 #wv-hd-right{ display:flex; align-items:center; gap:10px; }
 .wv-hd-pill{
   display:inline-flex; align-items:center; gap:6px;
-  padding:7px 14px; border:1px solid rgba(0,0,0,0.09);
+  min-height:40px;
+  padding:0 16px; border:1px solid rgba(0,0,0,0.14);
   border-radius:999px; color:rgba(29,29,31,0.64);
-  font:500 10px/1 "Zen Kaku Gothic New",sans-serif;
+  font:600 10.5px/1 "Zen Kaku Gothic New",sans-serif;
   letter-spacing:.14em; background:transparent;
   cursor:pointer;
   transition:background .2s, border-color .2s, color .2s, transform .26s cubic-bezier(0.16,1,0.3,1);
@@ -3289,13 +3354,14 @@ body.perf-stable::after{
 .wv-hd-pill:hover{ background:rgba(0,0,0,0.05); border-color:rgba(0,0,0,0.15); color:#1D1D1F; }
 .wv-hd-pill:active{ transform:scale(0.95); }
 #wv-x{
-  width:36px; height:36px; border:1px solid rgba(0,0,0,0.09);
+  width:44px; height:44px; border:1px solid rgba(0,0,0,0.16);
   border-radius:50%; background:rgba(0,0,0,0.03); color:#1D1D1F;
-  font-size:15px; cursor:pointer;
+  font-size:19px; font-weight:500; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
-  transition:background .18s, transform .28s cubic-bezier(0.16,1,0.3,1);
+  transition:background .18s, border-color .18s, transform .28s cubic-bezier(0.16,1,0.3,1);
 }
-#wv-x:hover{ background:rgba(0,0,0,0.09); transform:rotate(90deg) scale(1.08); }
+#wv-x:hover,
+#wv-x:focus-visible{ background:rgba(0,0,0,0.09); border-color:rgba(0,0,0,0.28); transform:rotate(90deg) scale(1.08); }
 
 /* ── scroll area ── */
 #wv-scroll{
@@ -3412,6 +3478,25 @@ body.perf-stable::after{
 }
 #wv-lnk.visible{ display:inline-flex; }
 #wv-lnk:hover{ background:#333; }
+
+#wv-lnk.is-experiment-link{
+  min-height:52px;
+  padding:0 26px;
+  border:1px solid rgba(201,163,92,.72);
+  border-radius:999px;
+  background:linear-gradient(135deg, #c9a35c, #9e7535);
+  box-shadow:0 12px 28px rgba(126,83,24,.22);
+  color:#17120b;
+  font-size:13px;
+  letter-spacing:.14em;
+}
+
+#wv-lnk.is-experiment-link:hover,
+#wv-lnk.is-experiment-link:focus-visible{
+  background:linear-gradient(135deg, #e1be78, #b98943);
+  color:#100d08;
+  transform:translateY(-2px);
+}
 
 /* ── divider ── */
 .wv-section-divider{
@@ -3656,6 +3741,9 @@ body.perf-stable::after{
 }
 @media(max-width:520px){
   #wv-hd{ padding:12px 16px; }
+  #wv-breadcrumb-title{ max-width:42vw; font-size:13px; }
+  .wv-hd-pill{ min-height:38px; padding:0 13px; }
+  #wv-x{ width:42px; height:42px; }
   .wvmeta-row{ grid-template-columns:66px 1fr; }
 }
 
@@ -24173,32 +24261,7 @@ img.is-quality-ready{
 }
 
 
-/* Work detail contact route */
-#wv-contact{
-  display:inline-flex !important;
-  align-items:center !important;
-  gap:7px !important;
-  width:fit-content !important;
-  margin-left:8px !important;
-  padding:10px 20px !important;
-  border:1px solid rgba(29,29,31,0.18) !important;
-  border-radius:999px !important;
-  background:transparent !important;
-  color:#1D1D1F !important;
-  font:700 10.5px/1 "Zen Kaku Gothic New", sans-serif !important;
-  letter-spacing:.16em !important;
-  text-decoration:none !important;
-  transition:background .2s ease, color .2s ease, border-color .2s ease, opacity .38s .34s, transform .46s .34s cubic-bezier(0.16,1,0.3,1) !important;
-}
-
-#wv-contact:hover{
-  background:#1D1D1F !important;
-  color:#fff !important;
-  border-color:#1D1D1F !important;
-}
-
 @media(max-width:720px){
-  #wv-contact,
   #wv-lnk{
     width:100% !important;
     justify-content:center !important;

@@ -315,8 +315,8 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
         '<div id="wv-hd">' +
           '<div id="wv-breadcrumb">WORKS <span>/</span> <span id="wv-breadcrumb-title"></span></div>' +
           '<div id="wv-hd-right">' +
-            '<button class="wv-hd-pill" id="wv-home" type="button">&#8962; ホーム</button>' +
             '<button id="wv-x" type="button" aria-label="閉じる">&#x2715;</button>' +
+            '<button class="wv-hd-pill" id="wv-home" type="button">&#8962; ホーム</button>' +
           '</div>' +
         '</div>' +
         '<div id="wv-scroll">' +
@@ -335,7 +335,6 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
               '<p  id="wv-dsc" class="wvi"></p>' +
               '<div id="wv-meta" class="wvi"></div>' +
               '<a  id="wv-lnk" class="wvi" target="_blank" rel="noopener">VIEW PROJECT &#8594;</a>' +
-              '<a  id="wv-contact" class="wvi" href="mailto:ryotaro.a09@gmail.com">CONTACT &#8594;</a>' +
             '</div>' +
             '<div id="wv-theme-wrap">' +
               '<p id="wv-theme-label">THEME / SIDE IMAGES</p>' +
@@ -553,17 +552,25 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
 
     /* home */
     document.getElementById("wv-home").addEventListener("click", function(){
+      var transitionDuration = 0;
+      if(window.__portfolioPlayViewTransition){
+        transitionDuration = window.__portfolioPlayViewTransition("design") || 0;
+      }
       close({ skipRoute:true });
       if(window.__portfolioSetView){
-        window.__portfolioSetView("profile", false, true, "push");
+        window.__portfolioSetView("design", false, true, "push");
       }
       setTimeout(function(){
         try{
-          var p = document.getElementById("view-profile");
-          if(p){ p.scrollIntoView({ behavior:"smooth", block:"start" }); }
-          else { window.scrollTo({ top:0, behavior:"smooth" }); }
+          if(window.__portfolioScrollToDesignTop){
+            window.__portfolioScrollToDesignTop(false);
+          }else{
+            var design = document.getElementById("view-design");
+            if(design){ design.scrollIntoView({ behavior:"smooth", block:"start" }); }
+            else { window.scrollTo({ top:0, behavior:"smooth" }); }
+          }
         }catch(_){ window.scrollTo(0,0); }
-      }, 240);
+      }, Math.max(240, transitionDuration + 80));
     });
 
     /* keyboard */
@@ -1089,6 +1096,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     if(d.href && d.href !== "#" && d.href !== window.location.href){
       lnk.href = d.href;
       lnk.textContent = (d.linkLabel || "VIEW PROJECT") + " \u2192";
+      lnk.classList.toggle("is-experiment-link", d.linkLabel === "試してみよう");
       if(d.download){
         lnk.setAttribute("download", d.downloadName || "");
         lnk.removeAttribute("target");
@@ -1101,6 +1109,7 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       lnk.classList.add("visible");
     } else {
       lnk.classList.remove("visible");
+      lnk.classList.remove("is-experiment-link");
       lnk.removeAttribute("download");
       lnk.textContent = "VIEW PROJECT \u2192";
     }
@@ -1260,9 +1269,21 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     opts = opts || {};
     if(closingFromRoute) return;
     closingFromRoute = true;
-    ov.classList.remove("open");
+    /* Do not let the previous work's visual theme bleed into the list on return. */
+    ov.classList.remove("open", "is-visual-film", "is-illustration-work", "has-video-preview", "is-showcase-opening");
     ov.setAttribute("aria-hidden", "true");
     clearTimeout(videoTimer);
+    clearTimeout(workTransitionOpenTimer);
+    clearTimeout(workTransitionEndTimer);
+    workTransitionOpenTimer = 0;
+    workTransitionEndTimer = 0;
+    workTransitioning = false;
+    if(workTransitionEl){
+      workTransitionEl.classList.remove("is-running", "is-ending");
+      workTransitionEl.style.display = "none";
+      var transitionMedia = workTransitionEl.querySelector(".work-trans-media");
+      if(transitionMedia) transitionMedia.removeAttribute("style");
+    }
     if(videoFrame) videoFrame.innerHTML = "";
     if(!opts.skipRoute && isWorkRoute()){
       writeListRouteForWork(cur, opts.routeMode || "push");
