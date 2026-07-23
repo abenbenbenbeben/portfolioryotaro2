@@ -32,9 +32,7 @@ function createViewer(stage){
     y:0,
     pointers:new Map(),
     dragStart:null,
-    pinchStart:null,
-    fullLoadStarted:false,
-    fullLoaded:false
+    pinchStart:null
   };
 
   function render(){
@@ -76,24 +74,6 @@ function createViewer(stage){
     render();
   }
 
-  function promoteToFullResolution(){
-    const fullSrc = image.dataset.fullSrc;
-    if(!fullSrc || state.fullLoadStarted || state.fullLoaded) return;
-
-    state.fullLoadStarted = true;
-    const preload = new Image();
-    preload.decoding = "async";
-    preload.onload = () => {
-      image.addEventListener("load", () => fitImage(false), { once:true });
-      image.src = fullSrc;
-      state.fullLoaded = true;
-    };
-    preload.onerror = () => {
-      state.fullLoadStarted = false;
-    };
-    preload.src = fullSrc;
-  }
-
   function zoomAt(nextScale, clientX, clientY){
     const rect = stage.getBoundingClientRect();
     const pointX = clientX - (rect.left + rect.width / 2);
@@ -101,8 +81,6 @@ function createViewer(stage){
     const previous = state.scale;
     const next = clamp(nextScale, MIN_SCALE, MAX_SCALE);
     const ratio = next / previous;
-
-    if(next > MIN_SCALE) promoteToFullResolution();
 
     state.x = pointX - (pointX - state.x) * ratio;
     state.y = pointY - (pointY - state.y) * ratio;
@@ -135,7 +113,6 @@ function createViewer(stage){
 
     if(isTouchPointer(event)){
       if(state.pointers.size === 2){
-        promoteToFullResolution();
         for(const pointerId of state.pointers.keys()){
           try{ stage.setPointerCapture(pointerId); }catch(_){ /* Native scroll may own the first pointer. */ }
         }
