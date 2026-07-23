@@ -32,7 +32,9 @@ function createViewer(stage){
     y:0,
     pointers:new Map(),
     dragStart:null,
-    pinchStart:null
+    pinchStart:null,
+    fullLoadStarted:false,
+    fullLoaded:false
   };
 
   function render(){
@@ -51,7 +53,7 @@ function createViewer(stage){
     render();
   }
 
-  function fitImage(){
+  function updateFitScale(){
     if(!image.naturalWidth || !image.naturalHeight) return;
     const rect = stage.getBoundingClientRect();
     const availableWidth = Math.max(120, rect.width - 48);
@@ -61,7 +63,35 @@ function createViewer(stage){
       availableHeight / image.naturalHeight
     );
     imageWrap.style.width = `${image.naturalWidth}px`;
-    reset();
+  }
+
+  function fitImage(resetState = true){
+    if(!image.naturalWidth || !image.naturalHeight) return;
+    updateFitScale();
+    if(resetState){
+      state.scale = 1;
+      state.x = 0;
+      state.y = 0;
+    }
+    render();
+  }
+
+  function promoteToFullResolution(){
+    const fullSrc = image.dataset.fullSrc;
+    if(!fullSrc || state.fullLoadStarted || state.fullLoaded) return;
+
+    state.fullLoadStarted = true;
+    const preload = new Image();
+    preload.decoding = "async";
+    preload.onload = () => {
+      image.addEventListener("load", () => fitImage(false), { once:true });
+      image.src = fullSrc;
+      state.fullLoaded = true;
+    };
+    preload.onerror = () => {
+      state.fullLoadStarted = false;
+    };
+    preload.src = fullSrc;
   }
 
   function zoomAt(nextScale, clientX, clientY){
@@ -71,6 +101,8 @@ function createViewer(stage){
     const previous = state.scale;
     const next = clamp(nextScale, MIN_SCALE, MAX_SCALE);
     const ratio = next / previous;
+
+    if(next > MIN_SCALE) promoteToFullResolution();
 
     state.x = pointX - (pointX - state.x) * ratio;
     state.y = pointY - (pointY - state.y) * ratio;
@@ -103,6 +135,7 @@ function createViewer(stage){
 
     if(isTouchPointer(event)){
       if(state.pointers.size === 2){
+        promoteToFullResolution();
         for(const pointerId of state.pointers.keys()){
           try{ stage.setPointerCapture(pointerId); }catch(_){ /* Native scroll may own the first pointer. */ }
         }
@@ -154,7 +187,7 @@ function createViewer(stage){
     zoomAt(state.scale > 1 ? 1 : 2.5, event.clientX, event.clientY);
   });
 
-  image.addEventListener("load", fitImage, { once:true });
+  image.addEventListener("load", () => fitImage(), { once:true });
   if(image.complete) fitImage();
   else render();
   return {
