@@ -6,6 +6,7 @@
     { "source": "/art", "destination": "/index.html" },
     { "source": "/illustration", "destination": "/index.html" },
     { "source": "/profile", "destination": "/index.html" },
+    { "source": "/tokyo-texture-experiment", "destination": "/tokyo-texture-experiment.html" },
     { "source": "/work/:slug", "destination": "/index.html" }
   ]
 }
