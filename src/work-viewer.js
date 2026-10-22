@@ -670,29 +670,37 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     });
   }
 
+  function getSafeWorkHref(value, download){
+    try{
+      var url = new URL(String(value || "").trim(), window.location.href);
+      if(download) return url.origin === window.location.origin ? url.href : "";
+      return url.protocol === "https:" || url.origin === window.location.origin ? url.href : "";
+    }catch(_){ return ""; }
+  }
+
   function getYoutubeId(value){
     var raw = String(value || "").trim();
     if(!raw) return "";
-    if(/^[A-Za-z0-9_-]{8,}$/.test(raw) && raw.indexOf("/") < 0){
+    if(/^[A-Za-z0-9_-]{11}$/.test(raw)){
       return raw;
     }
     try{
-      var url = new URL(raw, window.location.href);
+      var url = new URL(raw);
+      if(url.protocol !== "https:" && url.protocol !== "http:") return "";
       var host = url.hostname.replace(/^www\./, "");
+      var videoId = "";
       if(host === "youtu.be"){
-        return (url.pathname.split("/").filter(Boolean)[0] || "").trim();
-      }
-      var queryId = url.searchParams.get("v");
-      if(queryId) return queryId.trim();
-      var parts = url.pathname.split("/").filter(Boolean);
-      for(var i = 0; i < parts.length - 1; i++){
-        if(parts[i] === "embed" || parts[i] === "shorts"){
-          return parts[i + 1].trim();
+        videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+      }else if(host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com" || host === "youtube-nocookie.com"){
+        videoId = url.searchParams.get("v") || "";
+        if(!videoId){
+          var parts = url.pathname.split("/").filter(Boolean);
+          if(parts[0] === "embed" || parts[0] === "shorts") videoId = parts[1] || "";
         }
       }
+      return /^[A-Za-z0-9_-]{11}$/.test(videoId) ? videoId : "";
     }catch(_){}
-    var match = raw.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|shorts\/)|[?&]v=)([A-Za-z0-9_-]{8,})/);
-    return match ? match[1] : raw;
+    return "";
   }
 
   function getYoutubeEmbedSrc(id, opts){
@@ -928,8 +936,8 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       playButton.addEventListener("click", function(){
         function postPlay(){
           if(!iframe.contentWindow) return;
-          iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":[]}', "*");
-          iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":[]}', "*");
+          iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":[]}', "https://www.youtube.com");
+          iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":[]}', "https://www.youtube.com");
         }
         slot.classList.add("is-playing");
         videoFrame.classList.add("is-playing");
@@ -1093,8 +1101,9 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
     renderProcess(d);
 
     /* link */
-    if(d.href && d.href !== "#" && d.href !== window.location.href){
-      lnk.href = d.href;
+    var safeHref = getSafeWorkHref(d.href, !!d.download);
+    if(safeHref && safeHref !== window.location.href){
+      lnk.href = safeHref;
       lnk.textContent = (d.linkLabel || "VIEW PROJECT") + " \u2192";
       lnk.classList.toggle("is-experiment-link", d.linkLabel === "試してみよう");
       if(d.download){
@@ -1104,12 +1113,13 @@ const isHeavyMediaConstrained = __portfolioUtils.isHeavyMediaConstrained || func
       }else{
         lnk.removeAttribute("download");
         lnk.target = "_blank";
-        lnk.rel = "noopener";
+        lnk.rel = "noopener noreferrer";
       }
       lnk.classList.add("visible");
     } else {
       lnk.classList.remove("visible");
       lnk.classList.remove("is-experiment-link");
+      lnk.removeAttribute("href");
       lnk.removeAttribute("download");
       lnk.textContent = "VIEW PROJECT \u2192";
     }
